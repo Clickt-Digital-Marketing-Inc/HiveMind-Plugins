@@ -1,0 +1,17 @@
+{
+  "meta": {
+    "account_id": "999000000000001",
+    "account_name": "Micro Oracle Co. (SAMPLE)",
+    "business_model": "Lead Gen",
+    "currency": "CAD",
+    "windows": { "structure": "last_30d", "creative": "last_90d" },
+    "generated_for_date": "2026-07-10"
+  },
+  "checks": [
+    { "id": "DI-01", "category": "Data Infrastructure & Signal", "name": "Dataset/pixel exists & active", "severity": "Critical", "flag": "PASS", "observed": "1 active dataset firing", "expected": ">=1 active dataset receiving events", "recommendation": "" },
+    { "id": "AT-05", "category": "Attribution", "name": "MER / NC-ROAS reality-check", "severity": "High", "flag": "N/A", "observed": "Requires backend revenue data", "expected": "Compare platform results to backend", "recommendation": "" },
+    { "id": "CR-03", "category": "Creative Performance", "name": "Hold-through (P100/P25)", "severity": "Medium", "flag": "FLAG", "observed": "Hold-through 30%", "expected": ">=35% of hooked (P25) viewers reach video end", "recommendation": "" },
+    { "id": "CR-06", "category": "Creative Performance", "name": "Spend concentration (top-5 ads)", "severity": "High", "flag": "FAIL", "observed": "Top-5 ads 78% of ad spend", "expected": "Top-5 ads <50% of L90 ad spend", "recommendation": "keep monitoring" }
+  ],
+  "findings": []
+}

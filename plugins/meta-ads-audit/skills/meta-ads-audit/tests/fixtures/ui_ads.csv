@@ -1,0 +1,5 @@
+Ad name,Amount spent (CAD),Impressions,Link clicks,Clicks (all),Results,Result indicator,Quality ranking,Engagement rate ranking,Conversion rate ranking,Reporting starts,Reporting ends
+Ad One,600.00,40000,350,500,50,Purchases,Above average,Average,Below average (bottom 20% of ads),2026-07-04,2026-07-10
+Ad Two,400.00,30000,200,260,20,Purchases,--,Not enough data,Average,2026-07-04,2026-07-10
+Ad Three,150.00,9000,40,70,4,Purchases,Below average (bottom 20% of ads),Average,Average,2026-07-04,2026-07-10
+Results from 3 ads,"1,150.00",79000,590,830,74,,,,,2026-07-04,2026-07-10

@@ -1,0 +1,159 @@
+{
+ "result": [
+  {
+   "search_term_view.search_term": "term-01",
+   "metrics.cost_micros": 31000000,
+   "metrics.conversions": 3
+  },
+  {
+   "search_term_view.search_term": "term-02",
+   "metrics.cost_micros": 30000000,
+   "metrics.conversions": 3
+  },
+  {
+   "search_term_view.search_term": "term-03",
+   "metrics.cost_micros": 29000000,
+   "metrics.conversions": 1
+  },
+  {
+   "search_term_view.search_term": "term-04",
+   "metrics.cost_micros": 28000000,
+   "metrics.conversions": 1
+  },
+  {
+   "search_term_view.search_term": "term-05",
+   "metrics.cost_micros": 27000000,
+   "metrics.conversions": 1
+  },
+  {
+   "search_term_view.search_term": "term-06",
+   "metrics.cost_micros": 26000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-07",
+   "metrics.cost_micros": 25000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-08",
+   "metrics.cost_micros": 24000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-09",
+   "metrics.cost_micros": 23000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-10",
+   "metrics.cost_micros": 22000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-11",
+   "metrics.cost_micros": 21000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-12",
+   "metrics.cost_micros": 20000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-13",
+   "metrics.cost_micros": 19000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-14",
+   "metrics.cost_micros": 18000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-15",
+   "metrics.cost_micros": 17000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-16",
+   "metrics.cost_micros": 16000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-17",
+   "metrics.cost_micros": 15000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-18",
+   "metrics.cost_micros": 14000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-19",
+   "metrics.cost_micros": 13000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-20",
+   "metrics.cost_micros": 12000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-21",
+   "metrics.cost_micros": 11000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-22",
+   "metrics.cost_micros": 10000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-23",
+   "metrics.cost_micros": 9000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-24",
+   "metrics.cost_micros": 8000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-25",
+   "metrics.cost_micros": 7000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-26",
+   "metrics.cost_micros": 6000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-27",
+   "metrics.cost_micros": 5000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-28",
+   "metrics.cost_micros": 4000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-29",
+   "metrics.cost_micros": 3000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-30",
+   "metrics.cost_micros": 2000000,
+   "metrics.conversions": 0
+  },
+  {
+   "search_term_view.search_term": "term-31",
+   "metrics.cost_micros": 1000000,
+   "metrics.conversions": 0
+  }
+ ]
+}

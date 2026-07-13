@@ -1,0 +1,1 @@
+{"query":"FROM sales SHOW customers, returning_customers, returning_customer_rate SINCE -90d UNTIL today","columns":[{"name":"customers","dataType":"INTEGER"},{"name":"returning_customers","dataType":"INTEGER"},{"name":"returning_customer_rate","dataType":"PERCENT"}],"rows":[["530","173","0.3264150943396226"]],"rowCount":1,"shopDomain":"test-shop.myshopify.com"}

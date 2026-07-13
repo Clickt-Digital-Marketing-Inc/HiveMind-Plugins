@@ -1,0 +1,10 @@
+Campaign report
+"April 1, 2026 - July 11, 2026"
+Campaign status,Campaign,Campaign type,Cost,Impr.,Clicks,CTR,Search impr. share,Search lost IS (budget),Search lost IS (rank),Conversions,Conv. value,Ad strength details,Bid strategy type
+Enabled,Camp A,Search,"1,000.00","18,632",800,4.29%,60.00%,< 10%,12.00%,30,"20,357.00","Pending: 0
+No Ads: 0
+Good: 4",Target CPA
+Enabled,Camp B,Performance Max,500.00,"9,732", --, --, --, --, --, --,"1,234.00", --,Target CPA
+Enabled,Camp C,Search,250.50,100,3,3.00%,80.00%,5.00%, --,5.5,0.00, --,Manual CPC
+Total: Campaigns, --, --,"1,750.50","28,464",803, --, --, --, --,35.5, --, --, --
+Total: Account,,,"1,750.50","28,464",803,,,,,35.5,,,

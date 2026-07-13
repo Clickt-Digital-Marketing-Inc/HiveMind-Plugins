@@ -1,0 +1,7 @@
+Search keyword report
+"April 1, 2026 - July 11, 2026"
+Keyword status,Keyword,Match type,Campaign,Ad group,Cost,Quality Score,Exp. CTR,Landing page exp.,Ad relevance,Conversions
+Enabled,"""blue widgets""",Phrase match,C1,AG1,300.00,7,Average,Average,Above average,10
+Enabled,"""blue widgets""",Phrase match,C1,AG2,200.00, --, --, --, --,5
+Enabled,[red widgets],Exact match,C1,AG1,250.00,3,Below average,Average,Below average,2
+Total: Search keywords, --, --, --, --,750.00, --, --, --, --,17

@@ -1,0 +1,5 @@
+{"result": [
+  {"campaign.name": "zc-alpha", "campaign.advertising_channel_type": "SEARCH", "metrics.cost_micros": 40000000, "metrics.conversions": 0},
+  {"campaign.name": "zc-beta", "campaign.advertising_channel_type": "SEARCH", "metrics.cost_micros": 35000000, "metrics.conversions": 0},
+  {"campaign.name": "zc-gamma", "campaign.advertising_channel_type": "SEARCH", "metrics.cost_micros": 25000000, "metrics.conversions": 0}
+]}

@@ -1,0 +1,13 @@
+{
+  "name": "cm3-tuner-parity-harness",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dev-only jsdom harness verifying the cm3-by-product in-Claude tuner's live JS recompute matches the Python compute() model (JS<->Python parity) at default + tuned params, and that Save/Export emit the correct prompts. Not shipped/run by the plugin at runtime.",
+  "type": "module",
+  "scripts": {
+    "parity": "python3 run_parity_cm3.py"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

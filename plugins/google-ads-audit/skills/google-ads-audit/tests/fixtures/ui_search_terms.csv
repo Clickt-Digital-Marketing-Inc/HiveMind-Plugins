@@ -1,0 +1,7 @@
+Search terms report
+"April 1, 2026 - July 11, 2026"
+Search term,Match type,Added/Excluded,Campaign,Clicks,Cost,Conversions,Cost/Enroll
+term one,Phrase match (close variant),None,C1,10,"1,200.50",3,CA$0.00
+term two,Performance Max,None,P1,5,300.00,0,CA$0.00
+term one,Exact match,None,C2,2,99.50,1,CA$0.00
+Total: Search terms, --, --, --,17,"1,600.00",4, --

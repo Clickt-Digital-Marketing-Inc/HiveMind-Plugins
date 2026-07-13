@@ -1,0 +1,101 @@
+{
+  "meta": {
+    "account_id": "999000000000123",
+    "account_name": "Example Outfitters (SAMPLE)",
+    "business_model": "Lead Gen",
+    "currency": "CAD",
+    "windows": { "structure": "last_30d", "creative": "last_90d", "trend": "" },
+    "generated_for_date": "2026-07-10",
+    "auditor": "Sample Auditor",
+    "out_of_scope": [
+      "Landing-page / CRO (load speed, headline match, friction, post-click CVR/bounce)",
+      "Incrementality economics (MER, NC-ROAS, new-customer revenue splits)"
+    ]
+  },
+  "checks": [
+    { "id": "DI-01", "category": "Data Infrastructure & Signal", "name": "Dataset/pixel exists & active", "severity": "Critical", "flag": "PASS", "observed": "2 active datasets, primary firing daily", "expected": ">=1 active dataset receiving events", "recommendation": "None." },
+    { "id": "DI-02", "category": "Data Infrastructure & Signal", "name": "CAPI live (server events)", "severity": "Critical", "flag": "FAIL", "observed": "Web events only; no server event volume", "expected": "Server events present alongside web", "recommendation": "Deploy Conversions API with deduplication." },
+    { "id": "DI-03", "category": "Data Infrastructure & Signal", "name": "Event deduplication", "severity": "High", "flag": "PASS", "observed": "event_id present on paired events", "expected": "Browser+server events deduplicated", "recommendation": "None." },
+    { "id": "DI-04", "category": "Data Infrastructure & Signal", "name": "EMQ (Lead)", "severity": "Critical", "flag": "FLAG", "observed": "Lead EMQ composite 7.0", "expected": "Primary-event match quality >=8.0 (FLAG 6-8, FAIL <6)", "recommendation": "Pass more match keys (email, phone)." },
+    { "id": "DI-05", "category": "Data Infrastructure & Signal", "name": "Domain verification", "severity": "Medium", "flag": "PASS", "observed": "Primary domain verified", "expected": "Verified", "recommendation": "None." },
+    { "id": "DI-06", "category": "Data Infrastructure & Signal", "name": "Advanced matching", "severity": "Medium", "flag": "FLAG", "observed": "Automatic advanced matching off on one dataset", "expected": "Enabled on all datasets", "recommendation": "Enable automatic advanced matching." },
+    { "id": "DI-07", "category": "Data Infrastructure & Signal", "name": "Key event volume >= 25/wk", "severity": "High", "flag": "PASS", "observed": "Lead ~130/wk", "expected": ">= 25/wk", "recommendation": "None." },
+
+    { "id": "AR-01", "category": "Account Architecture", "name": "Top-3 spend concentration", "severity": "High", "flag": "FLAG", "observed": "Top-3 campaigns 52% of spend", "expected": "Top-3 campaigns >=60% of spend (FLAG 45-60%, FAIL <45%)", "recommendation": "Consolidate thin campaigns." },
+    { "id": "AR-02", "category": "Account Architecture", "name": "Fragmentation / learning starvation", "severity": "Critical", "flag": "FAIL", "observed": "9 of 12 active ad sets under 25 results/30d", "expected": "Active ad sets clear ~25 results per 30d", "recommendation": "Merge ad sets; raise budgets to exit learning." },
+    { "id": "AR-03", "category": "Account Architecture", "name": "Conflated goals", "severity": "High", "flag": "PASS", "observed": "One optimization goal per campaign", "expected": "One optimization goal per campaign", "recommendation": "None." },
+    { "id": "AR-04", "category": "Account Architecture", "name": "Goal vs objective alignment", "severity": "Critical", "flag": "PASS", "observed": "All lead campaigns optimize lead events", "expected": "Ad-set optimization goals match the campaign objective", "recommendation": "None." },
+    { "id": "AR-05", "category": "Account Architecture", "name": "Prospecting:retargeting split", "severity": "High", "flag": "FLAG", "observed": "Retargeting 38% of spend", "expected": "~80:20 prospecting:retargeting", "recommendation": "Shift budget toward prospecting." },
+    { "id": "AR-06", "category": "Account Architecture", "name": "Audience overlap", "severity": "Medium", "flag": "PASS", "observed": "No major overlap between prospecting ad sets", "expected": "Minimal audience overlap", "recommendation": "None." },
+    { "id": "AR-07", "category": "Account Architecture", "name": "Legacy campaign drift", "severity": "Medium", "flag": "FLAG", "observed": "2 campaigns older than 540 days still spending", "expected": "Legacy campaigns reviewed or retired", "recommendation": "Review legacy campaigns against current cost per result." },
+    { "id": "AR-08", "category": "Account Architecture", "name": "Naming hygiene", "severity": "Low", "flag": "FLAG", "observed": "Mixed naming conventions across campaigns", "expected": "Clear offer/audience naming", "recommendation": "Adopt a naming convention." },
+
+    { "id": "BP-01", "category": "Budget & Pacing", "name": "Daily vs lifetime pacing", "severity": "Medium", "flag": "FLAG", "observed": "All evergreen campaigns on rigid daily caps", "expected": "Lifetime/rolling budgets on proven winners", "recommendation": "Pilot lifetime budget on 1-2 winners." },
+    { "id": "BP-02", "category": "Budget & Pacing", "name": "Spend vs results contribution", "severity": "High", "flag": "FAIL", "observed": "One campaign takes 12% of spend for 3% of results", "expected": "No campaign takes >10% of spend while producing <5% of results", "recommendation": "Cut or rework the legacy campaign." },
+    { "id": "BP-03", "category": "Budget & Pacing", "name": "Budget-capped efficient campaigns", "severity": "Medium", "flag": "PASS", "observed": "No cheap-but-capped campaign found", "expected": "Efficient campaigns not starved of budget", "recommendation": "None." },
+    { "id": "BP-04", "category": "Budget & Pacing", "name": "Bid strategy fit", "severity": "Medium", "flag": "PASS", "observed": "Highest volume on all scaled campaigns", "expected": "Defined bid control per goal", "recommendation": "None." },
+    { "id": "BP-05", "category": "Budget & Pacing", "name": "CBO vs ABO fit", "severity": "Medium", "flag": "FLAG", "observed": "Mixed budget levels inside one campaign group", "expected": "Deliberate budget-level choice per campaign", "recommendation": "Standardise budget level per campaign purpose." },
+
+    { "id": "AT-01", "category": "Attribution", "name": "Attribution-window inventory", "severity": "Medium", "flag": "PASS", "observed": "Attribution recorded per ad set", "expected": "Documented per ad set", "recommendation": "None." },
+    { "id": "AT-02", "category": "Attribution", "name": "1-day-view reliance", "severity": "High", "flag": "FLAG", "observed": "34% of spend on attribution containing 1d_view", "expected": "<20% of spend on 1d_view attribution (FLAG 20-50%, FAIL >50%)", "recommendation": "Move core ad sets to 7d_click." },
+    { "id": "AT-03", "category": "Attribution", "name": "7-day-click preference", "severity": "Medium", "flag": "PASS", "observed": "58% of spend on exactly 7d_click", "expected": "Exactly-7d_click attribution dominant (>=50% of spend)", "recommendation": "None." },
+    { "id": "AT-04", "category": "Attribution", "name": "View-through sanity", "severity": "Medium", "flag": "FLAG", "observed": "View-through share high on retargeting", "expected": "View-through results sanity-checked", "recommendation": "Compare click-only results before scaling." },
+    { "id": "AT-05", "category": "Attribution", "name": "MER / NC-ROAS reality-check", "severity": "High", "flag": "N/A", "observed": "Requires backend revenue/CRM data", "expected": "Compare platform results to backend", "recommendation": "Out of scope for a platform-only audit." },
+
+    { "id": "CR-01", "category": "Creative Performance", "name": "Thumb-stop (3s)", "severity": "Medium", "flag": "N/A", "observed": "3-second view rate not exposed", "expected": ">= 25%", "recommendation": "Use ThruPlay and quartiles instead." },
+    { "id": "CR-02", "category": "Creative Performance", "name": "ThruPlay (hold) rate", "severity": "Medium", "flag": "FLAG", "observed": "ThruPlay/impressions 1.9% on top videos", "expected": "Stable or improving hold rate", "recommendation": "Refresh hooks on fatiguing concepts." },
+    { "id": "CR-03", "category": "Creative Performance", "name": "Hold-through (P100/P25)", "severity": "Medium", "flag": "PASS", "observed": "Hold-through 41%", "expected": ">=35% of hooked (P25) viewers reach video end", "recommendation": "None." },
+    { "id": "CR-04", "category": "Creative Performance", "name": "CTR-Link", "severity": "High", "flag": "FLAG", "observed": "Link CTR 0.72%", "expected": "Link CTR >=0.8% (FLAG 0.5-0.8%, FAIL <0.5%)", "recommendation": "Test stronger hooks and offers." },
+    { "id": "CR-05", "category": "Creative Performance", "name": "Concept count (prospecting)", "severity": "High", "flag": "FAIL", "observed": "3 distinct concepts live", "expected": ">= 6 live concepts", "recommendation": "Expand the concept pipeline." },
+    { "id": "CR-06", "category": "Creative Performance", "name": "Spend concentration (top-5 ads)", "severity": "High", "flag": "FAIL", "observed": "Top-5 ads 78% of L90 ad spend", "expected": "Top-5 ads <50% of L90 ad spend (FLAG 50-70%, FAIL >70%)", "recommendation": "Reduce reliance; ramp new winners." },
+    { "id": "CR-07", "category": "Creative Performance", "name": "Frequency (prospecting)", "severity": "High", "flag": "FLAG", "observed": "Spend-weighted frequency 3.6 on the 7-day window", "expected": "Spend-weighted ad-set frequency <3.0 (FLAG 3-5, FAIL >5)", "recommendation": "Broaden audiences or add creative." },
+    { "id": "CR-08", "category": "Creative Performance", "name": "Refresh cadence", "severity": "Low", "flag": "PASS", "observed": "Newest active ad 12 days old", "expected": "Newest active ad <=30 days old (FLAG 31-60, FAIL >60)", "recommendation": "None." },
+    { "id": "CR-09", "category": "Creative Performance", "name": "Format diversity", "severity": "Medium", "flag": "FLAG", "observed": "Mostly static images; little video", "expected": "Mixed formats in rotation", "recommendation": "Add short-form video and carousel." },
+
+    { "id": "CO-01", "category": "Competitive Landscape", "name": "Competitor ad presence", "severity": "Medium", "flag": "N/A", "observed": "Competitor set not supplied", "expected": "Qualitative — reviewed, not scored", "recommendation": "Provide competitor pages to review." },
+    { "id": "CO-02", "category": "Competitive Landscape", "name": "Offer/angle whitespace", "severity": "Medium", "flag": "N/A", "observed": "Competitor set not supplied", "expected": "Qualitative — reviewed, not scored", "recommendation": "Provide competitor pages to review." },
+
+    { "id": "FP-01", "category": "Future-Proofing", "name": "Opportunity score", "severity": "Medium", "flag": "FLAG", "observed": "Score 61/100", "expected": "High opportunity score", "recommendation": "Apply the top recommendations." },
+    { "id": "FP-02", "category": "Future-Proofing", "name": "Catalog/feed health", "severity": "High", "flag": "PASS", "observed": "Feed syncing; no errors", "expected": "Healthy feed", "recommendation": "None." },
+    { "id": "FP-03", "category": "Future-Proofing", "name": "Anomalies", "severity": "Medium", "flag": "PASS", "observed": "No active anomalies", "expected": "None active", "recommendation": "None." },
+    { "id": "FP-04", "category": "Future-Proofing", "name": "Advantage+ adoption", "severity": "Medium", "flag": "N/A", "observed": "Advantage+ eligibility not returned for this account", "expected": "Deliberate Advantage+ position", "recommendation": "Reassess when eligibility data is available." }
+  ],
+  "sections": {
+    "architecture": {
+      "columns": ["Campaign", "Spend", "Results", "Spend %", "Cost/Result"],
+      "rows": [
+        ["Prospecting Alpha", 8400, 260, "31%", 32.31],
+        ["Prospecting Beta", 5700, 158, "21%", 36.08],
+        ["Retarget Legacy", 3200, 24, "12%", 133.33],
+        ["Brand Broad", 2500, 60, "9%", 41.67]
+      ]
+    },
+    "creative": {
+      "columns": ["Ad", "Spend", "Impr", "Freq", "CTR(all)"],
+      "rows": [
+        ["Video Hook 01", 4800, 260000, 3.6, "1.10%"],
+        ["Static Offer 04", 3700, 205000, 3.2, "0.84%"],
+        ["Carousel Compare 02", 2100, 120000, 2.4, "0.69%"]
+      ]
+    },
+    "competitive": {
+      "columns": ["Competitor", "Dominant angle", "Offer pattern", "Whitespace"],
+      "rows": [
+        ["Competitor One", "Polished lifestyle", "Percent-off discounts", "No durability angle"],
+        ["Competitor Two", "Founder story", "Free-shipping threshold", "No bundle offer"]
+      ]
+    }
+  },
+  "findings": [
+    { "id": "F-101", "title": "No Conversions API / server events", "category": "Data Infrastructure & Signal", "severity": "Critical", "evidence": "Web events only in the dataset stats", "recommendation": "Deploy CAPI with browser+server dedup", "impact": 9, "confidence": 9, "ease": 6 },
+    { "id": "F-102", "title": "Core ad sets starved below the learning floor", "category": "Account Architecture", "severity": "Critical", "evidence": "9 of 12 ad sets under 25 results/30d", "recommendation": "Consolidate ad sets; raise budgets" },
+    { "id": "F-103", "title": "Legacy retargeting campaign drains budget", "category": "Budget & Pacing", "severity": "High", "evidence": "12% of spend for 3% of results", "recommendation": "Cut or rework; reallocate to prospecting", "impact": 10, "confidence": 10, "ease": 10 },
+    { "id": "F-104", "title": "Creative over-concentration (top-5 = 78%)", "category": "Creative Performance", "severity": "High", "evidence": "L90 ad spend distribution", "recommendation": "Expand the concept pipeline; refresh cadence" },
+    { "id": "F-105", "title": "Inconsistent campaign naming", "category": "Account Architecture", "severity": "Low", "evidence": "Mixed conventions across 12 campaigns", "recommendation": "Adopt a naming convention" }
+  ],
+  "kpis": [
+    { "metric": "Spend", "value": 27100.00, "unit": "", "benchmark": "", "flag": "N/A", "notes": "account currency, last_30d" },
+    { "metric": "Cost per Result", "value": 41.55, "unit": "", "benchmark": "", "flag": "N/A", "notes": "blended, indicator: Leads (form), last_30d" },
+    { "metric": "CTR (all-click)", "value": 1.55, "unit": "%", "benchmark": "", "flag": "N/A", "notes": "all-click (not link), last_90d ads" }
+  ]
+}

@@ -1,0 +1,4 @@
+Ad set name,Campaign name,Amount spent (CAD),Impressions,Reach,Frequency,Results,Result indicator,Attribution setting,Reporting starts,Reporting ends
+Ad Set One,Campaign Alpha,500.00,40000,20000,2.00,60,Leads (form),7-day click,2026-07-04,2026-07-10
+Ad Set Two,Campaign Beta,300.00,30000,12000,2.50,30,Leads (form),1-day view or 7-day click,2026-07-04,2026-07-10
+Results from 2 ad sets,,800.00,70000,32000,--,90,,,2026-07-04,2026-07-10

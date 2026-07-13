@@ -1,0 +1,6 @@
+{"result": [
+  {"ad_group_criterion.keyword.text": "blue widgets", "ad_group_criterion.keyword.match_type": "EXACT", "metrics.cost_micros": 30000000, "metrics.conversions": 10},
+  {"ad_group_criterion.keyword.text": "blue widgets", "ad_group_criterion.keyword.match_type": "EXACT", "metrics.cost_micros": 20000000, "metrics.conversions": 5},
+  {"ad_group_criterion.keyword.text": "red widgets", "ad_group_criterion.keyword.match_type": "PHRASE", "metrics.cost_micros": 25000000, "metrics.conversions": 2},
+  {"ad_group_criterion.keyword.text": "green widgets", "ad_group_criterion.keyword.match_type": "BROAD", "metrics.cost_micros": 25000000, "metrics.conversions": 0}
+]}

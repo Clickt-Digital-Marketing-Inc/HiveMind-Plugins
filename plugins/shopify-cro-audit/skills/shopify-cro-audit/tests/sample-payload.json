@@ -1,0 +1,200 @@
+{
+  "meta": {
+    "store_name": "Acme Wellness",
+    "store_url": "https://acmewellness.example",
+    "currency": "USD",
+    "date_range": "2026-03-26 to 2026-06-24 (90 days)",
+    "generated_for_date": "2026-06-25",
+    "auditor": "Clickt CRO",
+    "data_inventory": [
+      { "dataset": "GA4 — landing pages, funnel, device, channels, new/returning", "status": "provided", "notes": "5 CSV exports, 90-day window" },
+      { "dataset": "Shopify — sales by product, sales by traffic source, AOV", "status": "provided", "notes": "Analytics report exports" },
+      { "dataset": "Reviews (Judge.me)", "status": "provided", "notes": "1,284 reviews, all exported" },
+      { "dataset": "Post-purchase survey (Fairing)", "status": "provided", "notes": "612 responses" },
+      { "dataset": "Customer support questionnaire", "status": "provided", "notes": "Partial — 2 of 5 questions answered" },
+      { "dataset": "Heatmaps (Microsoft Clarity)", "status": "missing", "notes": "Not yet installed" },
+      { "dataset": "Email long survey (Typeform)", "status": "missing", "notes": "Not sent" },
+      { "dataset": "User testing (UserBrain)", "status": "missing", "notes": "Not commissioned" },
+      { "dataset": "Competitor URLs", "status": "provided", "notes": "3 competitors, WebFetched" }
+    ],
+    "steps": [
+      { "step": 1, "name": "GA4 & Shopify Analytics", "status": "run", "reason": "" },
+      { "step": 2, "name": "Heuristic (LIFT)", "status": "run", "reason": "Storefront WebFetched on mobile" },
+      { "step": 3, "name": "Review Mining", "status": "run", "reason": "1,284 reviews mined" },
+      { "step": 4, "name": "Customer Support", "status": "partial", "reason": "Only complaints + top questions returned" },
+      { "step": 5, "name": "Heatmaps", "status": "not_run", "reason": "Clarity not installed; recommend installing + 2 weeks data" },
+      { "step": 6, "name": "Post-Purchase Survey", "status": "run", "reason": "612 Fairing responses" },
+      { "step": 7, "name": "Email Long Survey", "status": "not_run", "reason": "Not sent; needs ~200 responses + incentive" },
+      { "step": 8, "name": "User Testing", "status": "not_run", "reason": "Not commissioned; recommend 5 UserBrain testers" },
+      { "step": 9, "name": "Marketing Strategy", "status": "run", "reason": "Meta Ads Library + channel CVR from GA4" },
+      { "step": 10, "name": "Competitor Analysis", "status": "run", "reason": "3 competitors WebFetched" },
+      { "step": 11, "name": "Testing Roadmap", "status": "run", "reason": "" }
+    ]
+  },
+
+  "analytics": {
+    "funnel": {
+      "sessions": 482190, "atc": 29413, "checkout": 21217, "purchases": 11091,
+      "atc_rate": 6.10, "checkout_rate": 4.40, "cvr": 2.30
+    },
+    "device": [
+      { "device": "Mobile", "sessions": 395396, "cvr": 1.90 },
+      { "device": "Desktop", "sessions": 67507, "cvr": 4.10 },
+      { "device": "Tablet", "sessions": 19287, "cvr": 2.60 }
+    ],
+    "channels": [
+      { "channel": "Paid Social", "sessions": 241095, "cvr": 1.40, "revenue": 312400 },
+      { "channel": "Organic Search", "sessions": 96438, "cvr": 3.60, "revenue": 268900 },
+      { "channel": "Email", "sessions": 57863, "cvr": 5.10, "revenue": 198750 },
+      { "channel": "Direct", "sessions": 86794, "cvr": 2.80, "revenue": 154300 }
+    ],
+    "landing_pages": [
+      { "page": "/products/daily-greens", "sessions": 198400, "share_pct": 41.1 },
+      { "page": "/", "sessions": 96420, "share_pct": 20.0 },
+      { "page": "/collections/best-sellers", "sessions": 53041, "share_pct": 11.0 }
+    ],
+    "revenue_concentration": [
+      { "product": "Daily Greens (30-day)", "revenue": 521900, "share_pct": 55.4 },
+      { "product": "Sleep Support", "revenue": 188300, "share_pct": 20.0 },
+      { "product": "Collagen Peptides", "revenue": 96100, "share_pct": 10.2 }
+    ],
+    "new_vs_returning": { "new_cvr": 1.70, "returning_cvr": 6.40 },
+    "aov": 84.90
+  },
+
+  "steps_detail": {
+    "heuristic": {
+      "findings": [
+        { "page": "PDP /products/daily-greens (mobile)", "lift_factor": "Clarity", "severity": "High",
+          "observed": "Add-to-cart sits below three scroll-lengths of copy; no sticky ATC on mobile.",
+          "recommendation": "Test a sticky mobile add-to-cart bar so the CTA is always visible." },
+        { "page": "PDP /products/daily-greens", "lift_factor": "Anxiety", "severity": "High",
+          "observed": "No subscription cancellation terms or money-back guarantee near the buy box.",
+          "recommendation": "Add a 30-day guarantee + 'cancel anytime' microcopy beside the ATC." },
+        { "page": "Homepage (mobile)", "lift_factor": "Value Proposition", "severity": "Medium",
+          "observed": "Hero leads with a lifestyle image; benefit headline is below the fold.",
+          "recommendation": "Test a benefit-led headline + star rating in the first viewport." },
+        { "page": "Cart drawer", "lift_factor": "Distraction", "severity": "Medium",
+          "observed": "Cart drawer hides the shipping threshold progress until checkout.",
+          "recommendation": "Surface free-shipping progress + threshold in the cart drawer." }
+      ]
+    },
+    "review_mining": {
+      "themes": [
+        { "theme": "Taste / mixability", "pct": 38 },
+        { "theme": "Energy / focus", "pct": 31 },
+        { "theme": "Price / value", "pct": 22 },
+        { "theme": "Subscription confusion", "pct": 14 },
+        { "theme": "Shipping speed", "pct": 11 }
+      ],
+      "objections": [
+        "Worried it would taste chalky like other greens powders",
+        "Almost didn't buy because the subscription terms were unclear",
+        "Unsure whether one tub actually lasts 30 days"
+      ],
+      "drivers": [
+        "Mixes clean with water, no grit",
+        "Noticeable afternoon energy without caffeine jitters",
+        "Third-party tested — trusted the label"
+      ],
+      "voice": [
+        "actually tastes good, doesn't make me gag",
+        "no 3pm crash anymore",
+        "finally a greens I'll keep reordering"
+      ]
+    },
+    "support": {
+      "rows": [
+        { "question_or_complaint": "How do I pause or cancel my subscription?", "category": "Pre-purchase question",
+          "site_gap": "Subscription terms not shown on PDP — add a 'cancel/pause anytime' explainer." },
+        { "question_or_complaint": "Does one tub really last 30 days?", "category": "Pre-purchase question",
+          "site_gap": "Add servings-per-tub + cost-per-serving to the PDP." },
+        { "question_or_complaint": "Order took 8 days to arrive", "category": "Post-purchase complaint",
+          "site_gap": "Set delivery expectations in cart + show est. delivery date." }
+      ]
+    },
+    "post_purchase_survey": {
+      "near_abandonment": [
+        "Price relative to other greens",
+        "Couldn't tell how the subscription billing worked",
+        "Wasn't sure about taste"
+      ],
+      "triggers": [
+        "Third-party tested claim",
+        "Founder story in the ad",
+        "First-order discount"
+      ],
+      "attribution": [
+        { "channel": "TikTok", "survey_pct": 34, "ga4_pct": 6, "note": "Large under-attribution in GA4 — view-through" },
+        { "channel": "Friend / word of mouth", "survey_pct": 18, "ga4_pct": 0, "note": "Invisible in GA4" },
+        { "channel": "Instagram", "survey_pct": 21, "ga4_pct": 19, "note": "Roughly aligned" }
+      ]
+    },
+    "marketing": {
+      "rows": [
+        { "area": "Ad-to-page match (Paid Social)", "observed": "Ads lead with founder story + third-party testing; PDP shows neither above the fold.",
+          "gap": "Add founder story + testing badge to the PDP hero to match the ad promise." },
+        { "area": "Promotional cadence", "observed": "6 sitewide sales in the last 6 months.",
+          "gap": "Likely training customers to wait for discounts — test reducing sale frequency." },
+        { "area": "Free-shipping threshold", "observed": "Free shipping at $75; hero product is $84.90.",
+          "gap": "Threshold sits just under AOV — fine, but test a single-unit bundle to lift it." }
+      ]
+    },
+    "competitor": {
+      "offer_table": {
+        "columns": ["Brand", "Single price", "Subscription discount", "Bundles", "Guarantee", "Free shipping"],
+        "rows": [
+          ["Acme Wellness (us)", "$84.90", "10%", "No", "None shown", "$75"],
+          ["Competitor A", "$79.00", "25%", "3-pack", "60-day", "First order"],
+          ["Competitor B", "$89.00", "30%", "2-pack + shaker", "90-day", "$50"],
+          ["Competitor C", "$69.00", "20%", "Starter kit", "Money-back", "Always"]
+        ]
+      },
+      "atf": {
+        "columns": ["Brand", "Headline", "Star rating", "Trust badges", "Primary CTA", "Notes"],
+        "rows": [
+          ["Acme Wellness (us)", "Lifestyle image, no headline", "Not shown", "None", "Shop", "Generic first viewport"],
+          ["Competitor A", "'Greens that actually taste good'", "4.8 (12k)", "3rd-party tested", "Build my routine", "Benefit-led"],
+          ["Competitor B", "'Energy without the crash'", "4.7 (8k)", "Dietitian approved", "Start subscription", "Subscription-first"]
+        ]
+      },
+      "messaging_gaps": [
+        "No competitor leads with taste as the hero angle — reviews show taste is our #1 driver. Test a 'tastes great' hero.",
+        "We're the only brand without a visible guarantee above the fold."
+      ]
+    }
+  },
+
+  "findings": [
+    { "id": "F-001", "title": "No sticky add-to-cart on mobile PDP", "step_sources": ["Heuristic", "Analytics"],
+      "severity": "High", "page": "PDP /products/daily-greens (mobile)",
+      "evidence": "ATC below 3 scroll-lengths; 82% of sessions are mobile and mobile CVR (1.9%) trails desktop (4.1%).",
+      "recommendation": "Test a sticky mobile ATC bar on the hero PDP (41% of all sessions land here).",
+      "impact": 9, "ease": 8, "change_type": "Test", "expected_lever": "Mobile ATC rate" },
+    { "id": "F-002", "title": "Subscription terms unclear", "step_sources": ["Review Mining", "Customer Support", "Post-Purchase Survey"],
+      "severity": "High", "page": "PDP / cart",
+      "evidence": "Triangulated: 14% of reviews mention subscription confusion, it's a top support question, and a top survey near-abandonment factor.",
+      "recommendation": "Add 'pause or cancel anytime' + billing cadence explainer beside the ATC.",
+      "impact": 8, "ease": 9, "change_type": "Ship", "expected_lever": "Subscription ATC / fewer tickets" },
+    { "id": "F-003", "title": "Ad-to-PDP message mismatch", "step_sources": ["Marketing", "Post-Purchase Survey"],
+      "severity": "High", "page": "PDP hero",
+      "evidence": "Ads sell founder story + third-party testing; PDP hero shows neither. Survey buyers cite both as triggers.",
+      "recommendation": "Add founder story + testing badge to the PDP hero to reinforce the ad promise.",
+      "impact": 8, "ease": 6, "change_type": "Test", "expected_lever": "Paid-social landing CVR" },
+    { "id": "F-004", "title": "No guarantee or 'tastes great' angle above the fold", "step_sources": ["Competitor", "Review Mining"],
+      "severity": "Medium", "page": "Homepage / PDP hero",
+      "evidence": "Taste is the #1 review driver (38%) yet no competitor uses it as the hero angle; we also lack a visible guarantee.",
+      "recommendation": "Test a benefit-led 'tastes great' hero + 30-day guarantee badge.",
+      "impact": 7, "ease": 7, "change_type": "Test", "expected_lever": "Homepage → PDP CTR / ATC" },
+    { "id": "F-005", "title": "Shipping threshold hidden until checkout", "step_sources": ["Heuristic"],
+      "severity": "Medium", "page": "Cart drawer",
+      "evidence": "Cart drawer hides free-shipping progress; checkout abandonment is elevated.",
+      "recommendation": "Show free-shipping progress bar + threshold in the cart drawer.",
+      "impact": 6, "ease": 8, "change_type": "Ship", "expected_lever": "Cart → checkout rate / AOV" },
+    { "id": "F-006", "title": "Heavy sale cadence may cannibalize full-price CVR", "step_sources": ["Marketing"],
+      "severity": "Low", "page": "Sitewide",
+      "evidence": "6 sitewide sales in 6 months — repeat visitors may be trained to wait.",
+      "recommendation": "Test reducing sale frequency and leading with value framing instead.",
+      "impact": 5, "ease": 5, "change_type": "Test", "expected_lever": "Full-price CVR" }
+  ]
+}

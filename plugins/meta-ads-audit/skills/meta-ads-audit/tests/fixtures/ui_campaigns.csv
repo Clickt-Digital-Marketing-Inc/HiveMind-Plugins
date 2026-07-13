@@ -1,0 +1,6 @@
+Campaign name,Amount spent (CAD),Impressions,Clicks (all),Results,Result indicator,Objective,Reporting starts,Reporting ends,Campaign budget (CAD),Campaign budget type
+"Campaign
+Alpha",1000.00,50000,600,120,Leads (form),Leads,2026-06-11,2026-07-10,50.00,Daily
+Campaign Beta,"2,500.50",80000,900,--,Leads (form),Leads,2026-06-11,2026-07-10,--,Using ad set budget
+Campaign Gamma,750.25,30000,300,45,Leads (form),Leads,2026-06-11,2026-07-10,100.00,Lifetime
+Results from 3 campaigns,"4,250.75",160000,1800,165,,,2026-06-11,2026-07-10,,

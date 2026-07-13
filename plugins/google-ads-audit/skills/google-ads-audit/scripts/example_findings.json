@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "client_name": "Acme Corp",
+    "account_id": "123-456-7890",
+    "currency": "USD",
+    "timezone": "America/Toronto",
+    "business_model": "Lead Gen",
+    "date_range": "2026-03-26 to 2026-06-24",
+    "search_terms_range": "2026-05-25 to 2026-06-24",
+    "auditor": "auditor@example.com",
+    "audit_date": "2026-06-24"
+  },
+  "data_inventory": [
+    {"pull": "Campaign performance L90", "resource": "campaign", "rows": 42, "status": "OK", "notes": "ENABLED only"},
+    {"pull": "Search terms L30", "resource": "search_term_view", "rows": 1840, "status": "OK", "notes": "filtered impressions>0 in app layer"},
+    {"pull": "Conversion actions", "resource": "conversion_action", "rows": 6, "status": "OK", "notes": ""},
+    {"pull": "Landing page health", "resource": "(manual)", "rows": 0, "status": "MANUAL", "notes": "GAQL exposes URLs only"}
+  ],
+  "kpis": [
+    {"metric": "CTR", "value": 3.2, "unit": "%", "benchmark": "4-7%", "flag": "FLAG", "notes": "below B2C lead-gen range"},
+    {"metric": "Avg CPC", "value": 6.10, "unit": "$", "benchmark": "$2-$8", "flag": "PASS", "notes": ""},
+    {"metric": "CPA", "value": 88.0, "unit": "$", "benchmark": "target $60", "flag": "FAIL", "notes": "47% over target"},
+    {"metric": "Search Impr. Share", "value": 58.0, "unit": "%", "benchmark": ">65%", "flag": "FLAG", "notes": ""},
+    {"metric": "Lost IS (Budget)", "value": 22.0, "unit": "%", "benchmark": "<10%", "flag": "FAIL", "notes": "budget-constrained"},
+    {"metric": "Lost IS (Rank)", "value": 20.0, "unit": "%", "benchmark": "<25%", "flag": "PASS", "notes": ""}
+  ],
+  "sections": [
+    {
+      "tab": "03_Account_Structure",
+      "title": "1. Account Structure",
+      "checks": [
+        {"id": "AS-01", "name": "Consistent campaign naming", "verify": "All campaigns follow one naming convention incl. type + objective.", "applies_to": "Both", "severity": "Medium", "result": "FLAG", "observed": "3 of 9 campaigns lack type/objective tags.", "recommendation": "Adopt {Type}_{Objective}_{Geo} naming."},
+        {"id": "AS-02", "name": "Brand vs non-brand separated", "verify": "Brand terms isolated from non-brand campaigns.", "applies_to": "Both", "severity": "High", "result": "FAIL", "observed": "Brand terms mixed into generic search campaign.", "recommendation": "Split brand into its own campaign to protect CPA and IS reporting."},
+        {"id": "AS-03", "name": "No keyword cannibalization", "verify": "Same high-intent keyword not duplicated across campaigns.", "applies_to": "Both", "severity": "Medium", "result": "PASS", "observed": "No cross-campaign duplicates found.", "recommendation": ""}
+      ]
+    },
+    {
+      "tab": "04_Performance_Review",
+      "title": "2. Performance Review",
+      "checks": [
+        {"id": "PR-01", "name": "CTR at/above benchmark", "verify": "Account CTR within vertical benchmark.", "applies_to": "Both", "severity": "Medium", "result": "FLAG", "observed": "3.2% vs 4-7% benchmark.", "recommendation": "Refresh RSA headlines; tighten match types."},
+        {"id": "PR-02", "name": "CPA within 20% of target", "verify": "Blended CPA near historical target.", "applies_to": "Lead Gen", "severity": "High", "result": "FAIL", "observed": "$88 vs $60 target (+47%).", "recommendation": "Review bidding + negatives; pause worst ad groups."},
+        {"id": "PR-04", "name": "Search Impression Share healthy", "verify": "Search impression share above benchmark.", "applies_to": "Both", "severity": "Medium", "result": "FLAG", "observed": "58% search IS.", "recommendation": "Address Lost IS (Budget) of 22%."}
+      ]
+    },
+    {
+      "tab": "05_Keyword_Strategy",
+      "title": "3. Keyword Strategy",
+      "checks": [
+        {"id": "KW-01", "name": "Negative keyword lists applied", "verify": ">=3 themed shared negative lists attached.", "applies_to": "Both", "severity": "Critical", "result": "FAIL", "observed": "No shared negative lists; only ad-hoc campaign negatives.", "recommendation": "Build Informational / Job-seeker / Competitor / Free-intent shared lists."},
+        {"id": "KW-02", "name": "Wasted spend controlled", "verify": "<5% spend on >$10, 0-conv terms.", "applies_to": "Both", "severity": "High", "result": "FAIL", "observed": "11% of spend on zero-conversion terms.", "recommendation": "Add exact/phrase negatives for top wasted terms."},
+        {"id": "KW-03", "name": "No legacy BMM left unmanaged", "verify": "BROAD + Manual CPC reviewed.", "applies_to": "Both", "severity": "Medium", "result": "N/A", "observed": "Account uses Smart Bidding; no Manual CPC.", "recommendation": ""}
+      ]
+    },
+    {
+      "tab": "06_Ad_Creatives_Assets",
+      "title": "4. Ad Creatives & Assets",
+      "checks": [
+        {"id": "AD-01", "name": "RSAs not ETAs", "verify": "No expanded text ads remain.", "applies_to": "Both", "severity": "Medium", "result": "PASS", "observed": "All ads are RSAs.", "recommendation": ""},
+        {"id": "AD-02", "name": "Ad Strength Good/Excellent", "verify": "RSA Ad Strength >= Good.", "applies_to": "Both", "severity": "Medium", "result": "FLAG", "observed": "4 ad groups at Average.", "recommendation": "Add distinct headlines; pin sparingly."},
+        {"id": "AD-03", "name": "Sitelink/callout/snippet assets", "verify": "Core assets present at account/campaign.", "applies_to": "Both", "severity": "Medium", "result": "PASS", "observed": "Sitelinks, callouts, snippets present.", "recommendation": ""}
+      ]
+    },
+    {
+      "tab": "07_Landing_Pages",
+      "title": "5. Landing Pages",
+      "checks": [
+        {"id": "LP-01", "name": "No broken final URLs", "verify": "No 404 / product-not-found.", "applies_to": "Both", "severity": "High", "result": "N/A", "observed": "Manual review pending (GAQL exposes URLs only).", "recommendation": "Crawl final URLs for 404s."},
+        {"id": "LP-02", "name": "Message match", "verify": "LP copy aligns with ad + keyword.", "applies_to": "Both", "severity": "Medium", "result": "FLAG", "observed": "Generic homepage used for 2 campaigns.", "recommendation": "Route to dedicated landing pages."}
+      ]
+    },
+    {
+      "tab": "08_Budget_Bidding",
+      "title": "6. Budget & Bidding",
+      "checks": [
+        {"id": "BB-01", "name": "Bidding strategy fits goal", "verify": "tCPA for lead gen / tROAS for ecommerce.", "applies_to": "Both", "severity": "High", "result": "FLAG", "observed": "Maximize Clicks on main lead-gen campaign.", "recommendation": "Move to tCPA once 30+ conv/month."},
+        {"id": "BB-02", "name": "No deprecated eCPC", "verify": "Enhanced CPC not in use.", "applies_to": "Both", "severity": "Medium", "result": "PASS", "observed": "No eCPC campaigns.", "recommendation": ""},
+        {"id": "BB-03", "name": "Budget follows performance", "verify": "Spend concentrated in best campaigns.", "applies_to": "Both", "severity": "Medium", "result": "FLAG", "observed": "Top campaign budget-limited while weak campaign over-funded.", "recommendation": "Reallocate ~20% toward top performer."}
+      ]
+    },
+    {
+      "tab": "09_Tracking_Measurement",
+      "title": "7. Tracking & Measurement",
+      "checks": [
+        {"id": "TR-01", "name": "Conversion actions valid", "verify": "Primary conv actions ENABLED + recording.", "applies_to": "Both", "severity": "Critical", "result": "PASS", "observed": "2 primary actions recording.", "recommendation": ""},
+        {"id": "TR-02", "name": "Enhanced Conversions on", "verify": "Enhanced Conversions for Leads/Web enabled.", "applies_to": "Both", "severity": "High", "result": "FAIL", "observed": "Not enabled.", "recommendation": "Enable Enhanced Conversions for Leads."},
+        {"id": "TR-03", "name": "Consent Mode v2 (EU)", "verify": "Consent Mode v2 if serving EU/EEA.", "applies_to": "Both", "severity": "Critical", "result": "N/A", "observed": "US-only targeting.", "recommendation": ""}
+      ]
+    },
+    {
+      "tab": "10_Audiences",
+      "title": "8. Audiences",
+      "checks": [
+        {"id": "AU-01", "name": "Remarketing lists active", "verify": "RLSA / remarketing lists populated.", "applies_to": "Both", "severity": "Medium", "result": "FLAG", "observed": "One stale list; low membership.", "recommendation": "Rebuild lists; add observation on prospecting."},
+        {"id": "AU-02", "name": "Exclusions sensible", "verify": "No high-value audiences excluded.", "applies_to": "Both", "severity": "Low", "result": "PASS", "observed": "Exclusions limited to converters.", "recommendation": ""}
+      ]
+    },
+    {
+      "tab": "11_Automation_Recommendations",
+      "title": "9. Scripts, Recommendations & Automation",
+      "checks": [
+        {"id": "AT-01", "name": "Recommendations triaged", "verify": "Optimization-score recos reviewed, not auto-applied.", "applies_to": "Both", "severity": "Medium", "result": "FLAG", "observed": "Auto-apply ON for broad match reco.", "recommendation": "Turn off auto-apply for budget/match-type recos."},
+        {"id": "AT-02", "name": "Scripts reviewed", "verify": "Account scripts current and non-conflicting.", "applies_to": "Both", "severity": "Low", "result": "N/A", "observed": "Manual: scripts not exposed via API.", "recommendation": ""}
+      ]
+    }
+  ],
+  "findings": [
+    {"id": "F-001", "section": "Keyword Strategy", "title": "No shared negative keyword lists; 11% wasted spend", "severity": "Critical", "recommendation": "Build 4 themed shared negative lists and attach account-wide.", "effort": "M", "horizon": "30", "owner": ""},
+    {"id": "F-002", "section": "Tracking", "title": "Enhanced Conversions for Leads not enabled", "severity": "High", "recommendation": "Enable Enhanced Conversions for Leads via Google tag.", "effort": "S", "horizon": "30", "owner": ""},
+    {"id": "F-003", "section": "Account Structure", "title": "Brand and non-brand mixed in one campaign", "severity": "High", "recommendation": "Split brand into a dedicated campaign.", "effort": "M", "horizon": "60", "owner": ""},
+    {"id": "F-004", "section": "Budget & Bidding", "title": "Lead-gen campaign on Maximize Clicks", "severity": "High", "recommendation": "Migrate to tCPA once conversion volume supports it.", "effort": "S", "horizon": "60", "owner": ""},
+    {"id": "F-005", "section": "Performance", "title": "22% Lost IS (Budget) on top campaign", "severity": "Medium", "recommendation": "Reallocate budget from weak campaigns to the budget-limited top performer.", "effort": "S", "horizon": "30", "owner": ""}
+  ]
+}

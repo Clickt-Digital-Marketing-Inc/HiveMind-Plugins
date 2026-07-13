@@ -1,0 +1,6 @@
+# 20260401-20260630
+Step,Active users,Completion rate
+1. session_start,"8,500",11.8%
+2. add_to_cart,1000,75.0%
+3. begin_checkout,750,24.0%
+4. purchase,180,

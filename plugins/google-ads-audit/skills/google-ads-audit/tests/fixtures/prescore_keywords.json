@@ -1,0 +1,7 @@
+{"result": [
+  {"ad_group_criterion.keyword.text": "blue widgets", "ad_group_criterion.keyword.match_type": "EXACT", "ad_group.id": 11, "campaign.name": "camp-a", "metrics.cost_micros": 300000000, "metrics.conversions": 10, "ad_group_criterion.quality_info.quality_score": 8},
+  {"ad_group_criterion.keyword.text": "blue widgets", "ad_group_criterion.keyword.match_type": "EXACT", "ad_group.id": 12, "campaign.name": "camp-a", "metrics.cost_micros": 200000000, "metrics.conversions": 5},
+  {"ad_group_criterion.keyword.text": "red widgets", "ad_group_criterion.keyword.match_type": "PHRASE", "ad_group.id": 11, "campaign.name": "camp-a", "metrics.cost_micros": 100000000, "metrics.conversions": 2, "ad_group_criterion.quality_info.quality_score": 6},
+  {"ad_group_criterion.keyword.text": "red widgets", "ad_group_criterion.keyword.match_type": "PHRASE", "ad_group.id": 31, "campaign.name": "camp-c", "metrics.cost_micros": 50000000, "metrics.conversions": 0},
+  {"ad_group_criterion.keyword.text": "cheap widgets", "ad_group_criterion.keyword.match_type": "BROAD", "ad_group.id": 51, "campaign.name": "camp-e", "metrics.cost_micros": 100000000, "metrics.conversions": 0, "ad_group_criterion.quality_info.quality_score": 4}
+]}

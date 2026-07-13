@@ -1,0 +1,20 @@
+{"result": [
+  {"campaign.name": "camp-a", "campaign.advertising_channel_type": "SEARCH", "metrics.cost_micros": 50000000, "metrics.conversions": 30,
+   "metrics.impressions": 10000, "metrics.clicks": 400,
+   "metrics.search_impression_share": 0.60, "metrics.search_budget_lost_impression_share": 0.25, "metrics.search_rank_lost_impression_share": 0.10,
+   "campaign.bidding_strategy_type": "TARGET_CPA"},
+  {"campaign.name": "camp-b", "campaign.advertising_channel_type": "PERFORMANCE_MAX", "metrics.cost_micros": 20000000, "metrics.conversions": 0,
+   "campaign.bidding_strategy_type": "TARGET_CPA"},
+  {"campaign.name": "camp-c", "campaign.advertising_channel_type": "SEARCH", "metrics.cost_micros": 10000000, "metrics.conversions": 5,
+   "metrics.impressions": 2000, "metrics.clicks": 100,
+   "metrics.search_impression_share": 0.80, "metrics.search_budget_lost_impression_share": 0.05, "metrics.search_rank_lost_impression_share": 0.15,
+   "campaign.bidding_strategy_type": "TARGET_CPA"},
+  {"campaign.name": "camp-d", "campaign.advertising_channel_type": "PERFORMANCE_MAX", "metrics.cost_micros": 10000000, "metrics.conversions": 0,
+   "campaign.bidding_strategy_type": "MAXIMIZE_CONVERSIONS"},
+  {"campaign.name": "camp-e", "campaign.advertising_channel_type": "SEARCH", "metrics.cost_micros": 5000000, "metrics.conversions": 1,
+   "metrics.impressions": 1000, "metrics.clicks": 20,
+   "metrics.search_impression_share": 0.40, "metrics.search_budget_lost_impression_share": 0.10, "metrics.search_rank_lost_impression_share": 0.45,
+   "campaign.bidding_strategy_type": "MANUAL_CPC"},
+  {"campaign.name": "camp-f", "campaign.advertising_channel_type": "PERFORMANCE_MAX", "metrics.cost_micros": 5000000, "metrics.conversions": 0,
+   "campaign.bidding_strategy_type": "MAXIMIZE_CONVERSIONS"}
+]}

@@ -1,0 +1,47 @@
+[
+ {
+  "name": "camp-a",
+  "spend": 50.0,
+  "results": 30.0,
+  "results_indicator": "Leads (form)",
+  "conv_results": 30.0,
+  "objective": "OUTCOME_LEADS"
+ },
+ {
+  "name": "camp-b",
+  "spend": 20.0,
+  "results": 5200.0,
+  "results_indicator": "Reach",
+  "objective": "OUTCOME_AWARENESS"
+ },
+ {
+  "name": "camp-c",
+  "spend": 10.0,
+  "results": 5.0,
+  "results_indicator": "Leads (form)",
+  "conv_results": 5.0,
+  "objective": "OUTCOME_LEADS"
+ },
+ {
+  "name": "camp-d",
+  "spend": 10.0,
+  "results": 1800.0,
+  "results_indicator": "video_continuous_2_sec_watched_actions",
+  "objective": "OUTCOME_AWARENESS"
+ },
+ {
+  "name": "camp-e",
+  "spend": 5.0,
+  "results": 1.0,
+  "results_indicator": "Leads (form)",
+  "conv_results": 1.0,
+  "objective": "OUTCOME_LEADS"
+ },
+ {
+  "name": "camp-f",
+  "spend": 5.0,
+  "results": 900.0,
+  "results_indicator": "Reach",
+  "objective": "OUTCOME_AWARENESS"
+ }
+]

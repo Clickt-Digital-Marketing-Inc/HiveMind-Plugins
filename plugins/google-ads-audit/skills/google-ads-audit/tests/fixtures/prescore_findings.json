@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "client_name": "Prescore Test Co",
+    "account_id": "111-222-3333",
+    "currency": "CAD",
+    "timezone": "America/Edmonton",
+    "business_model": "Lead Gen",
+    "date_range": "LAST_90_DAYS",
+    "search_terms_range": "LAST_30_DAYS",
+    "auditor": "test",
+    "audit_date": "2026-07-11"
+  },
+  "data_inventory": [],
+  "kpis": [
+    {"metric": "CTR", "value": 9.9, "unit": "%", "benchmark": "4%+", "flag": "PASS", "notes": "model-typed, should be replaced"},
+    {"metric": "Conv rate", "value": 5.0, "unit": "%", "benchmark": "3-8%", "flag": "PASS", "notes": "not machine-scored, must survive"}
+  ],
+  "sections": [
+    {
+      "tab": "05_Keyword_Strategy",
+      "title": "3. Keyword Strategy",
+      "checks": [
+        {"id": "KW-02", "name": "Wasted spend controlled", "verify": "<5% of spend on >$10 / 0-conv terms",
+         "applies_to": "Both", "severity": "High", "result": "PASS",
+         "observed": "model says under control", "recommendation": "keep monitoring"},
+        {"id": "KW-06", "name": "Intent alignment", "verify": "Keywords match funnel intent",
+         "applies_to": "Both", "severity": "Medium", "result": "PASS",
+         "observed": "intent looks aligned", "recommendation": ""}
+      ]
+    }
+  ],
+  "findings": []
+}

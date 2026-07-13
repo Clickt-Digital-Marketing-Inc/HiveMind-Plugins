@@ -1,0 +1,25 @@
+# OS / editor
+.DS_Store
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node (dev-only jsdom parity harness under cm3's tests/)
+node_modules/
+
+# Generated report outputs & client data — never commit
+artifacts/
+reports/
+audits/
+*.xlsx
+*.pptx
+*.csv
+
+# ...but the committed test fixtures (synthetic) must ship:
+!**/tests/fixtures/*.csv
+!**/tests/fixtures/**/*.csv
+!**/tests/sample-shopping.csv

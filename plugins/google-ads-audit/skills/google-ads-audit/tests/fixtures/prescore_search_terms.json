@@ -1,0 +1,8 @@
+{"result": [
+  {"search_term_view.search_term": "waste one", "metrics.cost_micros": 12000000, "metrics.conversions": 0, "search_term_view.status": "NONE"},
+  {"search_term_view.search_term": "waste two", "metrics.cost_micros": 6000000, "metrics.conversions": 0, "search_term_view.status": "NONE"},
+  {"search_term_view.search_term": "waste two", "metrics.cost_micros": 6000000, "metrics.conversions": 0, "search_term_view.status": "NONE"},
+  {"search_term_view.search_term": "good term", "metrics.cost_micros": 50000000, "metrics.conversions": 3, "search_term_view.status": "ADDED"},
+  {"search_term_view.search_term": "small waste", "metrics.cost_micros": 9000000, "metrics.conversions": 0, "search_term_view.status": "NONE"},
+  {"search_term_view.search_term": "already excluded", "metrics.cost_micros": 20000000, "metrics.conversions": 0, "search_term_view.status": "EXCLUDED"}
+]}

@@ -1,0 +1,3 @@
+openpyxl>=3.1
+python-pptx>=0.6.21
+vl-convert-python==1.7.0  # exact pin: static chart SVGs must match the vendored Vega-Lite runtime (skills/cm3-by-product-report/_charts/vendor/VERSIONS.md)

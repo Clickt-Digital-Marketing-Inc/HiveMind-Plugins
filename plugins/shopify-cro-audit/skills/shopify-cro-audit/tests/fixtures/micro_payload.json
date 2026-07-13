@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "store_name": "Micro Oracle Co (sample)",
+    "store_url": "micro.example",
+    "currency": "USD",
+    "date_range": "2026-04-01 to 2026-06-30",
+    "generated_for_date": "2026-07-01",
+    "steps": [
+      { "step": 1, "name": "GA4 & Shopify Analytics", "status": "run", "reason": "" },
+      { "step": 5, "name": "Heatmaps", "status": "partial", "reason": "One week of Clarity data only" }
+    ]
+  },
+
+  "analytics": {
+    "funnel": {
+      "sessions": 1000, "atc": 72, "purchases": 15,
+      "atc_rate": 7.23, "cvr": 1.495
+    }
+  },
+
+  "findings": [
+    { "id": "M-001", "title": "High-severity finding without Impact/Ease", "step_sources": ["Heuristic"],
+      "severity": "High", "page": "/products/a",
+      "evidence": "defaults exercise", "recommendation": "r1", "change_type": "test" },
+    { "id": "M-002", "title": "Critical finding with lowercase severity", "step_sources": ["Analytics", "Heuristic"],
+      "severity": "critical", "page": "/",
+      "evidence": "canon + defaults exercise", "recommendation": "r2", "change_type": "Ship" }
+  ]
+}

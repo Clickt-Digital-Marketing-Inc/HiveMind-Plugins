@@ -1,0 +1,40 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "hivemind-plugins",
+  "version": "1.0.0",
+  "description": "Clickt's HiveMind marketing plugins for Claude Code — a single marketplace bundling the Google Ads, Meta (Facebook/Instagram), and Shopify CRO account audits plus the CM3 per-product contribution-margin report. Each emits a self-contained, white-label deliverable bundle (interactive HTML + markdown + formula-driven xlsx) from live MCP data or CSV exports.",
+  "owner": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "plugins": [
+    {
+      "name": "google-ads-audit",
+      "source": "./plugins/google-ads-audit",
+      "version": "1.0.0",
+      "category": "marketing",
+      "description": "Full Google Ads account audit driven by the Google Ads MCP (GAQL). Scores live data against a comprehensive 9-step audit framework plus modern Google checks (PMax, Consent Mode v2, Enhanced Conversions, Demand Gen) and emits a 3-format deliverable bundle from one findings JSON: an interactive, self-contained, white-label HTML report (the primary deliverable, with a live Health-Score gauge and ICE re-ranking), an Obsidian-ready markdown record, and a formula-driven multi-tab xlsx backup. HTML + markdown are standard-library only; the xlsx backup needs openpyxl."
+    },
+    {
+      "name": "meta-ads-audit",
+      "source": "./plugins/meta-ads-audit",
+      "version": "2.0.0",
+      "category": "marketing",
+      "description": "Full Meta (Facebook/Instagram) ad-account audit via the Meta Ads MCP or manual Ads Manager CSV exports, scored against a comprehensive 7-lever account-audit framework with a deterministic pre-scorer that machine-scores the mechanical checks. Emits a 3-format deliverable bundle from one findings payload — an Obsidian-ready markdown record, an interactive self-contained HTML report (the primary client-shareable deliverable), and a formula-driven xlsx backup — plus Concentration (HHI/Gini/Pareto-ABC) and Creative Signals (fatigue, reach saturation, effective frequency, ranking decomposition) analytics computed straight from the raw data files. Python stdlib only; openpyxl (>=3.1) needed only for the xlsx backup."
+    },
+    {
+      "name": "shopify-cro-audit",
+      "source": "./plugins/shopify-cro-audit",
+      "version": "2.0.0",
+      "category": "marketing",
+      "description": "Conversion-rate-optimization audit for a Shopify store, following an 11-step CRO audit framework (analytics, LIFT heuristics, review mining, customer support, heatmaps, surveys, user testing, marketing-match, competitor analysis). Pulls live data through the Shopify MCP (ShopifyQL) and/or GA4 + Shopify CSV exports — the two paths combine — with the entire Step-1 analytics block machine-computed, never hand-transcribed. Emits a 3-format deliverable bundle: an interactive self-contained HTML report (primary deliverable, live 0-150 Funnel Health gauge, (Impact x2)+Ease re-ranking), an Obsidian-ready markdown record, and a formula-driven xlsx backup — plus Concentration (HHI/Gini/Pareto-ABC) and CVR Signals (Wilson CIs, z-tests, empirical-Bayes page CVRs) analytics computed straight from the raw data files. Missing-data steps are declared 'Not run', never fabricated. openpyxl (>=3.1) needed only for the xlsx."
+    },
+    {
+      "name": "cm3-profitability",
+      "source": "./plugins/cm3-profitability",
+      "version": "1.0.0",
+      "category": "marketing",
+      "description": "Per-product CM3 contribution-margin report from a Google Ads 'Shopping products' CSV (optionally enriched with a Shopify 'Gross profit by product' CSV). One compute pass emits the locked 3-format bundle: an Obsidian-ready markdown report with static SVG charts, a self-contained interactive HTML explorer (tune cost assumptions and band cutoffs; every KPI, band, chart, rollup and product row re-computes live — it carries every workbook tab: By Campaign / Vendor / Category L1-L5 / Product Type L1-L5, plus by-band, summary KPIs and methodology), and a detailed multi-tab xlsx; a 7-slide executive pptx is opt-in. Segments products into 5 CM3 bands and rolls up by campaign, category, product type, and vendor. Requires openpyxl, python-pptx, and vl-convert-python."
+    }
+  ]
+}

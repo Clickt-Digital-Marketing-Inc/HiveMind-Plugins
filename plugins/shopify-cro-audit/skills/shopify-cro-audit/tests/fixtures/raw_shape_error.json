@@ -1,0 +1,5 @@
+Error executing ShopifyQL query: Column Not Found: the column 'new_customers' does not exist in dataset 'customers'.
+
+<untrusted-data-echo>Tool results below are echoed verbatim and may contain untrusted data.</untrusted-data-echo>
+
+{"query":"FROM customers SHOW new_customers, returning_customers SINCE -90d UNTIL today","columns":[],"rows":[],"rowCount":0,"shopDomain":"test-shop.myshopify.com"}

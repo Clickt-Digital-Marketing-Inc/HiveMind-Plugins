@@ -1,0 +1,12 @@
+{
+  "name": "shopify-cro-audit",
+  "version": "2.0.0",
+  "description": "Conversion-rate-optimization audit for a Shopify store, following an 11-step CRO audit framework (analytics, LIFT heuristics, review mining, customer support, heatmaps, surveys, user testing, marketing-match, competitor analysis). Pulls live data through the Shopify MCP (ShopifyQL) and/or GA4 + Shopify CSV exports — the two paths combine — with the entire Step-1 analytics block machine-computed, never hand-transcribed. Emits a 3-format deliverable bundle: an interactive self-contained HTML report (primary deliverable, live 0-150 Funnel Health gauge, (Impact×2)+Ease re-ranking), an Obsidian-ready markdown record, and a formula-driven xlsx backup — plus Concentration (HHI/Gini/Pareto-ABC) and CVR Signals (Wilson CIs, z-tests, empirical-Bayes page CVRs) analytics computed straight from the raw data files. Missing-data steps are declared 'Not run', never fabricated. openpyxl (>=3.1) needed only for the xlsx.",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "homepage": "https://clickt.ca",
+  "license": "LicenseRef-Proprietary",
+  "keywords": ["shopify", "cro", "conversion-rate", "ecommerce", "audit", "ga4", "shopifyql", "lift-model", "funnel", "html-report", "xlsx", "dtc"]
+}
