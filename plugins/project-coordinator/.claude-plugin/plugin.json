@@ -1,0 +1,9 @@
+{
+  "name": "project-coordinator",
+  "description": "Project coordination pipeline for software and marketing projects (content, social calendars, events, launches): refine ideas into briefs, plan work into Linear, structure project folders, and keep Linear as the source of truth with issues executable as standalone Claude prompts.",
+  "version": "0.5.0",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  }
+}

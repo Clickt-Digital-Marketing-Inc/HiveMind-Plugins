@@ -1,0 +1,17 @@
+{
+  "name": "morning-briefing",
+  "description": "Daily Morning Briefing: summarizes Gmail conversations and drafts replies, reports Linear project progress and blocked issues, prioritizes your assigned issues, and blocks focused work time on your calendar.",
+  "version": "0.4.0",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "keywords": [
+    "briefing",
+    "email",
+    "linear",
+    "calendar",
+    "productivity",
+    "daily"
+  ]
+}

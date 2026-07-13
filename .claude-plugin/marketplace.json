@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "hivemind-plugins",
   "version": "1.0.0",
-  "description": "Clickt's HiveMind marketing plugins for Claude Code — a single marketplace bundling the Google Ads, Meta (Facebook/Instagram), and Shopify CRO account audits plus the CM3 per-product contribution-margin report. Each emits a self-contained, white-label deliverable bundle (interactive HTML + markdown + formula-driven xlsx) from live MCP data or CSV exports.",
+  "description": "Clickt's HiveMind plugins for Claude Code — one marketplace bundling four marketing deliverables (Google Ads, Meta, and Shopify CRO account audits + the CM3 per-product contribution-margin report) and three workflow plugins (project coordinator, social media manager, and daily morning briefing) that run on Linear, Gmail, and Google Calendar.",
   "owner": {
     "name": "Clickt Digital Marketing Inc.",
     "url": "https://clickt.ca"
@@ -35,6 +35,27 @@
       "version": "1.0.0",
       "category": "marketing",
       "description": "Per-product CM3 contribution-margin report from a Google Ads 'Shopping products' CSV (optionally enriched with a Shopify 'Gross profit by product' CSV). One compute pass emits the locked 3-format bundle: an Obsidian-ready markdown report with static SVG charts, a self-contained interactive HTML explorer (tune cost assumptions and band cutoffs; every KPI, band, chart, rollup and product row re-computes live — it carries every workbook tab: By Campaign / Vendor / Category L1-L5 / Product Type L1-L5, plus by-band, summary KPIs and methodology), and a detailed multi-tab xlsx; a 7-slide executive pptx is opt-in. Segments products into 5 CM3 bands and rolls up by campaign, category, product type, and vendor. Requires openpyxl, python-pptx, and vl-convert-python."
+    },
+    {
+      "name": "project-coordinator",
+      "source": "./plugins/project-coordinator",
+      "version": "0.5.0",
+      "category": "productivity",
+      "description": "Project coordination pipeline for software and marketing projects (content, social calendars, events, launches): refine ideas into briefs, plan work into Linear, structure project folders, and keep Linear as the source of truth with issues executable as standalone Claude prompts. Runs on the Linear MCP."
+    },
+    {
+      "name": "social-media-manager",
+      "source": "./plugins/social-media-manager",
+      "version": "0.1.0",
+      "category": "marketing",
+      "description": "Plans a batch of social posts end-to-end: asks how many posts, at what cadence, for which platforms and formats; scans Reddit and news sites for trending content ideas; interviews you to capture your real opinions and direct quotes (building a persistent voice profile stored at ~/.claude/social-media-manager/, outside the plugin); then authors a production-ready writing prompt and a Higgsfield media prompt per post and files each as a scheduled Linear issue. Runs on the Linear MCP + web access."
+    },
+    {
+      "name": "morning-briefing",
+      "source": "./plugins/morning-briefing",
+      "version": "0.4.0",
+      "category": "productivity",
+      "description": "Daily Morning Briefing: summarizes Gmail conversations and drafts replies, reports Linear project progress and blocked issues, prioritizes your assigned issues, blocks focused work time on your calendar, and looks three weeks ahead for time-off bottlenecks. Runs on the Gmail, Linear, and Google Calendar MCPs."
     }
   ]
 }
