@@ -1,0 +1,7687 @@
+{
+"meta": {
+"client_name": "Synthetic Large Store",
+"account_id": "000-000-0000",
+"currency": "USD",
+"window_30d": "2026-05-28 to 2026-06-26",
+"window_14d": "2026-06-13 to 2026-06-26",
+"window_prev14d": "2026-05-30 to 2026-06-12",
+"generated": "2026-06-27"
+},
+"products": [
+{
+"product_item_id": "SKU-0209",
+"product_title": "Product 0209 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0405",
+"product_title": "Product 0405 (decline)",
+"merchant_id": "100405",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.46,
+"cost_30d": 54.92,
+"impressions_30d": 5902,
+"conversions_14d": 3.89,
+"impressions_14d": 4950,
+"conversions_prev14d": 9,
+"impressions_prev14d": 4748
+},
+{
+"product_item_id": "SKU-0109",
+"product_title": "Product 0109 (inactive)",
+"merchant_id": "100109",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0457",
+"product_title": "Product 0457 (neither)",
+"merchant_id": "100457",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 5.15,
+"cost_30d": 58.58,
+"impressions_30d": 7082,
+"conversions_14d": 3.81,
+"impressions_14d": 1614,
+"conversions_prev14d": 5,
+"impressions_prev14d": 3482
+},
+{
+"product_item_id": "SKU-0049",
+"product_title": "Product 0049 (inactive)",
+"merchant_id": "100049",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0169",
+"product_title": "Product 0169 (inactive)",
+"merchant_id": "100169",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0374",
+"product_title": "Product 0374 (surge_edge)",
+"merchant_id": "100374",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.32,
+"cost_30d": 262.29,
+"impressions_30d": 6886,
+"conversions_14d": 12.52,
+"impressions_14d": 2723,
+"conversions_prev14d": 10,
+"impressions_prev14d": 4286
+},
+{
+"product_item_id": "SKU-0490",
+"product_title": "Product 0490 (neither)",
+"merchant_id": "100490",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 6.34,
+"cost_30d": 247.84,
+"impressions_30d": 4886,
+"conversions_14d": 3.66,
+"impressions_14d": 2905,
+"conversions_prev14d": 4,
+"impressions_prev14d": 3762
+},
+{
+"product_item_id": "SKU-0273",
+"product_title": "Product 0273 (zombie)",
+"merchant_id": "100273",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 193.42,
+"impressions_30d": 1603,
+"conversions_14d": 0,
+"impressions_14d": 1489,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2635
+},
+{
+"product_item_id": "SKU-0156",
+"product_title": "Product 0156 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0151",
+"product_title": "Product 0151 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0451",
+"product_title": "Product 0451 (neither)",
+"merchant_id": "100451",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 2.43,
+"cost_30d": 238.78,
+"impressions_30d": 5759,
+"conversions_14d": 3.69,
+"impressions_14d": 1553,
+"conversions_prev14d": 5,
+"impressions_prev14d": 1056
+},
+{
+"product_item_id": "SKU-0386",
+"product_title": "Product 0386 (decline)",
+"merchant_id": "100386",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 3.05,
+"cost_30d": 175.34,
+"impressions_30d": 4257,
+"conversions_14d": 1.56,
+"impressions_14d": 3403,
+"conversions_prev14d": 9,
+"impressions_prev14d": 2102
+},
+{
+"product_item_id": "SKU-0241",
+"product_title": "Product 0241 (zombie)",
+"merchant_id": "100241",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 379.13,
+"impressions_30d": 5590,
+"conversions_14d": 0,
+"impressions_14d": 674,
+"conversions_prev14d": 0,
+"impressions_prev14d": 583
+},
+{
+"product_item_id": "SKU-0157",
+"product_title": "Product 0157 (inactive)",
+"merchant_id": "100157",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0256",
+"product_title": "Product 0256 (zombie)",
+"merchant_id": "100256",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 330.51,
+"impressions_30d": 4490,
+"conversions_14d": 0,
+"impressions_14d": 1145,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2974
+},
+{
+"product_item_id": "SKU-0456",
+"product_title": "Product 0456 (neither)",
+"merchant_id": "100456",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 2.7,
+"cost_30d": 211.02,
+"impressions_30d": 4653,
+"conversions_14d": 6.55,
+"impressions_14d": 1790,
+"conversions_prev14d": 8,
+"impressions_prev14d": 1290
+},
+{
+"product_item_id": "SKU-0467",
+"product_title": "Product 0467 (neither)",
+"merchant_id": "100467",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.28,
+"cost_30d": 246.95,
+"impressions_30d": 5074,
+"conversions_14d": 2.42,
+"impressions_14d": 2349,
+"conversions_prev14d": 3,
+"impressions_prev14d": 3971
+},
+{
+"product_item_id": "SKU-0106",
+"product_title": "Product 0106 (inactive)",
+"merchant_id": "100106",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0045",
+"product_title": "Product 0045 (inactive)",
+"merchant_id": "100045",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0014",
+"product_title": "Product 0014 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0418",
+"product_title": "Product 0418 (decline)",
+"merchant_id": "100418",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.83,
+"cost_30d": 275.61,
+"impressions_30d": 4384,
+"conversions_14d": 4.04,
+"impressions_14d": 1531,
+"conversions_prev14d": 10,
+"impressions_prev14d": 3139
+},
+{
+"product_item_id": "SKU-0135",
+"product_title": "Product 0135 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0334",
+"product_title": "Product 0334 (surge)",
+"merchant_id": "100334",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.24,
+"cost_30d": 211.2,
+"impressions_30d": 6679,
+"conversions_14d": 17.43,
+"impressions_14d": 2633,
+"conversions_prev14d": 8,
+"impressions_prev14d": 2493
+},
+{
+"product_item_id": "SKU-0213",
+"product_title": "Product 0213 (zombie)",
+"merchant_id": "100213",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 120.81,
+"impressions_30d": 4875,
+"conversions_14d": 0,
+"impressions_14d": 2202,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2205
+},
+{
+"product_item_id": "SKU-0174",
+"product_title": "Product 0174 (inactive)",
+"merchant_id": "100174",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0487",
+"product_title": "Product 0487 (neither)",
+"merchant_id": "100487",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 2.33,
+"cost_30d": 219.57,
+"impressions_30d": 5246,
+"conversions_14d": 5.23,
+"impressions_14d": 3487,
+"conversions_prev14d": 7,
+"impressions_prev14d": 3291
+},
+{
+"product_item_id": "SKU-0034",
+"product_title": "Product 0034 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0120",
+"product_title": "Product 0120 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0121",
+"product_title": "Product 0121 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0316",
+"product_title": "Product 0316 (surge)",
+"merchant_id": "100316",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.07,
+"cost_30d": 278.4,
+"impressions_30d": 4074,
+"conversions_14d": 5.61,
+"impressions_14d": 3873,
+"conversions_prev14d": 2,
+"impressions_prev14d": 3858
+},
+{
+"product_item_id": "SKU-0179",
+"product_title": "Product 0179 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0325",
+"product_title": "Product 0325 (surge)",
+"merchant_id": "100325",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.12,
+"cost_30d": 175.71,
+"impressions_30d": 4936,
+"conversions_14d": 15.27,
+"impressions_14d": 2168,
+"conversions_prev14d": 8,
+"impressions_prev14d": 2350
+},
+{
+"product_item_id": "SKU-0103",
+"product_title": "Product 0103 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0318",
+"product_title": "Product 0318 (surge)",
+"merchant_id": "100318",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.15,
+"cost_30d": 241.25,
+"impressions_30d": 7562,
+"conversions_14d": 14.98,
+"impressions_14d": 3696,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3228
+},
+{
+"product_item_id": "SKU-0097",
+"product_title": "Product 0097 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0469",
+"product_title": "Product 0469 (neither)",
+"merchant_id": "100469",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 2.07,
+"cost_30d": 227.08,
+"impressions_30d": 6972,
+"conversions_14d": 6.26,
+"impressions_14d": 2120,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3103
+},
+{
+"product_item_id": "SKU-0067",
+"product_title": "Product 0067 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0486",
+"product_title": "Product 0486 (neither)",
+"merchant_id": "100486",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 8.64,
+"cost_30d": 219.01,
+"impressions_30d": 4288,
+"conversions_14d": 7.13,
+"impressions_14d": 2745,
+"conversions_prev14d": 8,
+"impressions_prev14d": 2484
+},
+{
+"product_item_id": "SKU-0479",
+"product_title": "Product 0479 (neither)",
+"merchant_id": "100479",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 3.87,
+"cost_30d": 204.82,
+"impressions_30d": 1636,
+"conversions_14d": 5.2,
+"impressions_14d": 1026,
+"conversions_prev14d": 7,
+"impressions_prev14d": 3879
+},
+{
+"product_item_id": "SKU-0150",
+"product_title": "Product 0150 (inactive)",
+"merchant_id": "100150",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0233",
+"product_title": "Product 0233 (zombie)",
+"merchant_id": "100233",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 231.18,
+"impressions_30d": 5251,
+"conversions_14d": 0,
+"impressions_14d": 874,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2593
+},
+{
+"product_item_id": "SKU-0312",
+"product_title": "Product 0312 (surge)",
+"merchant_id": "100312",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 10.6,
+"cost_30d": 204.14,
+"impressions_30d": 8774,
+"conversions_14d": 15.39,
+"impressions_14d": 4607,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3527
+},
+{
+"product_item_id": "SKU-0262",
+"product_title": "Product 0262 (zombie)",
+"merchant_id": "100262",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 114.93,
+"impressions_30d": 4561,
+"conversions_14d": 0,
+"impressions_14d": 748,
+"conversions_prev14d": 0,
+"impressions_prev14d": 771
+},
+{
+"product_item_id": "SKU-0371",
+"product_title": "Product 0371 (surge_edge)",
+"merchant_id": "100371",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 5.43,
+"cost_30d": 87.07,
+"impressions_30d": 5545,
+"conversions_14d": 5.72,
+"impressions_14d": 2203,
+"conversions_prev14d": 4,
+"impressions_prev14d": 3467
+},
+{
+"product_item_id": "SKU-0492",
+"product_title": "Product 0492 (neither)",
+"merchant_id": "100492",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.31,
+"cost_30d": 118.67,
+"impressions_30d": 1836,
+"conversions_14d": 5.42,
+"impressions_14d": 2799,
+"conversions_prev14d": 6,
+"impressions_prev14d": 2153
+},
+{
+"product_item_id": "SKU-0255",
+"product_title": "Product 0255 (zombie)",
+"merchant_id": "100255",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 216.63,
+"impressions_30d": 2120,
+"conversions_14d": 0,
+"impressions_14d": 341,
+"conversions_prev14d": 0,
+"impressions_prev14d": 847
+},
+{
+"product_item_id": "SKU-0297",
+"product_title": "Product 0297 (surge)",
+"merchant_id": "100297",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 10.18,
+"cost_30d": 53.47,
+"impressions_30d": 7136,
+"conversions_14d": 10.69,
+"impressions_14d": 3762,
+"conversions_prev14d": 4,
+"impressions_prev14d": 1361
+},
+{
+"product_item_id": "SKU-0171",
+"product_title": "Product 0171 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0277",
+"product_title": "Product 0277 (zombie)",
+"merchant_id": "100277",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 52.13,
+"impressions_30d": 3543,
+"conversions_14d": 0,
+"impressions_14d": 891,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1639
+},
+{
+"product_item_id": "SKU-0210",
+"product_title": "Product 0210 (inactive)",
+"merchant_id": "100210",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0082",
+"product_title": "Product 0082 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0300",
+"product_title": "Product 0300 (surge)",
+"merchant_id": "100300",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.09,
+"cost_30d": 260.7,
+"impressions_30d": 7983,
+"conversions_14d": 14.79,
+"impressions_14d": 1649,
+"conversions_prev14d": 6,
+"impressions_prev14d": 2085
+},
+{
+"product_item_id": "SKU-0148",
+"product_title": "Product 0148 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0423",
+"product_title": "Product 0423 (decline)",
+"merchant_id": "100423",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 10.87,
+"cost_30d": 207.57,
+"impressions_30d": 5420,
+"conversions_14d": 1.06,
+"impressions_14d": 1796,
+"conversions_prev14d": 7,
+"impressions_prev14d": 2013
+},
+{
+"product_item_id": "SKU-0254",
+"product_title": "Product 0254 (zombie)",
+"merchant_id": "100254",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 146.54,
+"impressions_30d": 3106,
+"conversions_14d": 0,
+"impressions_14d": 1608,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1772
+},
+{
+"product_item_id": "SKU-0202",
+"product_title": "Product 0202 (inactive)",
+"merchant_id": "100202",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0219",
+"product_title": "Product 0219 (zombie)",
+"merchant_id": "100219",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 349.15,
+"impressions_30d": 2658,
+"conversions_14d": 0,
+"impressions_14d": 2453,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1752
+},
+{
+"product_item_id": "SKU-0406",
+"product_title": "Product 0406 (decline)",
+"merchant_id": "100406",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.03,
+"cost_30d": 168.9,
+"impressions_30d": 4120,
+"conversions_14d": 0.91,
+"impressions_14d": 2650,
+"conversions_prev14d": 6,
+"impressions_prev14d": 2021
+},
+{
+"product_item_id": "SKU-0031",
+"product_title": "Product 0031 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0433",
+"product_title": "Product 0433 (neither)",
+"merchant_id": "100433",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.22,
+"cost_30d": 153.37,
+"impressions_30d": 6246,
+"conversions_14d": 7.6,
+"impressions_14d": 3255,
+"conversions_prev14d": 9,
+"impressions_prev14d": 839
+},
+{
+"product_item_id": "SKU-0178",
+"product_title": "Product 0178 (inactive)",
+"merchant_id": "100178",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0055",
+"product_title": "Product 0055 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0359",
+"product_title": "Product 0359 (surge_edge)",
+"merchant_id": "100359",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.72,
+"cost_30d": 111.55,
+"impressions_30d": 7733,
+"conversions_14d": 13.41,
+"impressions_14d": 3418,
+"conversions_prev14d": 10,
+"impressions_prev14d": 1990
+},
+{
+"product_item_id": "SKU-0132",
+"product_title": "Product 0132 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0337",
+"product_title": "Product 0337 (surge)",
+"merchant_id": "100337",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 10.27,
+"cost_30d": 175.88,
+"impressions_30d": 5624,
+"conversions_14d": 18.44,
+"impressions_14d": 1077,
+"conversions_prev14d": 8,
+"impressions_prev14d": 1041
+},
+{
+"product_item_id": "SKU-0449",
+"product_title": "Product 0449 (neither)",
+"merchant_id": "100449",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.28,
+"cost_30d": 172.81,
+"impressions_30d": 1751,
+"conversions_14d": 6.83,
+"impressions_14d": 1181,
+"conversions_prev14d": 9,
+"impressions_prev14d": 1241
+},
+{
+"product_item_id": "SKU-0149",
+"product_title": "Product 0149 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0115",
+"product_title": "Product 0115 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0197",
+"product_title": "Product 0197 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0428",
+"product_title": "Product 0428 (neither)",
+"merchant_id": "100428",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.07,
+"cost_30d": 124.38,
+"impressions_30d": 3356,
+"conversions_14d": 2.57,
+"impressions_14d": 3079,
+"conversions_prev14d": 3,
+"impressions_prev14d": 3639
+},
+{
+"product_item_id": "SKU-0145",
+"product_title": "Product 0145 (inactive)",
+"merchant_id": "100145",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0348",
+"product_title": "Product 0348 (surge_edge)",
+"merchant_id": "100348",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 3.73,
+"cost_30d": 225.03,
+"impressions_30d": 7076,
+"conversions_14d": 8.03,
+"impressions_14d": 2655,
+"conversions_prev14d": 6,
+"impressions_prev14d": 1128
+},
+{
+"product_item_id": "SKU-0113",
+"product_title": "Product 0113 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0341",
+"product_title": "Product 0341 (surge_edge)",
+"merchant_id": "100341",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 9.21,
+"cost_30d": 208.97,
+"impressions_30d": 4678,
+"conversions_14d": 7.69,
+"impressions_14d": 4432,
+"conversions_prev14d": 6,
+"impressions_prev14d": 3343
+},
+{
+"product_item_id": "SKU-0126",
+"product_title": "Product 0126 (inactive)",
+"merchant_id": "100126",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0495",
+"product_title": "Product 0495 (neither)",
+"merchant_id": "100495",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.37,
+"cost_30d": 212.32,
+"impressions_30d": 1710,
+"conversions_14d": 2.57,
+"impressions_14d": 3439,
+"conversions_prev14d": 3,
+"impressions_prev14d": 3515
+},
+{
+"product_item_id": "SKU-0466",
+"product_title": "Product 0466 (neither)",
+"merchant_id": "100466",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 2.2,
+"cost_30d": 48.44,
+"impressions_30d": 1730,
+"conversions_14d": 4.61,
+"impressions_14d": 3668,
+"conversions_prev14d": 5,
+"impressions_prev14d": 2009
+},
+{
+"product_item_id": "SKU-0305",
+"product_title": "Product 0305 (surge)",
+"merchant_id": "100305",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 8.29,
+"cost_30d": 223.99,
+"impressions_30d": 3298,
+"conversions_14d": 17.89,
+"impressions_14d": 2519,
+"conversions_prev14d": 7,
+"impressions_prev14d": 4938
+},
+{
+"product_item_id": "SKU-0367",
+"product_title": "Product 0367 (surge_edge)",
+"merchant_id": "100367",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 6.06,
+"cost_30d": 283.16,
+"impressions_30d": 4354,
+"conversions_14d": 13.45,
+"impressions_14d": 2958,
+"conversions_prev14d": 10,
+"impressions_prev14d": 3023
+},
+{
+"product_item_id": "SKU-0166",
+"product_title": "Product 0166 (inactive)",
+"merchant_id": "100166",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0461",
+"product_title": "Product 0461 (neither)",
+"merchant_id": "100461",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.55,
+"cost_30d": 200.31,
+"impressions_30d": 7711,
+"conversions_14d": 9.56,
+"impressions_14d": 905,
+"conversions_prev14d": 9,
+"impressions_prev14d": 1748
+},
+{
+"product_item_id": "SKU-0033",
+"product_title": "Product 0033 (inactive)",
+"merchant_id": "100033",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0086",
+"product_title": "Product 0086 (inactive)",
+"merchant_id": "100086",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0204",
+"product_title": "Product 0204 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0032",
+"product_title": "Product 0032 (inactive)",
+"merchant_id": "100032",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0381",
+"product_title": "Product 0381 (surge_edge)",
+"merchant_id": "100381",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 8.98,
+"cost_30d": 278.95,
+"impressions_30d": 6787,
+"conversions_14d": 9.62,
+"impressions_14d": 1470,
+"conversions_prev14d": 7,
+"impressions_prev14d": 1968
+},
+{
+"product_item_id": "SKU-0250",
+"product_title": "Product 0250 (zombie)",
+"merchant_id": "100250",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 51.17,
+"impressions_30d": 3267,
+"conversions_14d": 0,
+"impressions_14d": 1572,
+"conversions_prev14d": 0,
+"impressions_prev14d": 961
+},
+{
+"product_item_id": "SKU-0481",
+"product_title": "Product 0481 (neither)",
+"merchant_id": "100481",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 6.48,
+"cost_30d": 180.52,
+"impressions_30d": 6373,
+"conversions_14d": 6.79,
+"impressions_14d": 2473,
+"conversions_prev14d": 7,
+"impressions_prev14d": 2339
+},
+{
+"product_item_id": "SKU-0190",
+"product_title": "Product 0190 (inactive)",
+"merchant_id": "100190",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0464",
+"product_title": "Product 0464 (neither)",
+"merchant_id": "100464",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 5.42,
+"cost_30d": 40.63,
+"impressions_30d": 5437,
+"conversions_14d": 5.37,
+"impressions_14d": 3625,
+"conversions_prev14d": 7,
+"impressions_prev14d": 3882
+},
+{
+"product_item_id": "SKU-0257",
+"product_title": "Product 0257 (zombie)",
+"merchant_id": "100257",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 92.31,
+"impressions_30d": 1700,
+"conversions_14d": 0,
+"impressions_14d": 2807,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2396
+},
+{
+"product_item_id": "SKU-0161",
+"product_title": "Product 0161 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0125",
+"product_title": "Product 0125 (inactive)",
+"merchant_id": "100125",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0427",
+"product_title": "Product 0427 (neither)",
+"merchant_id": "100427",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 9.23,
+"cost_30d": 101.98,
+"impressions_30d": 3484,
+"conversions_14d": 8.75,
+"impressions_14d": 2176,
+"conversions_prev14d": 8,
+"impressions_prev14d": 2222
+},
+{
+"product_item_id": "SKU-0373",
+"product_title": "Product 0373 (surge_edge)",
+"merchant_id": "100373",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.54,
+"cost_30d": 271.72,
+"impressions_30d": 2733,
+"conversions_14d": 11.26,
+"impressions_14d": 4123,
+"conversions_prev14d": 9,
+"impressions_prev14d": 1369
+},
+{
+"product_item_id": "SKU-0440",
+"product_title": "Product 0440 (neither)",
+"merchant_id": "100440",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.31,
+"cost_30d": 222.87,
+"impressions_30d": 4635,
+"conversions_14d": 4.21,
+"impressions_14d": 1974,
+"conversions_prev14d": 4,
+"impressions_prev14d": 2960
+},
+{
+"product_item_id": "SKU-0054",
+"product_title": "Product 0054 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0107",
+"product_title": "Product 0107 (inactive)",
+"merchant_id": "100107",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0094",
+"product_title": "Product 0094 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0013",
+"product_title": "Product 0013 (inactive)",
+"merchant_id": "100013",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0016",
+"product_title": "Product 0016 (inactive)",
+"merchant_id": "100016",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0475",
+"product_title": "Product 0475 (neither)",
+"merchant_id": "100475",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.62,
+"cost_30d": 49.84,
+"impressions_30d": 2962,
+"conversions_14d": 8.99,
+"impressions_14d": 1532,
+"conversions_prev14d": 9,
+"impressions_prev14d": 3025
+},
+{
+"product_item_id": "SKU-0080",
+"product_title": "Product 0080 (inactive)",
+"merchant_id": "100080",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0264",
+"product_title": "Product 0264 (zombie)",
+"merchant_id": "100264",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 368.12,
+"impressions_30d": 1819,
+"conversions_14d": 0,
+"impressions_14d": 2339,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1673
+},
+{
+"product_item_id": "SKU-0363",
+"product_title": "Product 0363 (surge_edge)",
+"merchant_id": "100363",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.22,
+"cost_30d": 285.04,
+"impressions_30d": 5983,
+"conversions_14d": 12.06,
+"impressions_14d": 1871,
+"conversions_prev14d": 9,
+"impressions_prev14d": 1596
+},
+{
+"product_item_id": "SKU-0105",
+"product_title": "Product 0105 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0333",
+"product_title": "Product 0333 (surge)",
+"merchant_id": "100333",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.38,
+"cost_30d": 122.36,
+"impressions_30d": 6635,
+"conversions_14d": 17.08,
+"impressions_14d": 3839,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3462
+},
+{
+"product_item_id": "SKU-0494",
+"product_title": "Product 0494 (neither)",
+"merchant_id": "100494",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.8,
+"cost_30d": 84.15,
+"impressions_30d": 5689,
+"conversions_14d": 8.79,
+"impressions_14d": 2003,
+"conversions_prev14d": 8,
+"impressions_prev14d": 1071
+},
+{
+"product_item_id": "SKU-0155",
+"product_title": "Product 0155 (inactive)",
+"merchant_id": "100155",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0500",
+"product_title": "Product 0500 (neither)",
+"merchant_id": "100500",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 2.77,
+"cost_30d": 212.93,
+"impressions_30d": 2118,
+"conversions_14d": 5.23,
+"impressions_14d": 1592,
+"conversions_prev14d": 5,
+"impressions_prev14d": 3877
+},
+{
+"product_item_id": "SKU-0419",
+"product_title": "Product 0419 (decline)",
+"merchant_id": "100419",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 10.74,
+"cost_30d": 247.15,
+"impressions_30d": 6177,
+"conversions_14d": 3.74,
+"impressions_14d": 2850,
+"conversions_prev14d": 12,
+"impressions_prev14d": 2415
+},
+{
+"product_item_id": "SKU-0439",
+"product_title": "Product 0439 (neither)",
+"merchant_id": "100439",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 7.07,
+"cost_30d": 112.05,
+"impressions_30d": 2445,
+"conversions_14d": 9.45,
+"impressions_14d": 3878,
+"conversions_prev14d": 9,
+"impressions_prev14d": 1427
+},
+{
+"product_item_id": "SKU-0158",
+"product_title": "Product 0158 (inactive)",
+"merchant_id": "100158",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0377",
+"product_title": "Product 0377 (surge_edge)",
+"merchant_id": "100377",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.86,
+"cost_30d": 101.22,
+"impressions_30d": 3692,
+"conversions_14d": 9.98,
+"impressions_14d": 2133,
+"conversions_prev14d": 7,
+"impressions_prev14d": 3985
+},
+{
+"product_item_id": "SKU-0288",
+"product_title": "Product 0288 (surge)",
+"merchant_id": "100288",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 11.24,
+"cost_30d": 86.33,
+"impressions_30d": 8337,
+"conversions_14d": 5.69,
+"impressions_14d": 2163,
+"conversions_prev14d": 2,
+"impressions_prev14d": 4334
+},
+{
+"product_item_id": "SKU-0362",
+"product_title": "Product 0362 (surge_edge)",
+"merchant_id": "100362",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 5.33,
+"cost_30d": 279.34,
+"impressions_30d": 2814,
+"conversions_14d": 9.65,
+"impressions_14d": 2755,
+"conversions_prev14d": 7,
+"impressions_prev14d": 4501
+},
+{
+"product_item_id": "SKU-0499",
+"product_title": "Product 0499 (neither)",
+"merchant_id": "100499",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.94,
+"cost_30d": 200.87,
+"impressions_30d": 7556,
+"conversions_14d": 5.12,
+"impressions_14d": 2744,
+"conversions_prev14d": 6,
+"impressions_prev14d": 3703
+},
+{
+"product_item_id": "SKU-0268",
+"product_title": "Product 0268 (zombie)",
+"merchant_id": "100268",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 330.25,
+"impressions_30d": 2368,
+"conversions_14d": 0,
+"impressions_14d": 1580,
+"conversions_prev14d": 0,
+"impressions_prev14d": 305
+},
+{
+"product_item_id": "SKU-0004",
+"product_title": "Product 0004 (inactive)",
+"merchant_id": "100004",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0285",
+"product_title": "Product 0285 (surge)",
+"merchant_id": "100285",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 10.42,
+"cost_30d": 188.06,
+"impressions_30d": 2773,
+"conversions_14d": 4.65,
+"impressions_14d": 1160,
+"conversions_prev14d": 2,
+"impressions_prev14d": 1483
+},
+{
+"product_item_id": "SKU-0482",
+"product_title": "Product 0482 (neither)",
+"merchant_id": "100482",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 4.55,
+"cost_30d": 87.44,
+"impressions_30d": 2970,
+"conversions_14d": 4.68,
+"impressions_14d": 2935,
+"conversions_prev14d": 6,
+"impressions_prev14d": 2600
+},
+{
+"product_item_id": "SKU-0133",
+"product_title": "Product 0133 (inactive)",
+"merchant_id": "100133",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0143",
+"product_title": "Product 0143 (inactive)",
+"merchant_id": "100143",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0430",
+"product_title": "Product 0430 (neither)",
+"merchant_id": "100430",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 3.54,
+"cost_30d": 209.62,
+"impressions_30d": 5464,
+"conversions_14d": 4.48,
+"impressions_14d": 1108,
+"conversions_prev14d": 5,
+"impressions_prev14d": 3991
+},
+{
+"product_item_id": "SKU-0138",
+"product_title": "Product 0138 (inactive)",
+"merchant_id": "100138",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0142",
+"product_title": "Product 0142 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0402",
+"product_title": "Product 0402 (decline)",
+"merchant_id": "100402",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 11.66,
+"cost_30d": 151.47,
+"impressions_30d": 2631,
+"conversions_14d": 2.37,
+"impressions_14d": 4714,
+"conversions_prev14d": 7,
+"impressions_prev14d": 1532
+},
+{
+"product_item_id": "SKU-0388",
+"product_title": "Product 0388 (decline)",
+"merchant_id": "100388",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.66,
+"cost_30d": 274.6,
+"impressions_30d": 6145,
+"conversions_14d": 1.03,
+"impressions_14d": 4882,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3164
+},
+{
+"product_item_id": "SKU-0444",
+"product_title": "Product 0444 (neither)",
+"merchant_id": "100444",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 9.66,
+"cost_30d": 119.63,
+"impressions_30d": 4488,
+"conversions_14d": 5.17,
+"impressions_14d": 3801,
+"conversions_prev14d": 5,
+"impressions_prev14d": 2884
+},
+{
+"product_item_id": "SKU-0071",
+"product_title": "Product 0071 (inactive)",
+"merchant_id": "100071",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0301",
+"product_title": "Product 0301 (surge)",
+"merchant_id": "100301",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 11.53,
+"cost_30d": 198.21,
+"impressions_30d": 7195,
+"conversions_14d": 7.64,
+"impressions_14d": 2375,
+"conversions_prev14d": 3,
+"impressions_prev14d": 4981
+},
+{
+"product_item_id": "SKU-0074",
+"product_title": "Product 0074 (inactive)",
+"merchant_id": "100074",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0407",
+"product_title": "Product 0407 (decline)",
+"merchant_id": "100407",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 8.59,
+"cost_30d": 153.02,
+"impressions_30d": 6628,
+"conversions_14d": 1.73,
+"impressions_14d": 4313,
+"conversions_prev14d": 7,
+"impressions_prev14d": 1032
+},
+{
+"product_item_id": "SKU-0493",
+"product_title": "Product 0493 (neither)",
+"merchant_id": "100493",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.37,
+"cost_30d": 228.83,
+"impressions_30d": 1527,
+"conversions_14d": 8.41,
+"impressions_14d": 2058,
+"conversions_prev14d": 8,
+"impressions_prev14d": 2959
+},
+{
+"product_item_id": "SKU-0426",
+"product_title": "Product 0426 (neither)",
+"merchant_id": "100426",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 2.3,
+"cost_30d": 136.34,
+"impressions_30d": 7980,
+"conversions_14d": 7.03,
+"impressions_14d": 1118,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3061
+},
+{
+"product_item_id": "SKU-0336",
+"product_title": "Product 0336 (surge)",
+"merchant_id": "100336",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 11.59,
+"cost_30d": 75.77,
+"impressions_30d": 7775,
+"conversions_14d": 23.67,
+"impressions_14d": 3710,
+"conversions_prev14d": 8,
+"impressions_prev14d": 1887
+},
+{
+"product_item_id": "SKU-0185",
+"product_title": "Product 0185 (inactive)",
+"merchant_id": "100185",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0321",
+"product_title": "Product 0321 (surge)",
+"merchant_id": "100321",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 4.71,
+"cost_30d": 229.02,
+"impressions_30d": 3755,
+"conversions_14d": 23.66,
+"impressions_14d": 4381,
+"conversions_prev14d": 8,
+"impressions_prev14d": 1105
+},
+{
+"product_item_id": "SKU-0216",
+"product_title": "Product 0216 (zombie)",
+"merchant_id": "100216",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 41.88,
+"impressions_30d": 3002,
+"conversions_14d": 0,
+"impressions_14d": 1784,
+"conversions_prev14d": 0,
+"impressions_prev14d": 924
+},
+{
+"product_item_id": "SKU-0234",
+"product_title": "Product 0234 (zombie)",
+"merchant_id": "100234",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 319.99,
+"impressions_30d": 3791,
+"conversions_14d": 0,
+"impressions_14d": 1612,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1992
+},
+{
+"product_item_id": "SKU-0421",
+"product_title": "Product 0421 (decline)",
+"merchant_id": "100421",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 10.25,
+"cost_30d": 282.22,
+"impressions_30d": 6982,
+"conversions_14d": 4.04,
+"impressions_14d": 3459,
+"conversions_prev14d": 10,
+"impressions_prev14d": 1923
+},
+{
+"product_item_id": "SKU-0164",
+"product_title": "Product 0164 (inactive)",
+"merchant_id": "100164",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0315",
+"product_title": "Product 0315 (surge)",
+"merchant_id": "100315",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 5.66,
+"cost_30d": 275.34,
+"impressions_30d": 7955,
+"conversions_14d": 9.15,
+"impressions_14d": 4660,
+"conversions_prev14d": 4,
+"impressions_prev14d": 3455
+},
+{
+"product_item_id": "SKU-0021",
+"product_title": "Product 0021 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0011",
+"product_title": "Product 0011 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0065",
+"product_title": "Product 0065 (inactive)",
+"merchant_id": "100065",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0353",
+"product_title": "Product 0353 (surge_edge)",
+"merchant_id": "100353",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 10.18,
+"cost_30d": 152.61,
+"impressions_30d": 5686,
+"conversions_14d": 5.66,
+"impressions_14d": 3424,
+"conversions_prev14d": 4,
+"impressions_prev14d": 2419
+},
+{
+"product_item_id": "SKU-0352",
+"product_title": "Product 0352 (surge_edge)",
+"merchant_id": "100352",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.09,
+"cost_30d": 277.72,
+"impressions_30d": 4952,
+"conversions_14d": 8.19,
+"impressions_14d": 3004,
+"conversions_prev14d": 6,
+"impressions_prev14d": 1423
+},
+{
+"product_item_id": "SKU-0220",
+"product_title": "Product 0220 (zombie)",
+"merchant_id": "100220",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 257.11,
+"impressions_30d": 2558,
+"conversions_14d": 0,
+"impressions_14d": 1556,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2313
+},
+{
+"product_item_id": "SKU-0473",
+"product_title": "Product 0473 (neither)",
+"merchant_id": "100473",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.05,
+"cost_30d": 103.32,
+"impressions_30d": 2588,
+"conversions_14d": 2.87,
+"impressions_14d": 3129,
+"conversions_prev14d": 3,
+"impressions_prev14d": 2013
+},
+{
+"product_item_id": "SKU-0463",
+"product_title": "Product 0463 (neither)",
+"merchant_id": "100463",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 7.82,
+"cost_30d": 144.42,
+"impressions_30d": 7023,
+"conversions_14d": 5.37,
+"impressions_14d": 3873,
+"conversions_prev14d": 6,
+"impressions_prev14d": 980
+},
+{
+"product_item_id": "SKU-0251",
+"product_title": "Product 0251 (zombie)",
+"merchant_id": "100251",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 279.44,
+"impressions_30d": 3330,
+"conversions_14d": 0,
+"impressions_14d": 2727,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1578
+},
+{
+"product_item_id": "SKU-0183",
+"product_title": "Product 0183 (inactive)",
+"merchant_id": "100183",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0176",
+"product_title": "Product 0176 (inactive)",
+"merchant_id": "100176",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0448",
+"product_title": "Product 0448 (neither)",
+"merchant_id": "100448",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 2.37,
+"cost_30d": 105.9,
+"impressions_30d": 7567,
+"conversions_14d": 5.78,
+"impressions_14d": 833,
+"conversions_prev14d": 8,
+"impressions_prev14d": 1737
+},
+{
+"product_item_id": "SKU-0077",
+"product_title": "Product 0077 (inactive)",
+"merchant_id": "100077",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0455",
+"product_title": "Product 0455 (neither)",
+"merchant_id": "100455",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.18,
+"cost_30d": 63.23,
+"impressions_30d": 7578,
+"conversions_14d": 3.93,
+"impressions_14d": 2170,
+"conversions_prev14d": 5,
+"impressions_prev14d": 3332
+},
+{
+"product_item_id": "SKU-0380",
+"product_title": "Product 0380 (surge_edge)",
+"merchant_id": "100380",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.46,
+"cost_30d": 84.6,
+"impressions_30d": 3726,
+"conversions_14d": 12.69,
+"impressions_14d": 3486,
+"conversions_prev14d": 9,
+"impressions_prev14d": 4780
+},
+{
+"product_item_id": "SKU-0058",
+"product_title": "Product 0058 (inactive)",
+"merchant_id": "100058",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0417",
+"product_title": "Product 0417 (decline)",
+"merchant_id": "100417",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 10.33,
+"cost_30d": 74.58,
+"impressions_30d": 2978,
+"conversions_14d": 4.11,
+"impressions_14d": 2103,
+"conversions_prev14d": 13,
+"impressions_prev14d": 1294
+},
+{
+"product_item_id": "SKU-0293",
+"product_title": "Product 0293 (surge)",
+"merchant_id": "100293",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 9.27,
+"cost_30d": 133.53,
+"impressions_30d": 8341,
+"conversions_14d": 7.12,
+"impressions_14d": 2543,
+"conversions_prev14d": 4,
+"impressions_prev14d": 4790
+},
+{
+"product_item_id": "SKU-0084",
+"product_title": "Product 0084 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0181",
+"product_title": "Product 0181 (inactive)",
+"merchant_id": "100181",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0302",
+"product_title": "Product 0302 (surge)",
+"merchant_id": "100302",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 5.52,
+"cost_30d": 175.55,
+"impressions_30d": 2050,
+"conversions_14d": 9.17,
+"impressions_14d": 4865,
+"conversions_prev14d": 5,
+"impressions_prev14d": 3014
+},
+{
+"product_item_id": "SKU-0198",
+"product_title": "Product 0198 (inactive)",
+"merchant_id": "100198",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0313",
+"product_title": "Product 0313 (surge)",
+"merchant_id": "100313",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.51,
+"cost_30d": 95.05,
+"impressions_30d": 5253,
+"conversions_14d": 6.61,
+"impressions_14d": 3311,
+"conversions_prev14d": 3,
+"impressions_prev14d": 2372
+},
+{
+"product_item_id": "SKU-0224",
+"product_title": "Product 0224 (zombie)",
+"merchant_id": "100224",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 169.56,
+"impressions_30d": 2531,
+"conversions_14d": 0,
+"impressions_14d": 2002,
+"conversions_prev14d": 0,
+"impressions_prev14d": 378
+},
+{
+"product_item_id": "SKU-0368",
+"product_title": "Product 0368 (surge_edge)",
+"merchant_id": "100368",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 11.57,
+"cost_30d": 211.9,
+"impressions_30d": 7884,
+"conversions_14d": 14.33,
+"impressions_14d": 2815,
+"conversions_prev14d": 10,
+"impressions_prev14d": 2442
+},
+{
+"product_item_id": "SKU-0497",
+"product_title": "Product 0497 (neither)",
+"merchant_id": "100497",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.96,
+"cost_30d": 164.28,
+"impressions_30d": 6658,
+"conversions_14d": 3.33,
+"impressions_14d": 2465,
+"conversions_prev14d": 4,
+"impressions_prev14d": 1619
+},
+{
+"product_item_id": "SKU-0064",
+"product_title": "Product 0064 (inactive)",
+"merchant_id": "100064",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0039",
+"product_title": "Product 0039 (inactive)",
+"merchant_id": "100039",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0384",
+"product_title": "Product 0384 (surge_edge)",
+"merchant_id": "100384",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 5.54,
+"cost_30d": 213.55,
+"impressions_30d": 5856,
+"conversions_14d": 7.98,
+"impressions_14d": 4443,
+"conversions_prev14d": 6,
+"impressions_prev14d": 4017
+},
+{
+"product_item_id": "SKU-0243",
+"product_title": "Product 0243 (zombie)",
+"merchant_id": "100243",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 314.89,
+"impressions_30d": 3331,
+"conversions_14d": 0,
+"impressions_14d": 2282,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1228
+},
+{
+"product_item_id": "SKU-0104",
+"product_title": "Product 0104 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0442",
+"product_title": "Product 0442 (neither)",
+"merchant_id": "100442",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 5.96,
+"cost_30d": 178.8,
+"impressions_30d": 3401,
+"conversions_14d": 4.06,
+"impressions_14d": 3483,
+"conversions_prev14d": 4,
+"impressions_prev14d": 2690
+},
+{
+"product_item_id": "SKU-0240",
+"product_title": "Product 0240 (zombie)",
+"merchant_id": "100240",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 186.14,
+"impressions_30d": 3274,
+"conversions_14d": 0,
+"impressions_14d": 423,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2947
+},
+{
+"product_item_id": "SKU-0128",
+"product_title": "Product 0128 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0072",
+"product_title": "Product 0072 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0223",
+"product_title": "Product 0223 (zombie)",
+"merchant_id": "100223",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 199.59,
+"impressions_30d": 1578,
+"conversions_14d": 0,
+"impressions_14d": 847,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1732
+},
+{
+"product_item_id": "SKU-0391",
+"product_title": "Product 0391 (decline)",
+"merchant_id": "100391",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 5.17,
+"cost_30d": 233.97,
+"impressions_30d": 2771,
+"conversions_14d": 1.57,
+"impressions_14d": 2837,
+"conversions_prev14d": 8,
+"impressions_prev14d": 1387
+},
+{
+"product_item_id": "SKU-0454",
+"product_title": "Product 0454 (neither)",
+"merchant_id": "100454",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.64,
+"cost_30d": 30.12,
+"impressions_30d": 3743,
+"conversions_14d": 5.97,
+"impressions_14d": 2173,
+"conversions_prev14d": 7,
+"impressions_prev14d": 1727
+},
+{
+"product_item_id": "SKU-0201",
+"product_title": "Product 0201 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0066",
+"product_title": "Product 0066 (inactive)",
+"merchant_id": "100066",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0470",
+"product_title": "Product 0470 (neither)",
+"merchant_id": "100470",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 3.15,
+"cost_30d": 90.52,
+"impressions_30d": 1569,
+"conversions_14d": 3.01,
+"impressions_14d": 2252,
+"conversions_prev14d": 4,
+"impressions_prev14d": 1044
+},
+{
+"product_item_id": "SKU-0404",
+"product_title": "Product 0404 (decline)",
+"merchant_id": "100404",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.43,
+"cost_30d": 266.1,
+"impressions_30d": 3259,
+"conversions_14d": 0.72,
+"impressions_14d": 2614,
+"conversions_prev14d": 9,
+"impressions_prev14d": 1432
+},
+{
+"product_item_id": "SKU-0108",
+"product_title": "Product 0108 (inactive)",
+"merchant_id": "100108",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0215",
+"product_title": "Product 0215 (zombie)",
+"merchant_id": "100215",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 379.74,
+"impressions_30d": 1482,
+"conversions_14d": 0,
+"impressions_14d": 413,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1917
+},
+{
+"product_item_id": "SKU-0217",
+"product_title": "Product 0217 (zombie)",
+"merchant_id": "100217",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 165.27,
+"impressions_30d": 3135,
+"conversions_14d": 0,
+"impressions_14d": 866,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1947
+},
+{
+"product_item_id": "SKU-0211",
+"product_title": "Product 0211 (zombie)",
+"merchant_id": "100211",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 211.34,
+"impressions_30d": 1588,
+"conversions_14d": 0,
+"impressions_14d": 2639,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2921
+},
+{
+"product_item_id": "SKU-0110",
+"product_title": "Product 0110 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0235",
+"product_title": "Product 0235 (zombie)",
+"merchant_id": "100235",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 114.31,
+"impressions_30d": 5755,
+"conversions_14d": 0,
+"impressions_14d": 2514,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2830
+},
+{
+"product_item_id": "SKU-0078",
+"product_title": "Product 0078 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0281",
+"product_title": "Product 0281 (surge)",
+"merchant_id": "100281",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 8.23,
+"cost_30d": 262.44,
+"impressions_30d": 8198,
+"conversions_14d": 6.53,
+"impressions_14d": 3025,
+"conversions_prev14d": 3,
+"impressions_prev14d": 3502
+},
+{
+"product_item_id": "SKU-0035",
+"product_title": "Product 0035 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0123",
+"product_title": "Product 0123 (inactive)",
+"merchant_id": "100123",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0050",
+"product_title": "Product 0050 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0345",
+"product_title": "Product 0345 (surge_edge)",
+"merchant_id": "100345",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.15,
+"cost_30d": 55.04,
+"impressions_30d": 8164,
+"conversions_14d": 5.26,
+"impressions_14d": 1857,
+"conversions_prev14d": 4,
+"impressions_prev14d": 3204
+},
+{
+"product_item_id": "SKU-0059",
+"product_title": "Product 0059 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0431",
+"product_title": "Product 0431 (neither)",
+"merchant_id": "100431",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.9,
+"cost_30d": 190.51,
+"impressions_30d": 3955,
+"conversions_14d": 4.39,
+"impressions_14d": 1110,
+"conversions_prev14d": 6,
+"impressions_prev14d": 2594
+},
+{
+"product_item_id": "SKU-0283",
+"product_title": "Product 0283 (surge)",
+"merchant_id": "100283",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.08,
+"cost_30d": 107.89,
+"impressions_30d": 8861,
+"conversions_14d": 8.54,
+"impressions_14d": 4055,
+"conversions_prev14d": 3,
+"impressions_prev14d": 1343
+},
+{
+"product_item_id": "SKU-0124",
+"product_title": "Product 0124 (inactive)",
+"merchant_id": "100124",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0425",
+"product_title": "Product 0425 (decline)",
+"merchant_id": "100425",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.79,
+"cost_30d": 221.51,
+"impressions_30d": 7746,
+"conversions_14d": 3.83,
+"impressions_14d": 2274,
+"conversions_prev14d": 10,
+"impressions_prev14d": 1308
+},
+{
+"product_item_id": "SKU-0057",
+"product_title": "Product 0057 (inactive)",
+"merchant_id": "100057",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0225",
+"product_title": "Product 0225 (zombie)",
+"merchant_id": "100225",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 224.65,
+"impressions_30d": 5112,
+"conversions_14d": 0,
+"impressions_14d": 1576,
+"conversions_prev14d": 0,
+"impressions_prev14d": 332
+},
+{
+"product_item_id": "SKU-0292",
+"product_title": "Product 0292 (surge)",
+"merchant_id": "100292",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.09,
+"cost_30d": 234.51,
+"impressions_30d": 6526,
+"conversions_14d": 7.21,
+"impressions_14d": 2386,
+"conversions_prev14d": 4,
+"impressions_prev14d": 1731
+},
+{
+"product_item_id": "SKU-0194",
+"product_title": "Product 0194 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0488",
+"product_title": "Product 0488 (neither)",
+"merchant_id": "100488",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.27,
+"cost_30d": 155.69,
+"impressions_30d": 4011,
+"conversions_14d": 2.77,
+"impressions_14d": 2466,
+"conversions_prev14d": 3,
+"impressions_prev14d": 2954
+},
+{
+"product_item_id": "SKU-0462",
+"product_title": "Product 0462 (neither)",
+"merchant_id": "100462",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.09,
+"cost_30d": 157.37,
+"impressions_30d": 3095,
+"conversions_14d": 7.33,
+"impressions_14d": 3908,
+"conversions_prev14d": 9,
+"impressions_prev14d": 1909
+},
+{
+"product_item_id": "SKU-0290",
+"product_title": "Product 0290 (surge)",
+"merchant_id": "100290",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.5,
+"cost_30d": 267.01,
+"impressions_30d": 8472,
+"conversions_14d": 22.81,
+"impressions_14d": 4399,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3321
+},
+{
+"product_item_id": "SKU-0340",
+"product_title": "Product 0340 (surge)",
+"merchant_id": "100340",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.45,
+"cost_30d": 158.27,
+"impressions_30d": 5992,
+"conversions_14d": 15.27,
+"impressions_14d": 1807,
+"conversions_prev14d": 6,
+"impressions_prev14d": 2311
+},
+{
+"product_item_id": "SKU-0102",
+"product_title": "Product 0102 (inactive)",
+"merchant_id": "100102",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0364",
+"product_title": "Product 0364 (surge_edge)",
+"merchant_id": "100364",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.17,
+"cost_30d": 93.67,
+"impressions_30d": 8502,
+"conversions_14d": 8.05,
+"impressions_14d": 3537,
+"conversions_prev14d": 6,
+"impressions_prev14d": 3133
+},
+{
+"product_item_id": "SKU-0385",
+"product_title": "Product 0385 (surge_edge)",
+"merchant_id": "100385",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.76,
+"cost_30d": 277.34,
+"impressions_30d": 7951,
+"conversions_14d": 8.48,
+"impressions_14d": 4573,
+"conversions_prev14d": 6,
+"impressions_prev14d": 2563
+},
+{
+"product_item_id": "SKU-0247",
+"product_title": "Product 0247 (zombie)",
+"merchant_id": "100247",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 238.01,
+"impressions_30d": 4702,
+"conversions_14d": 0,
+"impressions_14d": 365,
+"conversions_prev14d": 0,
+"impressions_prev14d": 571
+},
+{
+"product_item_id": "SKU-0037",
+"product_title": "Product 0037 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0177",
+"product_title": "Product 0177 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0154",
+"product_title": "Product 0154 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0343",
+"product_title": "Product 0343 (surge_edge)",
+"merchant_id": "100343",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 5.15,
+"cost_30d": 241.71,
+"impressions_30d": 3872,
+"conversions_14d": 5.59,
+"impressions_14d": 3676,
+"conversions_prev14d": 4,
+"impressions_prev14d": 2048
+},
+{
+"product_item_id": "SKU-0267",
+"product_title": "Product 0267 (zombie)",
+"merchant_id": "100267",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 333.09,
+"impressions_30d": 1158,
+"conversions_14d": 0,
+"impressions_14d": 396,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1776
+},
+{
+"product_item_id": "SKU-0459",
+"product_title": "Product 0459 (neither)",
+"merchant_id": "100459",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.36,
+"cost_30d": 95.38,
+"impressions_30d": 6394,
+"conversions_14d": 5.43,
+"impressions_14d": 1983,
+"conversions_prev14d": 6,
+"impressions_prev14d": 1210
+},
+{
+"product_item_id": "SKU-0295",
+"product_title": "Product 0295 (surge)",
+"merchant_id": "100295",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 4.23,
+"cost_30d": 177.84,
+"impressions_30d": 8645,
+"conversions_14d": 16.13,
+"impressions_14d": 2438,
+"conversions_prev14d": 6,
+"impressions_prev14d": 2490
+},
+{
+"product_item_id": "SKU-0480",
+"product_title": "Product 0480 (neither)",
+"merchant_id": "100480",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.6,
+"cost_30d": 43.78,
+"impressions_30d": 2163,
+"conversions_14d": 6.0,
+"impressions_14d": 2778,
+"conversions_prev14d": 6,
+"impressions_prev14d": 2857
+},
+{
+"product_item_id": "SKU-0403",
+"product_title": "Product 0403 (decline)",
+"merchant_id": "100403",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 11.99,
+"cost_30d": 246.35,
+"impressions_30d": 2061,
+"conversions_14d": 1.81,
+"impressions_14d": 1326,
+"conversions_prev14d": 6,
+"impressions_prev14d": 2475
+},
+{
+"product_item_id": "SKU-0394",
+"product_title": "Product 0394 (decline)",
+"merchant_id": "100394",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 4.05,
+"cost_30d": 134.44,
+"impressions_30d": 5861,
+"conversions_14d": 3.7,
+"impressions_14d": 1091,
+"conversions_prev14d": 13,
+"impressions_prev14d": 1826
+},
+{
+"product_item_id": "SKU-0003",
+"product_title": "Product 0003 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0075",
+"product_title": "Product 0075 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0228",
+"product_title": "Product 0228 (zombie)",
+"merchant_id": "100228",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 193.93,
+"impressions_30d": 2478,
+"conversions_14d": 0,
+"impressions_14d": 2330,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2392
+},
+{
+"product_item_id": "SKU-0314",
+"product_title": "Product 0314 (surge)",
+"merchant_id": "100314",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.71,
+"cost_30d": 148.69,
+"impressions_30d": 8257,
+"conversions_14d": 17.41,
+"impressions_14d": 3940,
+"conversions_prev14d": 8,
+"impressions_prev14d": 2282
+},
+{
+"product_item_id": "SKU-0387",
+"product_title": "Product 0387 (decline)",
+"merchant_id": "100387",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.1,
+"cost_30d": 211.8,
+"impressions_30d": 5661,
+"conversions_14d": 2.37,
+"impressions_14d": 1115,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3483
+},
+{
+"product_item_id": "SKU-0289",
+"product_title": "Product 0289 (surge)",
+"merchant_id": "100289",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.81,
+"cost_30d": 68.3,
+"impressions_30d": 8150,
+"conversions_14d": 17.72,
+"impressions_14d": 2451,
+"conversions_prev14d": 8,
+"impressions_prev14d": 4195
+},
+{
+"product_item_id": "SKU-0025",
+"product_title": "Product 0025 (inactive)",
+"merchant_id": "100025",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0401",
+"product_title": "Product 0401 (decline)",
+"merchant_id": "100401",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.92,
+"cost_30d": 276.81,
+"impressions_30d": 3569,
+"conversions_14d": 1.62,
+"impressions_14d": 4586,
+"conversions_prev14d": 6,
+"impressions_prev14d": 4877
+},
+{
+"product_item_id": "SKU-0061",
+"product_title": "Product 0061 (inactive)",
+"merchant_id": "100061",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0476",
+"product_title": "Product 0476 (neither)",
+"merchant_id": "100476",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.15,
+"cost_30d": 66.02,
+"impressions_30d": 3520,
+"conversions_14d": 6.98,
+"impressions_14d": 2727,
+"conversions_prev14d": 7,
+"impressions_prev14d": 3516
+},
+{
+"product_item_id": "SKU-0167",
+"product_title": "Product 0167 (inactive)",
+"merchant_id": "100167",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0460",
+"product_title": "Product 0460 (neither)",
+"merchant_id": "100460",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 5.37,
+"cost_30d": 62.39,
+"impressions_30d": 4999,
+"conversions_14d": 2.35,
+"impressions_14d": 1618,
+"conversions_prev14d": 3,
+"impressions_prev14d": 1774
+},
+{
+"product_item_id": "SKU-0263",
+"product_title": "Product 0263 (zombie)",
+"merchant_id": "100263",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 208.07,
+"impressions_30d": 1614,
+"conversions_14d": 0,
+"impressions_14d": 2073,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1310
+},
+{
+"product_item_id": "SKU-0214",
+"product_title": "Product 0214 (zombie)",
+"merchant_id": "100214",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 316.96,
+"impressions_30d": 2755,
+"conversions_14d": 0,
+"impressions_14d": 1192,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1881
+},
+{
+"product_item_id": "SKU-0286",
+"product_title": "Product 0286 (surge)",
+"merchant_id": "100286",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 5.37,
+"cost_30d": 171.96,
+"impressions_30d": 4189,
+"conversions_14d": 4.27,
+"impressions_14d": 3015,
+"conversions_prev14d": 2,
+"impressions_prev14d": 2138
+},
+{
+"product_item_id": "SKU-0081",
+"product_title": "Product 0081 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0200",
+"product_title": "Product 0200 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0131",
+"product_title": "Product 0131 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0279",
+"product_title": "Product 0279 (zombie)",
+"merchant_id": "100279",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 351.31,
+"impressions_30d": 4721,
+"conversions_14d": 0,
+"impressions_14d": 1634,
+"conversions_prev14d": 0,
+"impressions_prev14d": 849
+},
+{
+"product_item_id": "SKU-0465",
+"product_title": "Product 0465 (neither)",
+"merchant_id": "100465",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.04,
+"cost_30d": 161.2,
+"impressions_30d": 4194,
+"conversions_14d": 8.47,
+"impressions_14d": 3274,
+"conversions_prev14d": 9,
+"impressions_prev14d": 2670
+},
+{
+"product_item_id": "SKU-0382",
+"product_title": "Product 0382 (surge_edge)",
+"merchant_id": "100382",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 11.74,
+"cost_30d": 52.44,
+"impressions_30d": 2906,
+"conversions_14d": 8.29,
+"impressions_14d": 1472,
+"conversions_prev14d": 6,
+"impressions_prev14d": 4161
+},
+{
+"product_item_id": "SKU-0119",
+"product_title": "Product 0119 (inactive)",
+"merchant_id": "100119",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0306",
+"product_title": "Product 0306 (surge)",
+"merchant_id": "100306",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.42,
+"cost_30d": 116.7,
+"impressions_30d": 2522,
+"conversions_14d": 12.93,
+"impressions_14d": 1956,
+"conversions_prev14d": 5,
+"impressions_prev14d": 1675
+},
+{
+"product_item_id": "SKU-0027",
+"product_title": "Product 0027 (inactive)",
+"merchant_id": "100027",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0372",
+"product_title": "Product 0372 (surge_edge)",
+"merchant_id": "100372",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.81,
+"cost_30d": 105.88,
+"impressions_30d": 2118,
+"conversions_14d": 12.77,
+"impressions_14d": 4653,
+"conversions_prev14d": 9,
+"impressions_prev14d": 3535
+},
+{
+"product_item_id": "SKU-0089",
+"product_title": "Product 0089 (inactive)",
+"merchant_id": "100089",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0296",
+"product_title": "Product 0296 (surge)",
+"merchant_id": "100296",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 5.02,
+"cost_30d": 122.48,
+"impressions_30d": 5546,
+"conversions_14d": 6.89,
+"impressions_14d": 4700,
+"conversions_prev14d": 3,
+"impressions_prev14d": 2902
+},
+{
+"product_item_id": "SKU-0134",
+"product_title": "Product 0134 (inactive)",
+"merchant_id": "100134",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0331",
+"product_title": "Product 0331 (surge)",
+"merchant_id": "100331",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.57,
+"cost_30d": 102.95,
+"impressions_30d": 8886,
+"conversions_14d": 14.7,
+"impressions_14d": 3307,
+"conversions_prev14d": 6,
+"impressions_prev14d": 1421
+},
+{
+"product_item_id": "SKU-0100",
+"product_title": "Product 0100 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0242",
+"product_title": "Product 0242 (zombie)",
+"merchant_id": "100242",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 210.83,
+"impressions_30d": 949,
+"conversions_14d": 0,
+"impressions_14d": 364,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1496
+},
+{
+"product_item_id": "SKU-0327",
+"product_title": "Product 0327 (surge)",
+"merchant_id": "100327",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 11.69,
+"cost_30d": 89.63,
+"impressions_30d": 5244,
+"conversions_14d": 8.72,
+"impressions_14d": 4048,
+"conversions_prev14d": 5,
+"impressions_prev14d": 1733
+},
+{
+"product_item_id": "SKU-0096",
+"product_title": "Product 0096 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0399",
+"product_title": "Product 0399 (decline)",
+"merchant_id": "100399",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 5.5,
+"cost_30d": 247.02,
+"impressions_30d": 3276,
+"conversions_14d": 3.06,
+"impressions_14d": 2041,
+"conversions_prev14d": 11,
+"impressions_prev14d": 3255
+},
+{
+"product_item_id": "SKU-0088",
+"product_title": "Product 0088 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0068",
+"product_title": "Product 0068 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0265",
+"product_title": "Product 0265 (zombie)",
+"merchant_id": "100265",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 244.26,
+"impressions_30d": 5163,
+"conversions_14d": 0,
+"impressions_14d": 1207,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2911
+},
+{
+"product_item_id": "SKU-0047",
+"product_title": "Product 0047 (inactive)",
+"merchant_id": "100047",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0424",
+"product_title": "Product 0424 (decline)",
+"merchant_id": "100424",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.37,
+"cost_30d": 100.83,
+"impressions_30d": 4935,
+"conversions_14d": 4.5,
+"impressions_14d": 4384,
+"conversions_prev14d": 10,
+"impressions_prev14d": 3844
+},
+{
+"product_item_id": "SKU-0093",
+"product_title": "Product 0093 (inactive)",
+"merchant_id": "100093",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0070",
+"product_title": "Product 0070 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0398",
+"product_title": "Product 0398 (decline)",
+"merchant_id": "100398",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 9.7,
+"cost_30d": 156.61,
+"impressions_30d": 4549,
+"conversions_14d": 0.65,
+"impressions_14d": 2625,
+"conversions_prev14d": 6,
+"impressions_prev14d": 1840
+},
+{
+"product_item_id": "SKU-0450",
+"product_title": "Product 0450 (neither)",
+"merchant_id": "100450",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.38,
+"cost_30d": 133.1,
+"impressions_30d": 3109,
+"conversions_14d": 4.26,
+"impressions_14d": 1891,
+"conversions_prev14d": 4,
+"impressions_prev14d": 2049
+},
+{
+"product_item_id": "SKU-0361",
+"product_title": "Product 0361 (surge_edge)",
+"merchant_id": "100361",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 10.56,
+"cost_30d": 120.99,
+"impressions_30d": 6577,
+"conversions_14d": 12.51,
+"impressions_14d": 1605,
+"conversions_prev14d": 9,
+"impressions_prev14d": 3508
+},
+{
+"product_item_id": "SKU-0410",
+"product_title": "Product 0410 (decline)",
+"merchant_id": "100410",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 4.72,
+"cost_30d": 135.0,
+"impressions_30d": 5641,
+"conversions_14d": 4.0,
+"impressions_14d": 4089,
+"conversions_prev14d": 11,
+"impressions_prev14d": 1303
+},
+{
+"product_item_id": "SKU-0231",
+"product_title": "Product 0231 (zombie)",
+"merchant_id": "100231",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 359.54,
+"impressions_30d": 912,
+"conversions_14d": 0,
+"impressions_14d": 1599,
+"conversions_prev14d": 0,
+"impressions_prev14d": 823
+},
+{
+"product_item_id": "SKU-0366",
+"product_title": "Product 0366 (surge_edge)",
+"merchant_id": "100366",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 5.43,
+"cost_30d": 172.63,
+"impressions_30d": 2411,
+"conversions_14d": 14.08,
+"impressions_14d": 4822,
+"conversions_prev14d": 10,
+"impressions_prev14d": 1805
+},
+{
+"product_item_id": "SKU-0036",
+"product_title": "Product 0036 (inactive)",
+"merchant_id": "100036",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0328",
+"product_title": "Product 0328 (surge)",
+"merchant_id": "100328",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 9.32,
+"cost_30d": 146.69,
+"impressions_30d": 4641,
+"conversions_14d": 10.7,
+"impressions_14d": 4745,
+"conversions_prev14d": 5,
+"impressions_prev14d": 2744
+},
+{
+"product_item_id": "SKU-0472",
+"product_title": "Product 0472 (neither)",
+"merchant_id": "100472",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 3.16,
+"cost_30d": 197.93,
+"impressions_30d": 7323,
+"conversions_14d": 3.12,
+"impressions_14d": 2882,
+"conversions_prev14d": 4,
+"impressions_prev14d": 3794
+},
+{
+"product_item_id": "SKU-0260",
+"product_title": "Product 0260 (zombie)",
+"merchant_id": "100260",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 195.46,
+"impressions_30d": 2362,
+"conversions_14d": 0,
+"impressions_14d": 2672,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1604
+},
+{
+"product_item_id": "SKU-0009",
+"product_title": "Product 0009 (inactive)",
+"merchant_id": "100009",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0390",
+"product_title": "Product 0390 (decline)",
+"merchant_id": "100390",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.28,
+"cost_30d": 61.02,
+"impressions_30d": 4733,
+"conversions_14d": 2.46,
+"impressions_14d": 2251,
+"conversions_prev14d": 13,
+"impressions_prev14d": 2126
+},
+{
+"product_item_id": "SKU-0320",
+"product_title": "Product 0320 (surge)",
+"merchant_id": "100320",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.27,
+"cost_30d": 153.48,
+"impressions_30d": 4548,
+"conversions_14d": 7.2,
+"impressions_14d": 3448,
+"conversions_prev14d": 4,
+"impressions_prev14d": 2857
+},
+{
+"product_item_id": "SKU-0436",
+"product_title": "Product 0436 (neither)",
+"merchant_id": "100436",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 2.79,
+"cost_30d": 217.97,
+"impressions_30d": 3081,
+"conversions_14d": 4.11,
+"impressions_14d": 3498,
+"conversions_prev14d": 4,
+"impressions_prev14d": 1236
+},
+{
+"product_item_id": "SKU-0130",
+"product_title": "Product 0130 (inactive)",
+"merchant_id": "100130",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0350",
+"product_title": "Product 0350 (surge_edge)",
+"merchant_id": "100350",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 11.47,
+"cost_30d": 214.01,
+"impressions_30d": 3348,
+"conversions_14d": 11.83,
+"impressions_14d": 3836,
+"conversions_prev14d": 9,
+"impressions_prev14d": 1419
+},
+{
+"product_item_id": "SKU-0330",
+"product_title": "Product 0330 (surge)",
+"merchant_id": "100330",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.52,
+"cost_30d": 176.3,
+"impressions_30d": 4455,
+"conversions_14d": 7.16,
+"impressions_14d": 2756,
+"conversions_prev14d": 3,
+"impressions_prev14d": 4684
+},
+{
+"product_item_id": "SKU-0443",
+"product_title": "Product 0443 (neither)",
+"merchant_id": "100443",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.26,
+"cost_30d": 42.71,
+"impressions_30d": 5979,
+"conversions_14d": 7.49,
+"impressions_14d": 2172,
+"conversions_prev14d": 7,
+"impressions_prev14d": 3255
+},
+{
+"product_item_id": "SKU-0160",
+"product_title": "Product 0160 (inactive)",
+"merchant_id": "100160",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0052",
+"product_title": "Product 0052 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0326",
+"product_title": "Product 0326 (surge)",
+"merchant_id": "100326",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.99,
+"cost_30d": 171.34,
+"impressions_30d": 7608,
+"conversions_14d": 8.63,
+"impressions_14d": 2883,
+"conversions_prev14d": 3,
+"impressions_prev14d": 1314
+},
+{
+"product_item_id": "SKU-0416",
+"product_title": "Product 0416 (decline)",
+"merchant_id": "100416",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.57,
+"cost_30d": 104.98,
+"impressions_30d": 6640,
+"conversions_14d": 3.37,
+"impressions_14d": 4506,
+"conversions_prev14d": 12,
+"impressions_prev14d": 2417
+},
+{
+"product_item_id": "SKU-0269",
+"product_title": "Product 0269 (zombie)",
+"merchant_id": "100269",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 163.64,
+"impressions_30d": 3881,
+"conversions_14d": 0,
+"impressions_14d": 2094,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1348
+},
+{
+"product_item_id": "SKU-0144",
+"product_title": "Product 0144 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0266",
+"product_title": "Product 0266 (zombie)",
+"merchant_id": "100266",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 349.38,
+"impressions_30d": 2838,
+"conversions_14d": 0,
+"impressions_14d": 2343,
+"conversions_prev14d": 0,
+"impressions_prev14d": 702
+},
+{
+"product_item_id": "SKU-0272",
+"product_title": "Product 0272 (zombie)",
+"merchant_id": "100272",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 262.21,
+"impressions_30d": 4414,
+"conversions_14d": 0,
+"impressions_14d": 2795,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2603
+},
+{
+"product_item_id": "SKU-0005",
+"product_title": "Product 0005 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0172",
+"product_title": "Product 0172 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0230",
+"product_title": "Product 0230 (zombie)",
+"merchant_id": "100230",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 114.89,
+"impressions_30d": 5180,
+"conversions_14d": 0,
+"impressions_14d": 1951,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2129
+},
+{
+"product_item_id": "SKU-0437",
+"product_title": "Product 0437 (neither)",
+"merchant_id": "100437",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.74,
+"cost_30d": 214.95,
+"impressions_30d": 3894,
+"conversions_14d": 6.45,
+"impressions_14d": 1700,
+"conversions_prev14d": 9,
+"impressions_prev14d": 2885
+},
+{
+"product_item_id": "SKU-0238",
+"product_title": "Product 0238 (zombie)",
+"merchant_id": "100238",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 125.05,
+"impressions_30d": 3400,
+"conversions_14d": 0,
+"impressions_14d": 852,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2335
+},
+{
+"product_item_id": "SKU-0379",
+"product_title": "Product 0379 (surge_edge)",
+"merchant_id": "100379",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 9.2,
+"cost_30d": 98.01,
+"impressions_30d": 6164,
+"conversions_14d": 11.94,
+"impressions_14d": 2639,
+"conversions_prev14d": 9,
+"impressions_prev14d": 1022
+},
+{
+"product_item_id": "SKU-0270",
+"product_title": "Product 0270 (zombie)",
+"merchant_id": "100270",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 373.47,
+"impressions_30d": 4790,
+"conversions_14d": 0,
+"impressions_14d": 1202,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2550
+},
+{
+"product_item_id": "SKU-0307",
+"product_title": "Product 0307 (surge)",
+"merchant_id": "100307",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 7.73,
+"cost_30d": 299.96,
+"impressions_30d": 7605,
+"conversions_14d": 4.92,
+"impressions_14d": 1118,
+"conversions_prev14d": 3,
+"impressions_prev14d": 4825
+},
+{
+"product_item_id": "SKU-0347",
+"product_title": "Product 0347 (surge_edge)",
+"merchant_id": "100347",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 5.67,
+"cost_30d": 283.04,
+"impressions_30d": 8578,
+"conversions_14d": 10.37,
+"impressions_14d": 1602,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3798
+},
+{
+"product_item_id": "SKU-0310",
+"product_title": "Product 0310 (surge)",
+"merchant_id": "100310",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 6.24,
+"cost_30d": 249.28,
+"impressions_30d": 8401,
+"conversions_14d": 14.53,
+"impressions_14d": 4342,
+"conversions_prev14d": 7,
+"impressions_prev14d": 4393
+},
+{
+"product_item_id": "SKU-0453",
+"product_title": "Product 0453 (neither)",
+"merchant_id": "100453",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 4.53,
+"cost_30d": 34.2,
+"impressions_30d": 7866,
+"conversions_14d": 8.43,
+"impressions_14d": 2204,
+"conversions_prev14d": 9,
+"impressions_prev14d": 3161
+},
+{
+"product_item_id": "SKU-0376",
+"product_title": "Product 0376 (surge_edge)",
+"merchant_id": "100376",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.45,
+"cost_30d": 51.4,
+"impressions_30d": 8015,
+"conversions_14d": 9.72,
+"impressions_14d": 3727,
+"conversions_prev14d": 7,
+"impressions_prev14d": 3557
+},
+{
+"product_item_id": "SKU-0413",
+"product_title": "Product 0413 (decline)",
+"merchant_id": "100413",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 4.26,
+"cost_30d": 128.01,
+"impressions_30d": 5144,
+"conversions_14d": 2.57,
+"impressions_14d": 3550,
+"conversions_prev14d": 12,
+"impressions_prev14d": 4854
+},
+{
+"product_item_id": "SKU-0276",
+"product_title": "Product 0276 (zombie)",
+"merchant_id": "100276",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 254.56,
+"impressions_30d": 2208,
+"conversions_14d": 0,
+"impressions_14d": 2381,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2436
+},
+{
+"product_item_id": "SKU-0412",
+"product_title": "Product 0412 (decline)",
+"merchant_id": "100412",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 11.2,
+"cost_30d": 167.26,
+"impressions_30d": 6340,
+"conversions_14d": 2.58,
+"impressions_14d": 3589,
+"conversions_prev14d": 7,
+"impressions_prev14d": 1291
+},
+{
+"product_item_id": "SKU-0090",
+"product_title": "Product 0090 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0087",
+"product_title": "Product 0087 (inactive)",
+"merchant_id": "100087",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0441",
+"product_title": "Product 0441 (neither)",
+"merchant_id": "100441",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 6.27,
+"cost_30d": 84.2,
+"impressions_30d": 5505,
+"conversions_14d": 2.96,
+"impressions_14d": 1271,
+"conversions_prev14d": 3,
+"impressions_prev14d": 2303
+},
+{
+"product_item_id": "SKU-0237",
+"product_title": "Product 0237 (zombie)",
+"merchant_id": "100237",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 366.93,
+"impressions_30d": 1432,
+"conversions_14d": 0,
+"impressions_14d": 856,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1116
+},
+{
+"product_item_id": "SKU-0434",
+"product_title": "Product 0434 (neither)",
+"merchant_id": "100434",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.59,
+"cost_30d": 157.6,
+"impressions_30d": 7730,
+"conversions_14d": 4.57,
+"impressions_14d": 3807,
+"conversions_prev14d": 5,
+"impressions_prev14d": 3927
+},
+{
+"product_item_id": "SKU-0226",
+"product_title": "Product 0226 (zombie)",
+"merchant_id": "100226",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 94.74,
+"impressions_30d": 2760,
+"conversions_14d": 0,
+"impressions_14d": 1255,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2207
+},
+{
+"product_item_id": "SKU-0153",
+"product_title": "Product 0153 (inactive)",
+"merchant_id": "100153",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0414",
+"product_title": "Product 0414 (decline)",
+"merchant_id": "100414",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.61,
+"cost_30d": 135.41,
+"impressions_30d": 4262,
+"conversions_14d": 0.3,
+"impressions_14d": 1202,
+"conversions_prev14d": 6,
+"impressions_prev14d": 4779
+},
+{
+"product_item_id": "SKU-0294",
+"product_title": "Product 0294 (surge)",
+"merchant_id": "100294",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 10.1,
+"cost_30d": 236.88,
+"impressions_30d": 4066,
+"conversions_14d": 8.33,
+"impressions_14d": 3088,
+"conversions_prev14d": 4,
+"impressions_prev14d": 3111
+},
+{
+"product_item_id": "SKU-0114",
+"product_title": "Product 0114 (inactive)",
+"merchant_id": "100114",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0218",
+"product_title": "Product 0218 (zombie)",
+"merchant_id": "100218",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 65.19,
+"impressions_30d": 4408,
+"conversions_14d": 0,
+"impressions_14d": 2121,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1134
+},
+{
+"product_item_id": "SKU-0282",
+"product_title": "Product 0282 (surge)",
+"merchant_id": "100282",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.71,
+"cost_30d": 248.73,
+"impressions_30d": 5575,
+"conversions_14d": 5.6,
+"impressions_14d": 3848,
+"conversions_prev14d": 2,
+"impressions_prev14d": 2946
+},
+{
+"product_item_id": "SKU-0101",
+"product_title": "Product 0101 (inactive)",
+"merchant_id": "100101",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0498",
+"product_title": "Product 0498 (neither)",
+"merchant_id": "100498",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 3.35,
+"cost_30d": 163.83,
+"impressions_30d": 3725,
+"conversions_14d": 2.19,
+"impressions_14d": 3365,
+"conversions_prev14d": 3,
+"impressions_prev14d": 2700
+},
+{
+"product_item_id": "SKU-0007",
+"product_title": "Product 0007 (inactive)",
+"merchant_id": "100007",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0303",
+"product_title": "Product 0303 (surge)",
+"merchant_id": "100303",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 11.39,
+"cost_30d": 260.74,
+"impressions_30d": 7023,
+"conversions_14d": 11.01,
+"impressions_14d": 2578,
+"conversions_prev14d": 4,
+"impressions_prev14d": 4765
+},
+{
+"product_item_id": "SKU-0029",
+"product_title": "Product 0029 (inactive)",
+"merchant_id": "100029",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0205",
+"product_title": "Product 0205 (inactive)",
+"merchant_id": "100205",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0408",
+"product_title": "Product 0408 (decline)",
+"merchant_id": "100408",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.11,
+"cost_30d": 68.95,
+"impressions_30d": 3763,
+"conversions_14d": 3.11,
+"impressions_14d": 4707,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3517
+},
+{
+"product_item_id": "SKU-0117",
+"product_title": "Product 0117 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0118",
+"product_title": "Product 0118 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0221",
+"product_title": "Product 0221 (zombie)",
+"merchant_id": "100221",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 135.94,
+"impressions_30d": 5693,
+"conversions_14d": 0,
+"impressions_14d": 2425,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2229
+},
+{
+"product_item_id": "SKU-0489",
+"product_title": "Product 0489 (neither)",
+"merchant_id": "100489",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.14,
+"cost_30d": 88.61,
+"impressions_30d": 3229,
+"conversions_14d": 2.98,
+"impressions_14d": 1437,
+"conversions_prev14d": 4,
+"impressions_prev14d": 3577
+},
+{
+"product_item_id": "SKU-0287",
+"product_title": "Product 0287 (surge)",
+"merchant_id": "100287",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.09,
+"cost_30d": 221.79,
+"impressions_30d": 6161,
+"conversions_14d": 9.55,
+"impressions_14d": 3771,
+"conversions_prev14d": 4,
+"impressions_prev14d": 1896
+},
+{
+"product_item_id": "SKU-0275",
+"product_title": "Product 0275 (zombie)",
+"merchant_id": "100275",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 355.07,
+"impressions_30d": 3088,
+"conversions_14d": 0,
+"impressions_14d": 411,
+"conversions_prev14d": 0,
+"impressions_prev14d": 587
+},
+{
+"product_item_id": "SKU-0165",
+"product_title": "Product 0165 (inactive)",
+"merchant_id": "100165",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0026",
+"product_title": "Product 0026 (inactive)",
+"merchant_id": "100026",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0203",
+"product_title": "Product 0203 (inactive)",
+"merchant_id": "100203",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0159",
+"product_title": "Product 0159 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0079",
+"product_title": "Product 0079 (inactive)",
+"merchant_id": "100079",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0141",
+"product_title": "Product 0141 (inactive)",
+"merchant_id": "100141",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0073",
+"product_title": "Product 0073 (inactive)",
+"merchant_id": "100073",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0471",
+"product_title": "Product 0471 (neither)",
+"merchant_id": "100471",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 4.44,
+"cost_30d": 62.95,
+"impressions_30d": 3759,
+"conversions_14d": 2.9,
+"impressions_14d": 1079,
+"conversions_prev14d": 3,
+"impressions_prev14d": 2178
+},
+{
+"product_item_id": "SKU-0184",
+"product_title": "Product 0184 (inactive)",
+"merchant_id": "100184",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0339",
+"product_title": "Product 0339 (surge)",
+"merchant_id": "100339",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.74,
+"cost_30d": 73.42,
+"impressions_30d": 2389,
+"conversions_14d": 15.94,
+"impressions_14d": 2078,
+"conversions_prev14d": 7,
+"impressions_prev14d": 4563
+},
+{
+"product_item_id": "SKU-0196",
+"product_title": "Product 0196 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0208",
+"product_title": "Product 0208 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0483",
+"product_title": "Product 0483 (neither)",
+"merchant_id": "100483",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.34,
+"cost_30d": 134.61,
+"impressions_30d": 2655,
+"conversions_14d": 4.72,
+"impressions_14d": 3985,
+"conversions_prev14d": 6,
+"impressions_prev14d": 2050
+},
+{
+"product_item_id": "SKU-0438",
+"product_title": "Product 0438 (neither)",
+"merchant_id": "100438",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 3.5,
+"cost_30d": 198.21,
+"impressions_30d": 5506,
+"conversions_14d": 3.97,
+"impressions_14d": 1867,
+"conversions_prev14d": 5,
+"impressions_prev14d": 3021
+},
+{
+"product_item_id": "SKU-0259",
+"product_title": "Product 0259 (zombie)",
+"merchant_id": "100259",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 305.36,
+"impressions_30d": 2103,
+"conversions_14d": 0,
+"impressions_14d": 2502,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1740
+},
+{
+"product_item_id": "SKU-0400",
+"product_title": "Product 0400 (decline)",
+"merchant_id": "100400",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.02,
+"cost_30d": 199.99,
+"impressions_30d": 2249,
+"conversions_14d": 1.09,
+"impressions_14d": 4649,
+"conversions_prev14d": 11,
+"impressions_prev14d": 4594
+},
+{
+"product_item_id": "SKU-0030",
+"product_title": "Product 0030 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0062",
+"product_title": "Product 0062 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0191",
+"product_title": "Product 0191 (inactive)",
+"merchant_id": "100191",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0206",
+"product_title": "Product 0206 (inactive)",
+"merchant_id": "100206",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0383",
+"product_title": "Product 0383 (surge_edge)",
+"merchant_id": "100383",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 10.24,
+"cost_30d": 193.83,
+"impressions_30d": 8938,
+"conversions_14d": 14.3,
+"impressions_14d": 2522,
+"conversions_prev14d": 10,
+"impressions_prev14d": 4041
+},
+{
+"product_item_id": "SKU-0041",
+"product_title": "Product 0041 (inactive)",
+"merchant_id": "100041",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0140",
+"product_title": "Product 0140 (inactive)",
+"merchant_id": "100140",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0395",
+"product_title": "Product 0395 (decline)",
+"merchant_id": "100395",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 11.59,
+"cost_30d": 236.6,
+"impressions_30d": 5100,
+"conversions_14d": 2.59,
+"impressions_14d": 2433,
+"conversions_prev14d": 7,
+"impressions_prev14d": 1154
+},
+{
+"product_item_id": "SKU-0299",
+"product_title": "Product 0299 (surge)",
+"merchant_id": "100299",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.53,
+"cost_30d": 115.71,
+"impressions_30d": 2998,
+"conversions_14d": 10.63,
+"impressions_14d": 4883,
+"conversions_prev14d": 4,
+"impressions_prev14d": 4333
+},
+{
+"product_item_id": "SKU-0112",
+"product_title": "Product 0112 (inactive)",
+"merchant_id": "100112",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0452",
+"product_title": "Product 0452 (neither)",
+"merchant_id": "100452",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 4.6,
+"cost_30d": 121.09,
+"impressions_30d": 5391,
+"conversions_14d": 8.08,
+"impressions_14d": 2808,
+"conversions_prev14d": 9,
+"impressions_prev14d": 2870
+},
+{
+"product_item_id": "SKU-0319",
+"product_title": "Product 0319 (surge)",
+"merchant_id": "100319",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 10.48,
+"cost_30d": 252.79,
+"impressions_30d": 6232,
+"conversions_14d": 4.56,
+"impressions_14d": 1794,
+"conversions_prev14d": 2,
+"impressions_prev14d": 2959
+},
+{
+"product_item_id": "SKU-0370",
+"product_title": "Product 0370 (surge_edge)",
+"merchant_id": "100370",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 8.16,
+"cost_30d": 125.16,
+"impressions_30d": 3895,
+"conversions_14d": 9.9,
+"impressions_14d": 3388,
+"conversions_prev14d": 7,
+"impressions_prev14d": 3558
+},
+{
+"product_item_id": "SKU-0249",
+"product_title": "Product 0249 (zombie)",
+"merchant_id": "100249",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 141.36,
+"impressions_30d": 1749,
+"conversions_14d": 0,
+"impressions_14d": 2575,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1648
+},
+{
+"product_item_id": "SKU-0147",
+"product_title": "Product 0147 (inactive)",
+"merchant_id": "100147",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0002",
+"product_title": "Product 0002 (inactive)",
+"merchant_id": "100002",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0496",
+"product_title": "Product 0496 (neither)",
+"merchant_id": "100496",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.88,
+"cost_30d": 30.42,
+"impressions_30d": 2189,
+"conversions_14d": 7.82,
+"impressions_14d": 1877,
+"conversions_prev14d": 8,
+"impressions_prev14d": 1235
+},
+{
+"product_item_id": "SKU-0258",
+"product_title": "Product 0258 (zombie)",
+"merchant_id": "100258",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 229.4,
+"impressions_30d": 3965,
+"conversions_14d": 0,
+"impressions_14d": 2369,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1093
+},
+{
+"product_item_id": "SKU-0170",
+"product_title": "Product 0170 (inactive)",
+"merchant_id": "100170",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0358",
+"product_title": "Product 0358 (surge_edge)",
+"merchant_id": "100358",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.08,
+"cost_30d": 177.7,
+"impressions_30d": 2296,
+"conversions_14d": 12.72,
+"impressions_14d": 2917,
+"conversions_prev14d": 10,
+"impressions_prev14d": 2470
+},
+{
+"product_item_id": "SKU-0051",
+"product_title": "Product 0051 (inactive)",
+"merchant_id": "100051",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0458",
+"product_title": "Product 0458 (neither)",
+"merchant_id": "100458",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.98,
+"cost_30d": 124.63,
+"impressions_30d": 4046,
+"conversions_14d": 3.19,
+"impressions_14d": 1527,
+"conversions_prev14d": 4,
+"impressions_prev14d": 1341
+},
+{
+"product_item_id": "SKU-0069",
+"product_title": "Product 0069 (inactive)",
+"merchant_id": "100069",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0322",
+"product_title": "Product 0322 (surge)",
+"merchant_id": "100322",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 9.19,
+"cost_30d": 291.22,
+"impressions_30d": 6493,
+"conversions_14d": 16.4,
+"impressions_14d": 4652,
+"conversions_prev14d": 6,
+"impressions_prev14d": 2472
+},
+{
+"product_item_id": "SKU-0015",
+"product_title": "Product 0015 (inactive)",
+"merchant_id": "100015",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0122",
+"product_title": "Product 0122 (inactive)",
+"merchant_id": "100122",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0445",
+"product_title": "Product 0445 (neither)",
+"merchant_id": "100445",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.61,
+"cost_30d": 210.73,
+"impressions_30d": 3733,
+"conversions_14d": 3.57,
+"impressions_14d": 2489,
+"conversions_prev14d": 5,
+"impressions_prev14d": 2687
+},
+{
+"product_item_id": "SKU-0357",
+"product_title": "Product 0357 (surge_edge)",
+"merchant_id": "100357",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 3.84,
+"cost_30d": 50.12,
+"impressions_30d": 3898,
+"conversions_14d": 6.62,
+"impressions_14d": 4474,
+"conversions_prev14d": 5,
+"impressions_prev14d": 2935
+},
+{
+"product_item_id": "SKU-0060",
+"product_title": "Product 0060 (inactive)",
+"merchant_id": "100060",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0038",
+"product_title": "Product 0038 (inactive)",
+"merchant_id": "100038",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0193",
+"product_title": "Product 0193 (inactive)",
+"merchant_id": "100193",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0146",
+"product_title": "Product 0146 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0173",
+"product_title": "Product 0173 (inactive)",
+"merchant_id": "100173",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0354",
+"product_title": "Product 0354 (surge_edge)",
+"merchant_id": "100354",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.64,
+"cost_30d": 279.72,
+"impressions_30d": 5408,
+"conversions_14d": 7.17,
+"impressions_14d": 2086,
+"conversions_prev14d": 5,
+"impressions_prev14d": 4444
+},
+{
+"product_item_id": "SKU-0245",
+"product_title": "Product 0245 (zombie)",
+"merchant_id": "100245",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 239.59,
+"impressions_30d": 3385,
+"conversions_14d": 0,
+"impressions_14d": 638,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1351
+},
+{
+"product_item_id": "SKU-0022",
+"product_title": "Product 0022 (inactive)",
+"merchant_id": "100022",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0043",
+"product_title": "Product 0043 (inactive)",
+"merchant_id": "100043",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0323",
+"product_title": "Product 0323 (surge)",
+"merchant_id": "100323",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 10.83,
+"cost_30d": 109.6,
+"impressions_30d": 8639,
+"conversions_14d": 10.33,
+"impressions_14d": 3389,
+"conversions_prev14d": 5,
+"impressions_prev14d": 2173
+},
+{
+"product_item_id": "SKU-0396",
+"product_title": "Product 0396 (decline)",
+"merchant_id": "100396",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 5.67,
+"cost_30d": 289.29,
+"impressions_30d": 4826,
+"conversions_14d": 1.05,
+"impressions_14d": 2563,
+"conversions_prev14d": 13,
+"impressions_prev14d": 3017
+},
+{
+"product_item_id": "SKU-0365",
+"product_title": "Product 0365 (surge_edge)",
+"merchant_id": "100365",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 10.42,
+"cost_30d": 112.26,
+"impressions_30d": 8907,
+"conversions_14d": 11.44,
+"impressions_14d": 4874,
+"conversions_prev14d": 9,
+"impressions_prev14d": 2088
+},
+{
+"product_item_id": "SKU-0346",
+"product_title": "Product 0346 (surge_edge)",
+"merchant_id": "100346",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.2,
+"cost_30d": 140.45,
+"impressions_30d": 7913,
+"conversions_14d": 8.01,
+"impressions_14d": 3437,
+"conversions_prev14d": 6,
+"impressions_prev14d": 3248
+},
+{
+"product_item_id": "SKU-0369",
+"product_title": "Product 0369 (surge_edge)",
+"merchant_id": "100369",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 10.97,
+"cost_30d": 190.63,
+"impressions_30d": 8088,
+"conversions_14d": 12.65,
+"impressions_14d": 1337,
+"conversions_prev14d": 9,
+"impressions_prev14d": 2538
+},
+{
+"product_item_id": "SKU-0116",
+"product_title": "Product 0116 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0342",
+"product_title": "Product 0342 (surge_edge)",
+"merchant_id": "100342",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 5.61,
+"cost_30d": 269.08,
+"impressions_30d": 6762,
+"conversions_14d": 9.15,
+"impressions_14d": 3470,
+"conversions_prev14d": 7,
+"impressions_prev14d": 3643
+},
+{
+"product_item_id": "SKU-0024",
+"product_title": "Product 0024 (inactive)",
+"merchant_id": "100024",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0127",
+"product_title": "Product 0127 (inactive)",
+"merchant_id": "100127",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0199",
+"product_title": "Product 0199 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0248",
+"product_title": "Product 0248 (zombie)",
+"merchant_id": "100248",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 58.24,
+"impressions_30d": 4141,
+"conversions_14d": 0,
+"impressions_14d": 650,
+"conversions_prev14d": 0,
+"impressions_prev14d": 366
+},
+{
+"product_item_id": "SKU-0420",
+"product_title": "Product 0420 (decline)",
+"merchant_id": "100420",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.3,
+"cost_30d": 206.7,
+"impressions_30d": 2292,
+"conversions_14d": 5.64,
+"impressions_14d": 3068,
+"conversions_prev14d": 13,
+"impressions_prev14d": 4213
+},
+{
+"product_item_id": "SKU-0023",
+"product_title": "Product 0023 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0317",
+"product_title": "Product 0317 (surge)",
+"merchant_id": "100317",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 10.67,
+"cost_30d": 87.5,
+"impressions_30d": 6994,
+"conversions_14d": 5.07,
+"impressions_14d": 3859,
+"conversions_prev14d": 3,
+"impressions_prev14d": 2367
+},
+{
+"product_item_id": "SKU-0187",
+"product_title": "Product 0187 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0278",
+"product_title": "Product 0278 (zombie)",
+"merchant_id": "100278",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 155.49,
+"impressions_30d": 1629,
+"conversions_14d": 0,
+"impressions_14d": 523,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2853
+},
+{
+"product_item_id": "SKU-0053",
+"product_title": "Product 0053 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0044",
+"product_title": "Product 0044 (inactive)",
+"merchant_id": "100044",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0028",
+"product_title": "Product 0028 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0332",
+"product_title": "Product 0332 (surge)",
+"merchant_id": "100332",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.11,
+"cost_30d": 273.5,
+"impressions_30d": 3563,
+"conversions_14d": 8.05,
+"impressions_14d": 3217,
+"conversions_prev14d": 3,
+"impressions_prev14d": 3987
+},
+{
+"product_item_id": "SKU-0298",
+"product_title": "Product 0298 (surge)",
+"merchant_id": "100298",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 5.33,
+"cost_30d": 88.61,
+"impressions_30d": 4358,
+"conversions_14d": 12.61,
+"impressions_14d": 2445,
+"conversions_prev14d": 7,
+"impressions_prev14d": 3649
+},
+{
+"product_item_id": "SKU-0477",
+"product_title": "Product 0477 (neither)",
+"merchant_id": "100477",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.74,
+"cost_30d": 187.88,
+"impressions_30d": 6736,
+"conversions_14d": 9.47,
+"impressions_14d": 1076,
+"conversions_prev14d": 9,
+"impressions_prev14d": 1139
+},
+{
+"product_item_id": "SKU-0468",
+"product_title": "Product 0468 (neither)",
+"merchant_id": "100468",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 2.45,
+"cost_30d": 228.53,
+"impressions_30d": 3532,
+"conversions_14d": 4.75,
+"impressions_14d": 2224,
+"conversions_prev14d": 5,
+"impressions_prev14d": 3286
+},
+{
+"product_item_id": "SKU-0447",
+"product_title": "Product 0447 (neither)",
+"merchant_id": "100447",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.24,
+"cost_30d": 231.22,
+"impressions_30d": 7700,
+"conversions_14d": 6.31,
+"impressions_14d": 3313,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3651
+},
+{
+"product_item_id": "SKU-0415",
+"product_title": "Product 0415 (decline)",
+"merchant_id": "100415",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 5.74,
+"cost_30d": 120.04,
+"impressions_30d": 8699,
+"conversions_14d": 1.7,
+"impressions_14d": 3483,
+"conversions_prev14d": 7,
+"impressions_prev14d": 3758
+},
+{
+"product_item_id": "SKU-0375",
+"product_title": "Product 0375 (surge_edge)",
+"merchant_id": "100375",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.53,
+"cost_30d": 155.8,
+"impressions_30d": 8325,
+"conversions_14d": 5.41,
+"impressions_14d": 4039,
+"conversions_prev14d": 4,
+"impressions_prev14d": 1246
+},
+{
+"product_item_id": "SKU-0129",
+"product_title": "Product 0129 (inactive)",
+"merchant_id": "100129",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0056",
+"product_title": "Product 0056 (inactive)",
+"merchant_id": "100056",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0098",
+"product_title": "Product 0098 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0378",
+"product_title": "Product 0378 (surge_edge)",
+"merchant_id": "100378",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.08,
+"cost_30d": 133.24,
+"impressions_30d": 3641,
+"conversions_14d": 11.5,
+"impressions_14d": 3485,
+"conversions_prev14d": 8,
+"impressions_prev14d": 1402
+},
+{
+"product_item_id": "SKU-0095",
+"product_title": "Product 0095 (inactive)",
+"merchant_id": "100095",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0349",
+"product_title": "Product 0349 (surge_edge)",
+"merchant_id": "100349",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.65,
+"cost_30d": 241.0,
+"impressions_30d": 2606,
+"conversions_14d": 14.16,
+"impressions_14d": 2890,
+"conversions_prev14d": 10,
+"impressions_prev14d": 1180
+},
+{
+"product_item_id": "SKU-0309",
+"product_title": "Product 0309 (surge)",
+"merchant_id": "100309",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.32,
+"cost_30d": 194.42,
+"impressions_30d": 8791,
+"conversions_14d": 10.51,
+"impressions_14d": 3349,
+"conversions_prev14d": 5,
+"impressions_prev14d": 2480
+},
+{
+"product_item_id": "SKU-0236",
+"product_title": "Product 0236 (zombie)",
+"merchant_id": "100236",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 177.98,
+"impressions_30d": 4342,
+"conversions_14d": 0,
+"impressions_14d": 459,
+"conversions_prev14d": 0,
+"impressions_prev14d": 429
+},
+{
+"product_item_id": "SKU-0389",
+"product_title": "Product 0389 (decline)",
+"merchant_id": "100389",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 11.12,
+"cost_30d": 224.0,
+"impressions_30d": 5401,
+"conversions_14d": 0.55,
+"impressions_14d": 3201,
+"conversions_prev14d": 6,
+"impressions_prev14d": 3194
+},
+{
+"product_item_id": "SKU-0338",
+"product_title": "Product 0338 (surge)",
+"merchant_id": "100338",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.6,
+"cost_30d": 250.47,
+"impressions_30d": 5116,
+"conversions_14d": 16.59,
+"impressions_14d": 2267,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3459
+},
+{
+"product_item_id": "SKU-0252",
+"product_title": "Product 0252 (zombie)",
+"merchant_id": "100252",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 138.41,
+"impressions_30d": 4695,
+"conversions_14d": 0,
+"impressions_14d": 2433,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2831
+},
+{
+"product_item_id": "SKU-0162",
+"product_title": "Product 0162 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0246",
+"product_title": "Product 0246 (zombie)",
+"merchant_id": "100246",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 347.32,
+"impressions_30d": 2768,
+"conversions_14d": 0,
+"impressions_14d": 2401,
+"conversions_prev14d": 0,
+"impressions_prev14d": 580
+},
+{
+"product_item_id": "SKU-0099",
+"product_title": "Product 0099 (inactive)",
+"merchant_id": "100099",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0355",
+"product_title": "Product 0355 (surge_edge)",
+"merchant_id": "100355",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 11.82,
+"cost_30d": 270.15,
+"impressions_30d": 4283,
+"conversions_14d": 11.78,
+"impressions_14d": 3600,
+"conversions_prev14d": 9,
+"impressions_prev14d": 2609
+},
+{
+"product_item_id": "SKU-0329",
+"product_title": "Product 0329 (surge)",
+"merchant_id": "100329",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 11.66,
+"cost_30d": 128.25,
+"impressions_30d": 3552,
+"conversions_14d": 16.52,
+"impressions_14d": 1395,
+"conversions_prev14d": 7,
+"impressions_prev14d": 2765
+},
+{
+"product_item_id": "SKU-0411",
+"product_title": "Product 0411 (decline)",
+"merchant_id": "100411",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 4.07,
+"cost_30d": 289.67,
+"impressions_30d": 2038,
+"conversions_14d": 2.26,
+"impressions_14d": 3915,
+"conversions_prev14d": 6,
+"impressions_prev14d": 2704
+},
+{
+"product_item_id": "SKU-0017",
+"product_title": "Product 0017 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0168",
+"product_title": "Product 0168 (inactive)",
+"merchant_id": "100168",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0304",
+"product_title": "Product 0304 (surge)",
+"merchant_id": "100304",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.88,
+"cost_30d": 169.61,
+"impressions_30d": 2404,
+"conversions_14d": 15.09,
+"impressions_14d": 1915,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3871
+},
+{
+"product_item_id": "SKU-0232",
+"product_title": "Product 0232 (zombie)",
+"merchant_id": "100232",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 41.61,
+"impressions_30d": 2590,
+"conversions_14d": 0,
+"impressions_14d": 510,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2105
+},
+{
+"product_item_id": "SKU-0227",
+"product_title": "Product 0227 (zombie)",
+"merchant_id": "100227",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 351.57,
+"impressions_30d": 5254,
+"conversions_14d": 0,
+"impressions_14d": 354,
+"conversions_prev14d": 0,
+"impressions_prev14d": 654
+},
+{
+"product_item_id": "SKU-0280",
+"product_title": "Product 0280 (zombie)",
+"merchant_id": "100280",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 347.11,
+"impressions_30d": 3903,
+"conversions_14d": 0,
+"impressions_14d": 1830,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2418
+},
+{
+"product_item_id": "SKU-0111",
+"product_title": "Product 0111 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0001",
+"product_title": "Product 0001 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0351",
+"product_title": "Product 0351 (surge_edge)",
+"merchant_id": "100351",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 10.73,
+"cost_30d": 87.72,
+"impressions_30d": 2256,
+"conversions_14d": 9.03,
+"impressions_14d": 3900,
+"conversions_prev14d": 7,
+"impressions_prev14d": 4100
+},
+{
+"product_item_id": "SKU-0189",
+"product_title": "Product 0189 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0244",
+"product_title": "Product 0244 (zombie)",
+"merchant_id": "100244",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 63.09,
+"impressions_30d": 3933,
+"conversions_14d": 0,
+"impressions_14d": 2092,
+"conversions_prev14d": 0,
+"impressions_prev14d": 900
+},
+{
+"product_item_id": "SKU-0344",
+"product_title": "Product 0344 (surge_edge)",
+"merchant_id": "100344",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 6.5,
+"cost_30d": 78.19,
+"impressions_30d": 8141,
+"conversions_14d": 6.85,
+"impressions_14d": 1664,
+"conversions_prev14d": 5,
+"impressions_prev14d": 4755
+},
+{
+"product_item_id": "SKU-0356",
+"product_title": "Product 0356 (surge_edge)",
+"merchant_id": "100356",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.96,
+"cost_30d": 239.3,
+"impressions_30d": 8170,
+"conversions_14d": 9.93,
+"impressions_14d": 1781,
+"conversions_prev14d": 7,
+"impressions_prev14d": 2888
+},
+{
+"product_item_id": "SKU-0020",
+"product_title": "Product 0020 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0006",
+"product_title": "Product 0006 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0397",
+"product_title": "Product 0397 (decline)",
+"merchant_id": "100397",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 11.66,
+"cost_30d": 149.02,
+"impressions_30d": 7873,
+"conversions_14d": 3.17,
+"impressions_14d": 4730,
+"conversions_prev14d": 12,
+"impressions_prev14d": 3891
+},
+{
+"product_item_id": "SKU-0136",
+"product_title": "Product 0136 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0010",
+"product_title": "Product 0010 (inactive)",
+"merchant_id": "100010",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0212",
+"product_title": "Product 0212 (zombie)",
+"merchant_id": "100212",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 143.82,
+"impressions_30d": 2783,
+"conversions_14d": 0,
+"impressions_14d": 1147,
+"conversions_prev14d": 0,
+"impressions_prev14d": 534
+},
+{
+"product_item_id": "SKU-0042",
+"product_title": "Product 0042 (inactive)",
+"merchant_id": "100042",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0311",
+"product_title": "Product 0311 (surge)",
+"merchant_id": "100311",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.56,
+"cost_30d": 297.42,
+"impressions_30d": 7590,
+"conversions_14d": 19.18,
+"impressions_14d": 1780,
+"conversions_prev14d": 7,
+"impressions_prev14d": 3372
+},
+{
+"product_item_id": "SKU-0239",
+"product_title": "Product 0239 (zombie)",
+"merchant_id": "100239",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 81.73,
+"impressions_30d": 4312,
+"conversions_14d": 0,
+"impressions_14d": 1642,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1574
+},
+{
+"product_item_id": "SKU-0008",
+"product_title": "Product 0008 (inactive)",
+"merchant_id": "100008",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0040",
+"product_title": "Product 0040 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0271",
+"product_title": "Product 0271 (zombie)",
+"merchant_id": "100271",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 353.09,
+"impressions_30d": 5772,
+"conversions_14d": 0,
+"impressions_14d": 569,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2977
+},
+{
+"product_item_id": "SKU-0012",
+"product_title": "Product 0012 (inactive)",
+"merchant_id": "100012",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0422",
+"product_title": "Product 0422 (decline)",
+"merchant_id": "100422",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 9.1,
+"cost_30d": 80.57,
+"impressions_30d": 4639,
+"conversions_14d": 5.99,
+"impressions_14d": 3833,
+"conversions_prev14d": 14,
+"impressions_prev14d": 3076
+},
+{
+"product_item_id": "SKU-0446",
+"product_title": "Product 0446 (neither)",
+"merchant_id": "100446",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.14,
+"cost_30d": 49.39,
+"impressions_30d": 7507,
+"conversions_14d": 7.2,
+"impressions_14d": 1987,
+"conversions_prev14d": 9,
+"impressions_prev14d": 3363
+},
+{
+"product_item_id": "SKU-0018",
+"product_title": "Product 0018 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0163",
+"product_title": "Product 0163 (inactive)",
+"merchant_id": "100163",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0491",
+"product_title": "Product 0491 (neither)",
+"merchant_id": "100491",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.64,
+"cost_30d": 212.62,
+"impressions_30d": 7274,
+"conversions_14d": 2.43,
+"impressions_14d": 1204,
+"conversions_prev14d": 3,
+"impressions_prev14d": 3358
+},
+{
+"product_item_id": "SKU-0392",
+"product_title": "Product 0392 (decline)",
+"merchant_id": "100392",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.19,
+"cost_30d": 88.09,
+"impressions_30d": 7049,
+"conversions_14d": 5.13,
+"impressions_14d": 2594,
+"conversions_prev14d": 14,
+"impressions_prev14d": 4884
+},
+{
+"product_item_id": "SKU-0186",
+"product_title": "Product 0186 (inactive)",
+"merchant_id": "100186",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0324",
+"product_title": "Product 0324 (surge)",
+"merchant_id": "100324",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.18,
+"cost_30d": 77.19,
+"impressions_30d": 3882,
+"conversions_14d": 6.95,
+"impressions_14d": 1759,
+"conversions_prev14d": 3,
+"impressions_prev14d": 3801
+},
+{
+"product_item_id": "SKU-0091",
+"product_title": "Product 0091 (inactive)",
+"merchant_id": "",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0429",
+"product_title": "Product 0429 (neither)",
+"merchant_id": "100429",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 6.64,
+"cost_30d": 239.37,
+"impressions_30d": 5854,
+"conversions_14d": 3.28,
+"impressions_14d": 1949,
+"conversions_prev14d": 3,
+"impressions_prev14d": 3266
+},
+{
+"product_item_id": "SKU-0308",
+"product_title": "Product 0308 (surge)",
+"merchant_id": "100308",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 8.4,
+"cost_30d": 230.76,
+"impressions_30d": 8194,
+"conversions_14d": 6.72,
+"impressions_14d": 3088,
+"conversions_prev14d": 3,
+"impressions_prev14d": 1673
+},
+{
+"product_item_id": "SKU-0152",
+"product_title": "Product 0152 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0478",
+"product_title": "Product 0478 (neither)",
+"merchant_id": "100478",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 5.87,
+"cost_30d": 73.21,
+"impressions_30d": 2774,
+"conversions_14d": 4.82,
+"impressions_14d": 1750,
+"conversions_prev14d": 5,
+"impressions_prev14d": 3116
+},
+{
+"product_item_id": "SKU-0435",
+"product_title": "Product 0435 (neither)",
+"merchant_id": "100435",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 2.42,
+"cost_30d": 69.19,
+"impressions_30d": 2081,
+"conversions_14d": 8.12,
+"impressions_14d": 2021,
+"conversions_prev14d": 8,
+"impressions_prev14d": 1109
+},
+{
+"product_item_id": "SKU-0048",
+"product_title": "Product 0048 (inactive)",
+"merchant_id": "100048",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0083",
+"product_title": "Product 0083 (inactive)",
+"merchant_id": "100083",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0261",
+"product_title": "Product 0261 (zombie)",
+"merchant_id": "100261",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 391.82,
+"impressions_30d": 5366,
+"conversions_14d": 0,
+"impressions_14d": 1367,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1883
+},
+{
+"product_item_id": "SKU-0180",
+"product_title": "Product 0180 (inactive)",
+"merchant_id": "100180",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0076",
+"product_title": "Product 0076 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0229",
+"product_title": "Product 0229 (zombie)",
+"merchant_id": "100229",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 273.05,
+"impressions_30d": 1728,
+"conversions_14d": 0,
+"impressions_14d": 2439,
+"conversions_prev14d": 0,
+"impressions_prev14d": 1586
+},
+{
+"product_item_id": "SKU-0137",
+"product_title": "Product 0137 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0192",
+"product_title": "Product 0192 (inactive)",
+"merchant_id": "100192",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0485",
+"product_title": "Product 0485 (neither)",
+"merchant_id": "100485",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 2.75,
+"cost_30d": 149.43,
+"impressions_30d": 6355,
+"conversions_14d": 3.18,
+"impressions_14d": 1048,
+"conversions_prev14d": 4,
+"impressions_prev14d": 1121
+},
+{
+"product_item_id": "SKU-0432",
+"product_title": "Product 0432 (neither)",
+"merchant_id": "100432",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 3.43,
+"cost_30d": 245.15,
+"impressions_30d": 5061,
+"conversions_14d": 2.54,
+"impressions_14d": 1491,
+"conversions_prev14d": 3,
+"impressions_prev14d": 940
+},
+{
+"product_item_id": "SKU-0188",
+"product_title": "Product 0188 (inactive)",
+"merchant_id": "100188",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0019",
+"product_title": "Product 0019 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0253",
+"product_title": "Product 0253 (zombie)",
+"merchant_id": "100253",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 217.74,
+"impressions_30d": 2621,
+"conversions_14d": 0,
+"impressions_14d": 2776,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2374
+},
+{
+"product_item_id": "SKU-0291",
+"product_title": "Product 0291 (surge)",
+"merchant_id": "100291",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 10.69,
+"cost_30d": 236.25,
+"impressions_30d": 4248,
+"conversions_14d": 12.29,
+"impressions_14d": 3881,
+"conversions_prev14d": 5,
+"impressions_prev14d": 3880
+},
+{
+"product_item_id": "SKU-0474",
+"product_title": "Product 0474 (neither)",
+"merchant_id": "100474",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 6.1,
+"cost_30d": 122.9,
+"impressions_30d": 3315,
+"conversions_14d": 7.39,
+"impressions_14d": 1839,
+"conversions_prev14d": 8,
+"impressions_prev14d": 2548
+},
+{
+"product_item_id": "SKU-0195",
+"product_title": "Product 0195 (inactive)",
+"merchant_id": "100195",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0139",
+"product_title": "Product 0139 (inactive)",
+"merchant_id": "100139",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0409",
+"product_title": "Product 0409 (decline)",
+"merchant_id": "100409",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 4.68,
+"cost_30d": 238.91,
+"impressions_30d": 8833,
+"conversions_14d": 1.58,
+"impressions_14d": 3325,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3211
+},
+{
+"product_item_id": "SKU-0182",
+"product_title": "Product 0182 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0046",
+"product_title": "Product 0046 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0222",
+"product_title": "Product 0222 (zombie)",
+"merchant_id": "100222",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 205.55,
+"impressions_30d": 3170,
+"conversions_14d": 0,
+"impressions_14d": 2099,
+"conversions_prev14d": 0,
+"impressions_prev14d": 2304
+},
+{
+"product_item_id": "SKU-0207",
+"product_title": "Product 0207 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0085",
+"product_title": "Product 0085 (inactive)",
+"merchant_id": "100085",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0063",
+"product_title": "Product 0063 (inactive)",
+"merchant_id": "",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0175",
+"product_title": "Product 0175 (inactive)",
+"merchant_id": "100175",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0484",
+"product_title": "Product 0484 (neither)",
+"merchant_id": "100484",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 6.61,
+"cost_30d": 54.18,
+"impressions_30d": 2883,
+"conversions_14d": 3.0,
+"impressions_14d": 2538,
+"conversions_prev14d": 4,
+"impressions_prev14d": 3932
+},
+{
+"product_item_id": "SKU-0360",
+"product_title": "Product 0360 (surge_edge)",
+"merchant_id": "100360",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 5.37,
+"cost_30d": 230.12,
+"impressions_30d": 6689,
+"conversions_14d": 9.54,
+"impressions_14d": 1116,
+"conversions_prev14d": 7,
+"impressions_prev14d": 4508
+},
+{
+"product_item_id": "SKU-0393",
+"product_title": "Product 0393 (decline)",
+"merchant_id": "100393",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 4.87,
+"cost_30d": 180.68,
+"impressions_30d": 6300,
+"conversions_14d": 3.03,
+"impressions_14d": 3842,
+"conversions_prev14d": 10,
+"impressions_prev14d": 1092
+},
+{
+"product_item_id": "SKU-0274",
+"product_title": "Product 0274 (zombie)",
+"merchant_id": "100274",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 388.43,
+"impressions_30d": 3795,
+"conversions_14d": 0,
+"impressions_14d": 2406,
+"conversions_prev14d": 0,
+"impressions_prev14d": 954
+},
+{
+"product_item_id": "SKU-0335",
+"product_title": "Product 0335 (surge)",
+"merchant_id": "100335",
+"channels": [
+"SHOPPING",
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 7.47,
+"cost_30d": 227.51,
+"impressions_30d": 7025,
+"conversions_14d": 13.64,
+"impressions_14d": 4740,
+"conversions_prev14d": 8,
+"impressions_prev14d": 3176
+},
+{
+"product_item_id": "SKU-0092",
+"product_title": "Product 0092 (inactive)",
+"merchant_id": "100092",
+"channels": [
+"PERFORMANCE_MAX"
+],
+"conversions_30d": 0,
+"cost_30d": 0,
+"impressions_30d": 0,
+"conversions_14d": 0,
+"impressions_14d": 0,
+"conversions_prev14d": 0,
+"impressions_prev14d": 0
+},
+{
+"product_item_id": "SKU-0284",
+"product_title": "Product 0284 (surge)",
+"merchant_id": "100284",
+"channels": [
+"SHOPPING"
+],
+"conversions_30d": 6.3,
+"cost_30d": 114.84,
+"impressions_30d": 7207,
+"conversions_14d": 5.77,
+"impressions_14d": 3466,
+"conversions_prev14d": 2,
+"impressions_prev14d": 1062
+}
+]
+}

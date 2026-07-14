@@ -37,6 +37,13 @@
       "description": "Per-product CM3 contribution-margin report from a Google Ads 'Shopping products' CSV (optionally enriched with a Shopify 'Gross profit by product' CSV). One compute pass emits the locked 3-format bundle: an Obsidian-ready markdown report with static SVG charts, a self-contained interactive HTML explorer (tune cost assumptions and band cutoffs; every KPI, band, chart, rollup and product row re-computes live — it carries every workbook tab: By Campaign / Vendor / Category L1-L5 / Product Type L1-L5, plus by-band, summary KPIs and methodology, a live Pivot cross-tab of any two dimensions, and a dark mode), and a detailed multi-tab xlsx; a 7-slide executive pptx is opt-in. Segments products into 5 CM3 bands and rolls up by campaign, category, product type, and vendor. Requires openpyxl, python-pptx, and vl-convert-python."
     },
     {
+      "name": "google-ads-management",
+      "source": "./plugins/google-ads-management",
+      "version": "2.0.0",
+      "category": "marketing",
+      "description": "Ongoing, cadence-based Google Ads management as done-with-you advisors — dual input (read-only Google Ads MCP or a user CSV export), fronted by an interactive in-Claude menu: invoke 'manage Google Ads' to open the google-ads hub, which lists every task and routes to it. A shared foundation (account selection, GAQL cookbook, 2026 benchmarks, dual-input + advisor output contract) plus account health & red flags, budget pacing, bidding strategy, keywords/search terms, Quality Score forensics, audience targeting, conversions & tracking, performance reporting, competitive analysis, PMax campaigns, PMax listing groups, and product performance. Diagnoses account data against thresholds behind a transcription firewall, then leads a prioritized recommendation loop and offers ready-to-apply Google Ads Editor CSVs — emitting the md + interactive-HTML + tunable-xlsx bundle (or a reduced md + xlsx bundle for account health & audience targeting), with Node<->Python kernel parity across every tunable skill. HTML + markdown are standard-library only; the xlsx backup needs openpyxl and the static chart SVGs need vl-convert-python."
+    },
+    {
       "name": "project-coordinator",
       "source": "./plugins/project-coordinator",
       "version": "0.5.0",

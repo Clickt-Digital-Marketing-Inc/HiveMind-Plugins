@@ -1,0 +1,58 @@
+{
+  "_comment": "Shared Python<->JS parity vectors for _shared/analytics.py. Consumed by skills/google-ads/tests/run_parity.py (analytics-primitives entry): _compute_expected.py --analytics computes the Python expected outputs, tuner_parity.mjs --analytics replays them through analytics.JS_MIRROR. Skills may add their own vectors as skills/<skill>/tests/analytics_vectors*.json (auto-discovered). Keep values away from exact .5 rounding boundaries (kernel-mirror contract).",
+  "concentration": [
+    {"rows": [{"cost": 500.0}, {"cost": 300.0}, {"cost": 150.0}, {"cost": 50.0}], "value_key": "cost", "top_n": 2},
+    {"rows": [{"v": 25}, {"v": 25}, {"v": 25}, {"v": 25}], "value_key": "v", "top_n": 4},
+    {"rows": [{"v": 10}], "value_key": "v", "top_n": 3},
+    {"rows": [], "value_key": "v", "top_n": 3},
+    {"rows": [{"v": 0}, {"v": 0}], "value_key": "v", "top_n": 2},
+    {"rows": [{"v": 100}, {"v": 100}, {"v": 100}], "value_key": "v", "top_n": 2},
+    {"rows": [{"v": 0.03}, {"v": 0.01}], "value_key": "v", "top_n": 1},
+    {"rows": [{"v": 5}, {"v": -3}, {"v": null}, {"v": "7"}, {}], "value_key": "v", "top_n": 10},
+    {"rows": [{"v": 123.456}, {"v": 78.9}, {"v": 0.0321}, {"v": 6543.21}, {"v": 0.0007}], "value_key": "v", "top_n": 3},
+    {"rows": [{"cost": 500.0}, {"cost": 300.0}, {"cost": 150.0}, {"cost": 50.0}], "value_key": "cost", "top_n": 0}
+  ],
+  "signals": [
+    {
+      "rows": [
+        {"cost": 250.0, "conversions": 0, "avg_cost": 100.0, "ctr": 0.005},
+        {"cost": 50.0, "conversions": 3, "avg_cost": 100.0, "ctr": 0.02},
+        {"cost": 200.0, "conversions": 1, "ctr": 0.02},
+        {"cost": null, "conversions": 0},
+        {}
+      ],
+      "rules": [
+        {"id": "high_cost", "key": "cost", "op": "gt", "value": 100},
+        {"id": "no_conv", "key": "conversions", "op": "eq", "value": 0},
+        {"id": "cost_over_avg", "key": "cost", "op": "ge", "value_key": "avg_cost", "mult": 2.0},
+        {"id": "low_ctr", "key": "ctr", "op": "lt", "value": 0.01}
+      ]
+    },
+    {
+      "rows": [{"x": 5}, {"x": 4}, {"x": 4.0001}, {"x": -2}],
+      "rules": [
+        {"id": "gt", "key": "x", "op": "gt", "value": 4},
+        {"id": "ge", "key": "x", "op": "ge", "value": 4},
+        {"id": "lt", "key": "x", "op": "lt", "value": 4},
+        {"id": "le", "key": "x", "op": "le", "value": 4},
+        {"id": "eq", "key": "x", "op": "eq", "value": 4},
+        {"id": "ne", "key": "x", "op": "ne", "value": 4}
+      ]
+    },
+    {
+      "rows": [{"spend": 90.0, "budget": 30.0}, {"spend": 89.9999, "budget": 30.0}, {"spend": 10.0}],
+      "rules": [
+        {"id": "over_3x_budget", "key": "spend", "op": "ge", "value_key": "budget", "mult": 3.0},
+        {"id": "under_budget", "key": "spend", "op": "lt", "value_key": "budget"}
+      ]
+    }
+  ],
+  "pre_score": [
+    {"row": {"flags": ["high_cost", "no_conv"]}, "weights": {"high_cost": 3.0, "no_conv": 5.0, "low_ctr": 1.5}},
+    {"row": {"flags": ["no_conv", "no_conv"]}, "weights": {"high_cost": 3.0, "no_conv": 5.0}},
+    {"row": {"flags": ["mystery"]}, "weights": {"high_cost": 3.0}},
+    {"row": {}, "weights": {"high_cost": 3.0}},
+    {"row": {"flags": ["b", "a", "c", "a"]}, "weights": {"a": 0.1002, "b": 0.2001, "c": 0.3003}},
+    {"row": {"flags": ["a", "b"]}, "weights": {"a": 1.2345, "b": 2.3456}}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "google-ads-tuner-parity-harness",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dev-only jsdom harness that verifies the in-Claude tuner's live JS recompute matches the Python model (JS<->Python parity) and that Save emits the correct direct-write prompt. Not shipped/run by the plugin at runtime.",
+  "type": "module",
+  "scripts": {
+    "parity": "python3 run_parity.py"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "client_name": "Sample Shop",
+    "account_id": "000-000-0000",
+    "currency": "CAD",
+    "window_30d": "2026-05-29 to 2026-06-27",
+    "generated": "2026-06-27"
+  },
+  "params": {
+    "expensiveness_factor": 1.50
+  },
+  "benchmarks": [
+    {"campaign_id": 1, "campaign": "Shopping - Brand",        "clicks": 500, "cost": 1000.0, "conversions": 50.0},
+    {"campaign_id": 2, "campaign": "Shopping - Generic",      "clicks": 800, "cost": 2000.0, "conversions": 40.0},
+    {"campaign_id": 3, "campaign": "Shopping - New (no conv)", "clicks": 50,  "cost": 100.0,  "conversions": 0.0}
+  ],
+  "listing_groups": [
+    {"campaign_id": 1, "campaign": "Shopping - Brand", "asset_group_id": "11", "asset_group": "AG Brand", "listing_group_id": "1~11", "listing_group": "Brand: Acme", "dimension": "product_brand", "impressions": 2000, "clicks": 40, "cost": 200.0, "conversions": 4.0, "conversions_value": 800.0},
+    {"campaign_id": 1, "campaign": "Shopping - Brand", "asset_group_id": "11", "asset_group": "AG Brand", "listing_group_id": "1~12", "listing_group": "Brand: Globex", "dimension": "product_brand", "impressions": 1500, "clicks": 30, "cost": 120.0, "conversions": 10.0, "conversions_value": 1500.0},
+    {"campaign_id": 1, "campaign": "Shopping - Brand", "asset_group_id": "11", "asset_group": "AG Brand", "listing_group_id": "1~13", "listing_group": "Item ID: SKU-COLD", "dimension": "product_item_id", "impressions": 900, "clicks": 20, "cost": 60.0, "conversions": 0.0, "conversions_value": 0.0},
+    {"campaign_id": 2, "campaign": "Shopping - Generic", "asset_group_id": "21", "asset_group": "AG Generic", "listing_group_id": "2~21", "listing_group": "Type: Widgets", "dimension": "product_type", "impressions": 3000, "clicks": 60, "cost": 300.0, "conversions": 5.0, "conversions_value": 900.0},
+    {"campaign_id": 2, "campaign": "Shopping - Generic", "asset_group_id": "21", "asset_group": "AG Generic", "listing_group_id": "2~22", "listing_group": "Item ID: SKU-OK", "dimension": "product_item_id", "impressions": 1200, "clicks": 25, "cost": 100.0, "conversions": 0.0, "conversions_value": 0.0},
+    {"campaign_id": 2, "campaign": "Shopping - Generic", "asset_group_id": "21", "asset_group": "AG Generic", "listing_group_id": "2~23", "listing_group": "", "dimension": "", "impressions": 5000, "clicks": 50, "cost": 400.0, "conversions": 8.0, "conversions_value": 1600.0},
+    {"campaign_id": 3, "campaign": "Shopping - New (no conv)", "asset_group_id": "31", "asset_group": "AG Test", "listing_group_id": "3~31", "listing_group": "Brand: Test", "dimension": "product_brand", "impressions": 600, "clicks": 10, "cost": 40.0, "conversions": 0.0, "conversions_value": 0.0}
+  ],
+  "products": [
+    {"campaign_id": 1, "campaign": "Shopping - Brand", "item_id": "SKU-001", "title": "Acme Anvil", "impressions": 1800, "clicks": 36, "cost": 180.0, "conversions": 3.0, "conversions_value": 600.0},
+    {"campaign_id": 1, "campaign": "Shopping - Brand", "item_id": "SKU-002", "title": "Globex Gear", "impressions": 1000, "clicks": 18, "cost": 90.0, "conversions": 6.0, "conversions_value": 900.0},
+    {"campaign_id": 1, "campaign": "Shopping - Brand", "item_id": "SKU-003", "title": "Cold Cog", "impressions": 700, "clicks": 20, "cost": 50.0, "conversions": 0.0, "conversions_value": 0.0},
+    {"campaign_id": 2, "campaign": "Shopping - Generic", "item_id": "SKU-101", "title": "Big Widget", "impressions": 1500, "clicks": 28, "cost": 120.0, "conversions": 0.0, "conversions_value": 0.0},
+    {"campaign_id": 2, "campaign": "Shopping - Generic", "item_id": "SKU-102", "title": "Small Widget", "impressions": 2500, "clicks": 40, "cost": 300.0, "conversions": 5.0, "conversions_value": 1000.0},
+    {"campaign_id": 3, "campaign": "Shopping - New (no conv)", "item_id": "SKU-201", "title": "Test Item", "impressions": 400, "clicks": 8, "cost": 30.0, "conversions": 0.0, "conversions_value": 0.0}
+  ]
+}

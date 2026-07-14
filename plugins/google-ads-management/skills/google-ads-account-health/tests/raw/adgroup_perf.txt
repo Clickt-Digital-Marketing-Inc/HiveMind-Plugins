@@ -1,0 +1,28 @@
+{
+ "result": [
+  {
+   "campaign.id": "1001",
+   "campaign.name": "NonBrand_US_Search_CRM_2026",
+   "ad_group.id": "2001",
+   "ad_group.name": "Generic - CRM",
+   "metrics.clicks": "40",
+   "metrics.impressions": "4000"
+  },
+  {
+   "campaign.id": "1001",
+   "campaign.name": "NonBrand_US_Search_CRM_2026",
+   "ad_group.id": "2002",
+   "ad_group.name": "Demos - CRM",
+   "metrics.clicks": "100",
+   "metrics.impressions": "1000"
+  },
+  {
+   "campaign.id": "1002",
+   "campaign.name": "Brand_US_Search_CRM_2026",
+   "ad_group.id": "2003",
+   "ad_group.name": "Core",
+   "metrics.clicks": "500",
+   "metrics.impressions": "5000"
+  }
+ ]
+}

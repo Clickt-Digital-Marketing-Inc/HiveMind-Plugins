@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "client_name": "Demo Co",
+    "account_id": "111-222-3333",
+    "currency": "USD",
+    "period": "2026-06-01 → 2026-06-26",
+    "prior_period": "2026-05-01 → 2026-05-26",
+    "generated": "2026-06-26"
+  },
+  "campaigns": [
+    {"campaign_id": 1, "campaign": "S | Brand", "status": "ENABLED", "channel": "SEARCH",
+     "impressions": 20000, "clicks": 1600, "cost": 1000.0, "conversions": 30, "conversions_value": 6000.0,
+     "search_impression_share": 0.62, "search_budget_lost_is": 0.25, "search_rank_lost_is": 0.05,
+     "prior_cost": 900.0, "prior_conversions": 26, "prior_conversions_value": 5000.0},
+    {"campaign_id": 2, "campaign": "S | NB - Core", "status": "ENABLED", "channel": "SEARCH",
+     "impressions": 30000, "clicks": 1500, "cost": 1000.0, "conversions": 25, "conversions_value": 5000.0,
+     "search_impression_share": 0.74, "search_budget_lost_is": 0.02, "search_rank_lost_is": 0.20,
+     "prior_cost": 1000.0, "prior_conversions": 24, "prior_conversions_value": 4800.0},
+    {"campaign_id": 3, "campaign": "S | NB - Laggard", "status": "ENABLED", "channel": "SEARCH",
+     "impressions": 40000, "clicks": 1200, "cost": 800.0, "conversions": 8, "conversions_value": 1600.0,
+     "search_impression_share": 0.40, "search_budget_lost_is": 0.30, "search_rank_lost_is": 0.10,
+     "prior_cost": 700.0, "prior_conversions": 10, "prior_conversions_value": 2200.0},
+    {"campaign_id": 4, "campaign": "S | NB - Weak", "status": "ENABLED", "channel": "SEARCH",
+     "impressions": 15000, "clicks": 600, "cost": 500.0, "conversions": 5, "conversions_value": 500.0,
+     "search_impression_share": 0.35, "search_budget_lost_is": 0.0, "search_rank_lost_is": 0.40,
+     "prior_cost": 520.0, "prior_conversions": 6, "prior_conversions_value": 700.0},
+    {"campaign_id": 5, "campaign": "Lead Gen | No Revenue", "status": "ENABLED", "channel": "SEARCH",
+     "impressions": 9000, "clicks": 360, "cost": 300.0, "conversions": 4,
+     "search_impression_share": 0.55, "search_budget_lost_is": 0.05, "search_rank_lost_is": 0.10,
+     "prior_cost": 280.0, "prior_conversions": 3},
+    {"campaign_id": 6, "campaign": "PMax | Shopping", "status": "ENABLED", "channel": "PERFORMANCE_MAX",
+     "impressions": 120000, "clicks": 4000, "cost": 2000.0, "conversions": 50, "conversions_value": 10000.0,
+     "prior_cost": 1800.0, "prior_conversions": 44, "prior_conversions_value": 8800.0}
+  ]
+}

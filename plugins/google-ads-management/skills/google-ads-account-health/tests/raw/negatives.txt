@@ -1,0 +1,19 @@
+{
+ "result": [
+  {
+   "campaign.id": "1002"
+  },
+  {
+   "campaign.id": "1002"
+  },
+  {
+   "campaign.id": "1002"
+  },
+  {
+   "campaign.id": "1002"
+  },
+  {
+   "campaign.id": "1002"
+  }
+ ]
+}

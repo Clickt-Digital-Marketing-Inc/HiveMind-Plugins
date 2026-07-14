@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "client_name": "Sample Co",
+    "account_id": "000-000-0000",
+    "currency": "USD",
+    "window_90d": "2026-03-28 to 2026-06-25",
+    "window_30d": "2026-05-27 to 2026-06-25",
+    "generated": "2026-06-26"
+  },
+  "benchmarks": [
+    {"campaign_id": 1, "campaign": "Brand Search",   "ctr": 0.10, "cost": 1000.0, "conversions": 100.0},
+    {"campaign_id": 2, "campaign": "Generic Search", "ctr": 0.08, "cost": 2000.0, "conversions": 40.0},
+    {"campaign_id": 3, "campaign": "New Test (no conv)", "ctr": 0.05, "cost": 50.0, "conversions": 0.0}
+  ],
+  "search_terms": [
+    {"campaign_id": 1, "campaign": "Brand Search", "ad_group": "Brand", "term": "cheap brand thing", "match_type": "PHRASE", "impressions": 1500, "clicks": 30, "ctr": 0.02, "cost": 30.0, "conversions_90d": 0, "conversions_30d": 0},
+    {"campaign_id": 1, "campaign": "Brand Search", "ad_group": "Brand", "term": "good brand term", "match_type": "PHRASE", "impressions": 800, "clicks": 96, "ctr": 0.12, "cost": 40.0, "conversions_90d": 5, "conversions_30d": 2},
+    {"campaign_id": 1, "campaign": "Brand Search", "ad_group": "Brand", "term": "high ctr no conv", "match_type": "NEAR_EXACT", "impressions": 500, "clicks": 100, "ctr": 0.20, "cost": 35.0, "conversions_90d": 0, "conversions_30d": 0},
+    {"campaign_id": 2, "campaign": "Generic Search", "ad_group": "Generic", "term": "old converter gone cold", "match_type": "NEAR_PHRASE", "impressions": 4000, "clicks": 40, "ctr": 0.01, "cost": 200.0, "conversions_90d": 3, "conversions_30d": 0},
+    {"campaign_id": 2, "campaign": "Generic Search", "ad_group": "Generic", "term": "still converting", "match_type": "NEAR_PHRASE", "impressions": 2000, "clicks": 160, "ctr": 0.08, "cost": 180.0, "conversions_90d": 4, "conversions_30d": 2},
+    {"campaign_id": 2, "campaign": "Generic Search", "ad_group": "Generic", "term": "low cost low ctr", "match_type": "PHRASE", "impressions": 1000, "clicks": 10, "ctr": 0.01, "cost": 10.0, "conversions_90d": 0, "conversions_30d": 0},
+    {"campaign_id": 2, "campaign": "Generic Search", "ad_group": "Generic", "term": "decayed but cheap", "match_type": "NEAR_PHRASE", "impressions": 1200, "clicks": 12, "ctr": 0.01, "cost": 60.0, "conversions_90d": 2, "conversions_30d": 0},
+    {"campaign_id": 3, "campaign": "New Test (no conv)", "ad_group": "Test", "term": "brand new untested term", "match_type": "PHRASE", "impressions": 600, "clicks": 6, "ctr": 0.01, "cost": 40.0, "conversions_90d": 0, "conversions_30d": 0}
+  ]
+}

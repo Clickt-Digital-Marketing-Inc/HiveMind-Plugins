@@ -1,0 +1,29 @@
+{
+  "_comment": "Per-skill Python<->JS parity vectors for _shared/analytics.py (HM-535), shaped like the budget-pacing skill's own use of concentration/signals/pre_score (spend concentration + the per-campaign pace pre-scorer). Auto-discovered by skills/google-ads/tests/run_parity.py's analytics-primitives gate — never edit the shared harness.",
+  "concentration": [
+    {"rows": [{"cost": 4000.0}, {"cost": 2000.0}, {"cost": 1500.0}, {"cost": 800.0}, {"cost": 600.0}, {"cost": 500.0}], "value_key": "cost", "top_n": 3},
+    {"rows": [{"cost": 300.0}, {"cost": 300.0}, {"cost": 300.0}], "value_key": "cost", "top_n": 3},
+    {"rows": [{"cost": 0.0}, {"cost": 0.0}], "value_key": "cost", "top_n": 3}
+  ],
+  "signals": [
+    {
+      "rows": [
+        {"campaign_pace_ratio": 0.4889, "budget_lost_is": 0.25, "conv": 100},
+        {"campaign_pace_ratio": 1.35, "budget_lost_is": 0.02, "conv": 30},
+        {"campaign_pace_ratio": null, "budget_lost_is": null, "conv": 10},
+        {"campaign_pace_ratio": 1.0, "budget_lost_is": 0.0, "conv": 0}
+      ],
+      "rules": [
+        {"id": "over_pace", "key": "campaign_pace_ratio", "op": "gt", "value": 1.15},
+        {"id": "under_pace", "key": "campaign_pace_ratio", "op": "lt", "value": 0.85},
+        {"id": "constrained", "key": "budget_lost_is", "op": "gt", "value": 0.10},
+        {"id": "zero_conv", "key": "conv", "op": "eq", "value": 0}
+      ]
+    }
+  ],
+  "pre_score": [
+    {"row": {"flags": ["under_pace", "constrained"]}, "weights": {"over_pace": 1.0, "under_pace": 1.0, "constrained": 1.5, "zero_conv": 2.0}},
+    {"row": {"flags": ["zero_conv"]}, "weights": {"over_pace": 1.0, "under_pace": 1.0, "constrained": 1.5, "zero_conv": 2.0}},
+    {"row": {"flags": []}, "weights": {"over_pace": 1.0, "under_pace": 1.0, "constrained": 1.5, "zero_conv": 2.0}}
+  ]
+}

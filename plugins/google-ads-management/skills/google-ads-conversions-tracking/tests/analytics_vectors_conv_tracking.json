@@ -1,0 +1,52 @@
+{
+  "_comment": "Skill-owned Python<->JS parity vectors for _shared/analytics.py, auto-discovered by skills/google-ads/tests/run_parity.py (analytics-primitives entry). Mirrors the exact rule shapes conv_tracking_core._trend_rules() / classify_trend() use: relative CVR-drop / CTR-held comparisons, an absolute volume floor, and pre_score over the trend/config flag-weight tables. Never edit the shared harness files to add these — this file alone is enough.",
+  "concentration": [
+    {"rows": [{"conv": 20.0}, {"conv": 25.0}, {"conv": 25.0}, {"conv": 85.0}, {"conv": 32.0}], "value_key": "conv", "top_n": 2},
+    {"rows": [{"conv": 0.0}, {"conv": 0.0}], "value_key": "conv", "top_n": 1}
+  ],
+  "signals": [
+    {
+      "rows": [
+        {"cvr_curr": 0.02, "cvr_prior": 0.05, "ctr_curr": 0.05, "ctr_prior": 0.05,
+         "conversions_curr": 20, "account_avg_cvr": 0.0227},
+        {"cvr_curr": 0.05, "cvr_prior": 0.08, "ctr_curr": 0.0333, "ctr_prior": 0.05,
+         "conversions_curr": 25, "account_avg_cvr": 0.0227},
+        {"cvr_curr": 0.10625, "cvr_prior": 0.10, "ctr_curr": 0.05, "ctr_prior": 0.05,
+         "conversions_curr": 85, "account_avg_cvr": 0.0227},
+        {"cvr_curr": 0.0667, "cvr_prior": null, "ctr_curr": 0.05, "ctr_prior": null,
+         "conversions_curr": 10, "account_avg_cvr": 0.0227}
+      ],
+      "rules": [
+        {"id": "cvr_drop", "key": "cvr_curr", "op": "le", "value_key": "cvr_prior", "mult": 0.7},
+        {"id": "ctr_held_or_up", "key": "ctr_curr", "op": "ge", "value_key": "ctr_prior", "mult": 1.0},
+        {"id": "thin_volume", "key": "conversions_curr", "op": "lt", "value": 30},
+        {"id": "below_account_cvr", "key": "cvr_curr", "op": "lt", "value_key": "account_avg_cvr", "mult": 0.5}
+      ]
+    },
+    {
+      "rows": [
+        {"conv30": 0.0, "primary_enabled": 1.0},
+        {"conv30": 12.5, "primary_enabled": 1.0},
+        {"conv30": 0.0, "primary_enabled": 0.0}
+      ],
+      "rules": [
+        {"id": "dormant_candidate", "key": "conv30", "op": "le", "value": 0},
+        {"id": "is_primary_enabled", "key": "primary_enabled", "op": "eq", "value": 1}
+      ]
+    }
+  ],
+  "pre_score": [
+    {"row": {"flags": ["cvr_drop", "ctr_held_or_up", "landing_page_suspect", "thin_volume", "below_account_cvr"]},
+     "weights": {"cvr_drop": 4.0, "landing_page_suspect": 6.0, "thin_volume": 1.0, "below_account_cvr": 2.0}},
+    {"row": {"flags": ["cvr_drop", "thin_volume"]},
+     "weights": {"cvr_drop": 4.0, "landing_page_suspect": 6.0, "thin_volume": 1.0, "below_account_cvr": 2.0}},
+    {"row": {"flags": ["below_account_cvr"]},
+     "weights": {"cvr_drop": 4.0, "landing_page_suspect": 6.0, "thin_volume": 1.0, "below_account_cvr": 2.0}},
+    {"row": {"flags": []},
+     "weights": {"cvr_drop": 4.0, "landing_page_suspect": 6.0, "thin_volume": 1.0, "below_account_cvr": 2.0}},
+    {"row": {"flags": ["dormant_primary", "every_counting_lead", "legacy_attribution", "duplicate_primary_category"]},
+     "weights": {"dormant_primary": 5.0, "every_counting_lead": 3.0, "legacy_attribution": 2.0, "duplicate_primary_category": 3.0}},
+    {"row": {"flags": ["duplicate_primary_category"]},
+     "weights": {"dormant_primary": 5.0, "every_counting_lead": 3.0, "legacy_attribution": 2.0, "duplicate_primary_category": 3.0}}
+  ]
+}

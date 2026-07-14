@@ -1,0 +1,21 @@
+# Python deps for the google-ads-management analytical generators.
+#
+# The standard analytical bundle is rendered by the shared toolkit (_shared/render):
+#   - md + html  -> stdlib only, NO third-party deps.
+#   - xlsx       -> needs openpyxl (the only part of the toolkit that imports it,
+#                   and only when the xlsx format is requested).
+#   - charts     -> needs vl-convert-python (lazy-imported, and only when the
+#                   spec declares charts). EXACT pin: the static chart SVGs must
+#                   be byte-reproducible and stay in lockstep with the vendored
+#                   Vega-Lite runtime in _shared/render/vendor/ (VERSIONS.md).
+openpyxl>=3.1
+vl-convert-python==1.7.0
+
+# Optional system dependency (not pip-installable): LibreOffice provides `soffice`,
+# used ONLY to normalize the .xlsx so it opens reliably in Excel-for-Mac while
+# staying formula-driven. The md/html primaries never need it. If you request the
+# .xlsx and soffice is missing, the build fails (exit 2) rather than shipping a file
+# that may not open — pass --no-normalize to override. macOS: `brew install --cask libreoffice`.
+#
+# The Google Ads Editor apply-CSVs (negative/add-keyword) are produced separately by
+# google-ads-foundation/scripts/make_editor_csv.py and need nothing here.
