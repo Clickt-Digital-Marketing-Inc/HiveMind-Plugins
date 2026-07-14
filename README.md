@@ -5,6 +5,10 @@ Clickt's HiveMind plugins for **Claude Code**, in one marketplace. Two families:
 self-contained, white-label client reports, and **workflow** plugins that run your
 day on Linear, Gmail, and Google Calendar.
 
+Authored by **Clickt Digital Marketing Inc.** ([clickt.ca](https://clickt.ca)).
+This repo is public and every plugin in it is free to install and run. No
+signup of any kind is required.
+
 ### Deliverable plugins
 
 Each emits an interactive HTML report, an Obsidian-ready markdown record, and a
@@ -19,7 +23,7 @@ formula-driven xlsx workbook from a single compute pass.
 
 ### Workflow plugins
 
-Skill-driven — no Python, no build step. They read and act through connected MCP
+Skill-driven: no Python, no build step. They read and act through connected MCP
 servers.
 
 | Plugin | What it does | Runs on |
@@ -33,7 +37,7 @@ servers.
 > resell, redistribute, mirror, or re-host it. See [`LICENSE`](LICENSE).
 >
 > The social-media-manager stores your voice profile at
-> `~/.claude/social-media-manager/voice-profile.md` — **on your machine, outside
+> `~/.claude/social-media-manager/voice-profile.md`, **on your machine, outside
 > this repo.** Nothing personal is published here.
 
 ## Install
@@ -42,7 +46,11 @@ servers.
    ```
    /plugin marketplace add Clickt-Digital-Marketing-Inc/HiveMind-Plugins
    ```
-2. **Install the plugin(s) you want:**
+2. **Install a plugin.** Example:
+   ```
+   /plugin install google-ads-audit@hivemind-plugins
+   ```
+   Installable slugs, each `@hivemind-plugins`:
    ```
    /plugin install google-ads-audit@hivemind-plugins
    /plugin install meta-ads-audit@hivemind-plugins
@@ -53,22 +61,22 @@ servers.
    /plugin install morning-briefing@hivemind-plugins
    ```
 3. **Set up what your chosen plugins need:**
-   - *Deliverable plugins* — Python 3 with `pip install openpyxl` (all four);
+   - *Deliverable plugins*: Python 3 with `pip install openpyxl` (all four);
      `cm3-profitability` also needs `pip install python-pptx vl-convert-python==1.7.0`.
-   - *Workflow plugins* — no Python. Connect the MCP servers they use: Linear
+   - *Workflow plugins*: no Python. Connect the MCP servers they use: Linear
      (all three), plus Gmail + Google Calendar (morning-briefing) and web access
      (social-media-manager).
 
 ## Requirements
 
 - **Claude Code** with plugin support.
-- **Deliverable plugins — Python 3.** The audits' HTML + markdown renderers are
+- **Deliverable plugins, Python 3.** The audits' HTML + markdown renderers are
   standard-library only; `openpyxl` (>=3.1) is needed for the xlsx workbooks.
   `cm3-profitability` additionally needs `python-pptx` and the exact pin
   `vl-convert-python==1.7.0`. **LibreOffice** (optional) normalizes xlsx output.
   Data comes from each plugin's own MCP (Google Ads / Meta Ads / Shopify) **or**
   from CSV exports; `cm3-profitability` is CSV-only.
-- **Workflow plugins — MCP servers, no Python.** `project-coordinator` and
+- **Workflow plugins, MCP servers, no Python.** `project-coordinator` and
   `social-media-manager` use the Linear MCP (social also uses web access);
   `morning-briefing` uses the Gmail, Linear, and Google Calendar MCPs. See each
   plugin's `SKILL.md` for the exact tools it calls.
@@ -77,13 +85,13 @@ servers.
 
 Ask for the plugin's job in plain language:
 
-- **Deliverables** — *"audit my Google Ads account"*, *"run a Meta ads audit"*,
+- **Deliverables**: *"audit my Google Ads account"*, *"run a Meta ads audit"*,
   *"run a Shopify CRO audit"*, *"run a CM3 report"*. Each resolves the account/CSVs,
   computes deterministically (numbers are parsed by code, never guessed by the
   model), asks where to save, and builds the bundle. Access is **read-only** and
-  the reports are **white-label** — they lead with the client's name, no vendor
+  the reports are **white-label**: they lead with the client's name, no vendor
   branding.
-- **Workflows** — *"set up this project"* / *"plan this into Linear"*,
+- **Workflows**: *"set up this project"* / *"plan this into Linear"*,
   *"plan my social posts"*, *"give me my morning briefing"*. These act through your
   connected tools; anything with an outward effect (sending mail, creating issues,
   booking calendar time) is confirmed with you first.
@@ -93,7 +101,23 @@ Ask for the plugin's job in plain language:
 Each plugin's full workflow lives in its `SKILL.md` under
 `plugins/<name>/skills/<name>/`.
 
+## Community and updates
+
+This repo is public, and every plugin in it is free to install and run. No
+signup is required to install anything above.
+
+If you want the HiveMind community and a heads-up when new plugins ship, one
+email at [gethivemind.co](https://gethivemind.co) gets you both. This is
+optional; it exists for people who want ongoing updates, not as a gate on the
+plugins themselves.
+
+<!-- TODO(CF-04): direct Discourse community URL when confirmed -->
+
+## Support
+
+Questions, bugs, or requests: [support@clickt.ca](mailto:support@clickt.ca).
+
 ## License
 
 Source-available. Copyright (c) 2026 Clickt Digital Marketing Inc. All rights
-reserved. Free to use, not to redistribute — see [`LICENSE`](LICENSE).
+reserved. Free to use, not to redistribute, see [`LICENSE`](LICENSE).
