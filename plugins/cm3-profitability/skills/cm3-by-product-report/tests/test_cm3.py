@@ -20,6 +20,7 @@ import os
 import re
 import sys
 import tempfile
+from collections import defaultdict
 from pathlib import Path
 
 HERE = Path(__file__).resolve()
@@ -256,6 +257,38 @@ def main():
           "single-campaign fixture: campaign bucket must equal totals")
     check({"Acme", "Nimbus"} <= set(by_vendor.keys()),
           f"vendor rollup missing Acme/Nimbus: {set(by_vendor.keys())}")
+
+    # Pivot tab wired in (full cross-tab value parity is pinned by the dev-only
+    # run_explorer_parity_cm3.py harness; here we gate the markers + a no-loss oracle).
+    for marker in ("pivotData", "renderPivot", "buildPivotPanel", "PIVOT_DIMS",
+                   "PIVOT_MEASURES", 'id="pivotRow"', 'id="pivotCol"', 'id="pivotMeas"',
+                   '"pivot"', "Pivot"):
+        check(marker in html, f"html missing pivot UI marker '{marker}'")
+    # Pivot cross-tab is loss-free: with every product placed in exactly one
+    # (row,col) cell via "(unset)" for blanks, the campaign×vendor grid conserves
+    # the full universe on the Products measure.
+    cross = defaultdict(int)
+    for p in products:
+        rk = p.campaign or "(no campaign)"
+        ck = p.vendor if p.vendor else "(unset)"
+        cross[(rk, ck)] += 1
+    check(sum(cross.values()) == len(products), "pivot cross-tab drops/duplicates products")
+    row_marg = defaultdict(int)
+    col_marg = defaultdict(int)
+    for (rk, ck), n in cross.items():
+        row_marg[rk] += n
+        col_marg[ck] += n
+    check(sum(row_marg.values()) == len(products) and sum(col_marg.values()) == len(products),
+          "pivot marginals do not reconcile to the product count")
+    # Every vendorless product lands in the "(unset)" column (unlike the vendor rollup).
+    check(col_marg.get("(unset)", 0) == (len(products) - n_vendored),
+          "pivot must bucket vendorless products into (unset)")
+
+    # Dark mode / brand restyle wired in.
+    for marker in ("prefers-color-scheme", 'data-theme="dark"', "themeToggle",
+                   "--lime", "--ember", "--pass"):
+        check(marker in html, f"html missing dark/brand marker '{marker}'")
+
     # Chartless variant carries no vendor bytes and no chart chrome.
     nchtml = cm3_html.render_html(ctx, period, currency, charts=False)
     check(chartsmod.VENDOR_BEGIN not in nchtml and "chartsCard" not in nchtml

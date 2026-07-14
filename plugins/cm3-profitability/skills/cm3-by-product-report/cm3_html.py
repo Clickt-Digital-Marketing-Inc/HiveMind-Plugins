@@ -85,16 +85,18 @@ CHARTS = [
     {
         "id": "revenue_cm3_scatter",
         "title": "Revenue vs CM3 % per product",
-        "mark": {"type": "point"},
+        "mark": {"type": "point", "size": 70, "filled": True, "opacity": 0.82},
         "transform": [
             {"filter": "datum.cm3_pct != null"},
         ],
         "encoding": {
-            "x": {"field": "rev", "type": "quantitative", "title": "Revenue"},
+            "x": {"field": "rev", "type": "quantitative", "title": "Revenue",
+                  "scale": {"nice": True, "padding": 16}},
             "y": {"field": "cm3_pct", "type": "quantitative", "title": "CM3 %",
-                  "axis": {"format": ".0%"}},
+                  "axis": {"format": ".0%"}, "scale": {"nice": True, "padding": 16}},
             "color": {"field": "band", "type": "nominal", "title": "Band",
-                      "scale": _BAND_SCALE},
+                      "scale": _BAND_SCALE,
+                      "legend": {"orient": "bottom", "columns": 6, "symbolLimit": 6}},
         },
         "width": 560, "height": 260,
         "md": True,
@@ -211,23 +213,91 @@ _TEMPLATE = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CM3 by product — explorer</title>
 <style>
-:root{--ink:#0B0F0E;--ink-2:#14191A;--slate:#5C6470;--mist:#E7EAED;--cloud:#F3F4F6;--card:#FFFFFF;--offwhite:#EEF1F3;--line:rgba(11,15,14,.10);--line-strong:rgba(11,15,14,.18);--surface:#DAE9E6;--tint:#97C4BD;--sage:#5BA89A;--teal:#1F7A82;--teal-deep:#0F4A52;--abyss:#07262B;--accent:#1F7A82;--accent-soft:rgba(31,122,130,.12);--dim:#5C6470;--font:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+/* Full Clickt brand token set, mirrored from google-ads-audit/scripts/audit_html.py
+   (neutrals, teal family, --lime/--purple/--ember division accents, semantic
+   --pass/--fail/--flag/--na). CM3's legacy tokens (--cloud/--mist/--surface/
+   --tint/--sage/--ink-2/--accent-soft/--line-strong/--dim) are reconciled onto
+   the same palette so the whole explorer flips with one theme mechanism.
+   BAND CONTRACT: the .b-<band> badge text colors are literal light hex (below);
+   --teal-deep (#0F4A52) is Average's identity and is NEVER redefined in a dark
+   block, so tests/test_cm3.py's light-hex parse stays valid. Dark badge legibility
+   is provided by theme-scoped descendant overrides, never by mutating those vars. */
+:root{
+  --ink:#0B0F0E; --ink-2:#14191A; --offwhite:#EEF1F3; --slate:#5C6470; --dim:#5C6470;
+  --card:#FFFFFF; --bg:#F3F4F6; --cloud:#F3F4F6; --mist:#E7EAED;
+  --line:rgba(11,15,14,.10); --line-2:rgba(11,15,14,.06); --line-strong:rgba(11,15,14,.18);
+  --teal:#1F7A82; --teal-deep:#0F4A52; --abyss:#07262B; --teal-100:#97C4BD; --tint:#97C4BD;
+  --sage:#5BA89A; --surface:#DAE9E6;
+  --lime:#B4E01F; --lime-700:#3F5410; --lime-50:#EEF7D2;
+  --purple:#897B9E; --purple-700:#2B2236; --ember:#F86B3C;
+  --pass:var(--lime-700); --pass-bg:var(--lime-50);
+  --flag:#8A6D00; --flag-bg:#FBF0CC;
+  --fail:#B23A16; --fail-bg:#FBE1D8;
+  --na:var(--slate); --na-bg:#ECEEF0;
+  --chrome:var(--abyss); --accent:#1F7A82; --accent-soft:rgba(31,122,130,.12);
+  --accent-ink:var(--teal-deep);
+  --shadow:0 1px 2px rgba(11,15,14,.06),0 8px 24px rgba(11,15,14,.06);
+  --font:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+/* Dark: OS-preference default (JS-off path) — do NOT redefine --teal-deep here. */
+@media(prefers-color-scheme:dark){:root{
+  --ink:#EEF1F3; --offwhite:#0B0F0E; --slate:#9AA4AE; --dim:#9AA4AE;
+  --card:#0F1A1C; --bg:#081113; --cloud:#0C1618; --mist:#1B2A2C;
+  --line:rgba(238,241,243,.12); --line-2:rgba(238,241,243,.07); --line-strong:rgba(238,241,243,.22);
+  --tint:#97C4BD; --sage:#5BA89A; --surface:rgba(31,122,130,.22);
+  --accent:#3FA0A8; --accent-soft:rgba(63,160,168,.18); --accent-ink:#8FD4DA;
+  --pass:#B4E01F; --pass-bg:rgba(180,224,31,.12);
+  --flag:#E7C453; --flag-bg:rgba(231,196,83,.12);
+  --fail:#FF8A64; --fail-bg:rgba(248,107,60,.14);
+  --na:#9AA4AE; --na-bg:rgba(154,164,174,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.4);
+}}
+/* Explicit toggle overrides (win over the media query in both directions). */
+:root[data-theme="dark"]{
+  --ink:#EEF1F3; --offwhite:#0B0F0E; --slate:#9AA4AE; --dim:#9AA4AE;
+  --card:#0F1A1C; --bg:#081113; --cloud:#0C1618; --mist:#1B2A2C;
+  --line:rgba(238,241,243,.12); --line-2:rgba(238,241,243,.07); --line-strong:rgba(238,241,243,.22);
+  --tint:#97C4BD; --sage:#5BA89A; --surface:rgba(31,122,130,.22);
+  --accent:#3FA0A8; --accent-soft:rgba(63,160,168,.18); --accent-ink:#8FD4DA;
+  --pass:#B4E01F; --pass-bg:rgba(180,224,31,.12);
+  --flag:#E7C453; --flag-bg:rgba(231,196,83,.12);
+  --fail:#FF8A64; --fail-bg:rgba(248,107,60,.14);
+  --na:#9AA4AE; --na-bg:rgba(154,164,174,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.4);
+}
+:root[data-theme="light"]{
+  --ink:#0B0F0E; --offwhite:#EEF1F3; --slate:#5C6470; --dim:#5C6470;
+  --card:#FFFFFF; --bg:#F3F4F6; --cloud:#F3F4F6; --mist:#E7EAED;
+  --line:rgba(11,15,14,.10); --line-strong:rgba(11,15,14,.18);
+  --tint:#97C4BD; --surface:#DAE9E6;
+  --accent:#1F7A82; --accent-soft:rgba(31,122,130,.12); --accent-ink:var(--teal-deep);
+  --pass:var(--lime-700); --pass-bg:var(--lime-50); --flag:#8A6D00; --flag-bg:#FBF0CC;
+  --fail:#B23A16; --fail-bg:#FBE1D8; --na:var(--slate); --na-bg:#ECEEF0;
+  --shadow:0 1px 2px rgba(11,15,14,.06),0 8px 24px rgba(11,15,14,.06);
+}
 *{box-sizing:border-box}
 body{margin:0;background:var(--cloud);color:var(--ink);font:14px/1.55 var(--font);-webkit-font-smoothing:antialiased}
 input,select,button{accent-color:var(--teal)}
-header{background:var(--abyss);color:var(--offwhite);padding:clamp(18px,3.5vw,30px) clamp(16px,4vw,34px)}
+header{background:linear-gradient(160deg,var(--abyss),var(--teal-deep));color:#EEF1F3;padding:clamp(18px,3.5vw,30px) clamp(16px,4vw,34px)}
+.hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;max-width:1240px;margin:0 auto}
+.hdr-main{min-width:0}
 header h1{font-size:19px;margin:0 0 8px;font-weight:700;letter-spacing:-.02em}
 .prov{font-family:var(--mono);font-size:11px;letter-spacing:.02em;color:var(--tint);margin:0}
+.themebtn{flex:none;font:inherit;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;border:1px solid rgba(238,241,243,.30);background:rgba(238,241,243,.08);color:#EEF1F3;cursor:pointer;transition:background .15s,border-color .15s}
+.themebtn:hover{background:rgba(238,241,243,.16);border-color:rgba(238,241,243,.55)}
+.themebtn:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
+.themebtn .ico{font-size:13px;line-height:1}
 .wrap{width:100%;max-width:1240px;margin:0 auto;padding:18px clamp(14px,4vw,28px) 56px}
 .grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
 .grid>*{min-width:0}
 @media(min-width:960px){.grid{grid-template-columns:minmax(300px,340px) minmax(0,1fr)}}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px;box-shadow:0 1px 2px rgba(11,15,14,.04)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px;box-shadow:var(--shadow)}
 .card h2{font-family:var(--mono);font-size:11px;margin:0 0 14px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--slate)}
 .ctls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px 18px;align-items:start}
 .ctl{margin:0}
 .ctl label{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;font-weight:600;margin:0 0 6px}
-.ctl label span{display:inline-block;min-width:2.6em;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--teal-deep);font-weight:600;font-size:12px;font-variant-numeric:tabular-nums;text-align:center;line-height:1.5}
+.ctl label span{display:inline-block;min-width:2.6em;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600;font-size:12px;font-variant-numeric:tabular-nums;text-align:center;line-height:1.5}
 .ctl input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;margin:4px 0;background:transparent;cursor:pointer}
 .ctl input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:linear-gradient(90deg,var(--teal) 0 calc(var(--p,0)*1%),var(--mist) calc(var(--p,0)*1%) 100%)}
 .ctl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;margin-top:-5px;border-radius:50%;background:var(--card);border:2px solid var(--teal);box-shadow:0 1px 2px rgba(11,15,14,.3);transition:box-shadow .15s,transform .15s}
@@ -258,6 +328,26 @@ td.l:first-child{min-width:150px;max-width:280px}
 .b-Excellent{background:rgba(47,122,82,.16);color:#1f6b46}.b-High{background:rgba(91,168,154,.24);color:#0f5a4a}
 .b-Average{background:var(--surface);color:var(--teal-deep)}.b-Low{background:#f6ead2;color:#7a4a0b}
 .b-Poor{background:#fbe9e7;color:#a3261f}.b-Inactive{background:var(--mist);color:#3c4350}
+/* Dark badge legibility — theme-scoped descendant overrides only (the base rules
+   above keep their literal light hex, which the band-color test parses). The four
+   layers cover: OS-dark w/ no JS (@media), forced dark, and forced light on a dark OS. */
+@media(prefers-color-scheme:dark){
+.b-Excellent{background:rgba(47,122,82,.26);color:#84DCA5}.b-High{background:rgba(91,168,154,.26);color:#7BD3BF}
+.b-Average{background:rgba(31,122,130,.26);color:#7EC6CE}.b-Low{background:rgba(160,110,20,.26);color:#E3B85C}
+.b-Poor{background:rgba(163,38,31,.28);color:#F3897D}.b-Inactive{background:rgba(154,164,174,.20);color:#AEB7C2}
+}
+:root[data-theme="dark"] .b-Excellent{background:rgba(47,122,82,.26);color:#84DCA5}
+:root[data-theme="dark"] .b-High{background:rgba(91,168,154,.26);color:#7BD3BF}
+:root[data-theme="dark"] .b-Average{background:rgba(31,122,130,.26);color:#7EC6CE}
+:root[data-theme="dark"] .b-Low{background:rgba(160,110,20,.26);color:#E3B85C}
+:root[data-theme="dark"] .b-Poor{background:rgba(163,38,31,.28);color:#F3897D}
+:root[data-theme="dark"] .b-Inactive{background:rgba(154,164,174,.20);color:#AEB7C2}
+:root[data-theme="light"] .b-Excellent{background:rgba(47,122,82,.16);color:#1f6b46}
+:root[data-theme="light"] .b-High{background:rgba(91,168,154,.24);color:#0f5a4a}
+:root[data-theme="light"] .b-Average{background:var(--surface);color:var(--teal-deep)}
+:root[data-theme="light"] .b-Low{background:#f6ead2;color:#7a4a0b}
+:root[data-theme="light"] .b-Poor{background:#fbe9e7;color:#a3261f}
+:root[data-theme="light"] .b-Inactive{background:var(--mist);color:#3c4350}
 .bandstat{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;display:flex;align-items:center;gap:6px}
 .ktable{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
 .kr{display:flex;justify-content:space-between;gap:8px;padding:7px 11px;background:var(--cloud);border:1px solid var(--line);border-radius:8px;font-variant-numeric:tabular-nums}
@@ -265,12 +355,21 @@ td.l:first-child{min-width:150px;max-width:280px}
 .pillnav{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
 .pill{font:inherit;font-size:12px;font-weight:600;padding:5px 13px;border-radius:999px;border:1px solid var(--line-strong);background:var(--card);color:var(--slate);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
 .pill:hover{border-color:var(--teal)}
-.pill.on{background:var(--accent-soft);color:var(--teal-deep);border-color:var(--teal)}
+.pill.on{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--teal)}
 .rolltbl{margin:0 0 18px}.rolltbl:last-child{margin-bottom:0}
 .rolltitle{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--slate);text-transform:uppercase;margin:0 0 6px}
 .mrow{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-bottom:1px solid var(--line)}
 .mrow:last-of-type{border-bottom:none}
 .mrow em{font-style:normal;color:var(--slate)}.mrow b{font-weight:600;text-align:right}
+.pivotctls{display:flex;flex-wrap:wrap;gap:10px 16px;margin:0 0 14px;align-items:flex-end}
+.pivotsel{display:flex;flex-direction:column;gap:5px;font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--slate)}
+.pivotsel select{font:inherit;font-family:var(--font);font-size:13px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink);padding:7px 10px;border:1px solid var(--line-strong);border-radius:8px;background:var(--card);cursor:pointer;min-width:150px}
+.pivotsel select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(31,122,130,.18)}
+.pivttbl th.rowhdr,.pivttbl td.rowhdr{text-align:left;white-space:nowrap;position:sticky;left:0;background:var(--cloud);z-index:1}
+.pivttbl th.rowhdr{z-index:2}
+.pivttbl td.dim{color:var(--slate);opacity:.5}
+.pivttbl td.totcol,.pivttbl th.totcol{font-weight:700;background:var(--cloud)}
+.pivttbl tr.totrow td{font-weight:700;background:var(--cloud);border-top:1px solid var(--line-strong)}
 .muted{color:var(--slate);font-size:12px;margin:12px 0 0;line-height:1.6}
 footer{color:var(--slate);font-size:12px;margin-top:22px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -278,8 +377,13 @@ footer{color:var(--slate);font-size:12px;margin-top:22px}
 </head>
 <body>
 <header>
+<div class="hdr">
+<div class="hdr-main">
 <h1>CM3 by product — explorer</h1>
 <div class="prov" id="prov"></div>
+</div>
+<button type="button" class="themebtn" id="themeToggle" aria-label="Toggle dark mode"><span class="ico" id="themeIco">◐</span><span id="themeTxt">Theme</span></button>
+</div>
 </header>
 <div class="wrap">
 <div class="grid">
@@ -332,9 +436,12 @@ const P = {
 };
 const BANDS = ["Excellent","High","Average","Low","Poor","Inactive"];
 const VCOGS = MODEL.vcogs || {};
-const ROLLUP_DIMS = [["camp","By campaign"],["ven","By vendor"],["cat","By category"],["pt","By product type"]];
+const ROLLUP_DIMS = [["camp","By campaign"],["ven","By vendor"],["cat","By category"],["pt","By product type"],["pivot","Pivot"]];
 let sortKey = "cm3", sortDir = -1;
 let rollupDim = "camp";
+// Pivot selections persist in module state so a slider drag (renderAll ->
+// renderRollups -> renderPivot) refreshes only the matrix, never the dropdowns.
+let pivotRow = "camp", pivotCol = "ven", pivotMeas = "cm3";
 
 function money(v){if(v===null||v===undefined)return "—";const s=v<0?"-":"";return s+"$"+Math.round(Math.abs(v)).toLocaleString();}
 function pct(v){return v===null||v===undefined?"—":(v*100).toFixed(1)+"%";}
@@ -391,6 +498,74 @@ function rollupData(dim){
     level:n+1,
     rows:sortedBuckets(aggregate(rows,r=>(r[field]&&r[field][n])?r[field][n]:"(unset)")).map(([nm,b])=>bucketRow(nm,b,tot,false))
   }))};
+}
+
+// --- Pivot cross-tab (sibling to rollupData; reuses the same bucket engine). ---
+// Selectable dimensions: Campaign, Vendor, and every taxonomy level (already
+// per-row on catL/ptL). Measures: CM3 $, CM3 %, Revenue, Ad spend, ROAS,
+// Products. Ratio measures (cm3_pct/roas) are DERIVED per cell/total via the
+// shared helpers, never summed.
+const PIVOT_DIMS = [
+  ["camp","Campaign"],["ven","Vendor"],
+  ["catL0","Category L1"],["catL1","Category L2"],["catL2","Category L3"],["catL3","Category L4"],["catL4","Category L5"],
+  ["ptL0","Product type L1"],["ptL1","Product type L2"],["ptL2","Product type L3"],["ptL3","Product type L4"],["ptL4","Product type L5"]
+];
+const PIVOT_MEASURES = [
+  ["cm3","CM3 $","money"],["cm3_pct","CM3 %","pct"],["rev","Revenue","money"],
+  ["cost","Ad spend","money"],["roas","ROAS","mult"],["n","Products","intf"]
+];
+// Missing keys map to "(unset)" so EVERY product lands in exactly one cell.
+// This deliberately differs from the vendor rollup (rollupData("ven")), which
+// SKIPS vendorless products; here a blank dim value becomes an explicit
+// "(unset)" bucket so the cross-tab conserves the full product universe.
+function pivotKey(r,dim){
+  if(dim==="camp") return r.camp||"(unset)";
+  if(dim==="ven") return r.ven?r.ven:"(unset)";
+  const m=/^(catL|ptL)([0-4])$/.exec(dim);
+  if(m){const arr=m[1]==="catL"?r.catL:r.ptL;const v=arr&&arr[+m[2]];return v?v:"(unset)";}
+  return "(unset)";
+}
+function pivotMeasure(b,meas){
+  if(meas==="cm3_pct") return bCm3Pct(b);
+  if(meas==="roas") return bRoas(b);
+  return b[meas]; // cm3 | rev | cost | n — summed on the bucket
+}
+function pivotFmt(v,type){
+  if(type==="money") return money(v);
+  if(type==="pct") return pct(v);
+  if(type==="mult") return mult(v);
+  return intf(v);
+}
+// Map<rowKey, Map<colKey, bucket>> + row/col/grand total buckets. Rows sorted
+// by row-total[measure] desc, cols by col-total[measure] desc; capped to the
+// top-12 x top-12, but ALL totals (row/col/grand) are computed over the full
+// universe, so a column total need not equal the sum of its shown cells — the
+// "…N more (in totals)" note flags that. Ratio measures sort nulls last.
+function pivotData(rowDim,colDim,measure){
+  const rows=rowsComputed();
+  const cellB=new Map(), rowB=new Map(), colB=new Map(), grand=newBucket();
+  rows.forEach(r=>{
+    const rk=pivotKey(r,rowDim), ck=pivotKey(r,colDim);
+    if(!cellB.has(rk)) cellB.set(rk,new Map());
+    const cm=cellB.get(rk); if(!cm.has(ck)) cm.set(ck,newBucket()); addTo(cm.get(ck),r);
+    if(!rowB.has(rk)) rowB.set(rk,newBucket()); addTo(rowB.get(rk),r);
+    if(!colB.has(ck)) colB.set(ck,newBucket()); addTo(colB.get(ck),r);
+    addTo(grand,r);
+  });
+  const mv=b=>pivotMeasure(b,measure);
+  const key=(map,k)=>{const v=mv(map.get(k));return v==null?-Infinity:v;};
+  const allRowKeys=[...rowB.keys()].sort((a,b)=>key(rowB,b)-key(rowB,a));
+  const allColKeys=[...colB.keys()].sort((a,b)=>key(colB,b)-key(colB,a));
+  const CAP=12;
+  const rowKeys=allRowKeys.slice(0,CAP), colKeys=allColKeys.slice(0,CAP);
+  const cell={}, rowTot={}, colTot={};
+  rowKeys.forEach(rk=>{cell[rk]={};const cm=cellB.get(rk);
+    colKeys.forEach(ck=>{cell[rk][ck]=cm.has(ck)?mv(cm.get(ck)):null;});
+    rowTot[rk]=mv(rowB.get(rk));});
+  colKeys.forEach(ck=>{colTot[ck]=mv(colB.get(ck));});
+  return {measure,rowDim,colDim,rowKeys,colKeys,cell,rowTot,colTot,grand:mv(grand),
+          extraRows:allRowKeys.length-rowKeys.length,extraCols:allColKeys.length-colKeys.length,
+          nRows:allRowKeys.length,nCols:allColKeys.length};
 }
 
 const COLS = [
@@ -459,6 +634,14 @@ function rollTable(title,nameHdr,cols,rows){
     +`<div class="tablewrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div></div>`;
 }
 function renderRollups(){
+  const pillsync=()=>document.querySelectorAll("#rollnav .pill").forEach(p=>p.classList.toggle("on",p.dataset.dim===rollupDim));
+  // Pivot mode: build the panel (selectors) ONCE; a re-render (slider drag)
+  // refreshes only the matrix so the dropdowns keep their value + focus.
+  if(rollupDim==="pivot"){
+    if(document.getElementById("pivotPanel")) renderPivot(); else buildPivotPanel();
+    pillsync();
+    return;
+  }
   let html="";
   if(rollupDim==="camp"){
     html = rollTable("By campaign","Campaign",_ROLL_STD,rollupData("camp").rows);
@@ -473,7 +656,50 @@ function renderRollups(){
                        : `<p class="muted">No ${label.toLowerCase()} data in this CSV.</p>`;
   }
   document.getElementById("rollup").innerHTML = html;
-  document.querySelectorAll("#rollnav .pill").forEach(p=>p.classList.toggle("on",p.dataset.dim===rollupDim));
+  pillsync();
+}
+function buildPivotPanel(){
+  const dimOpts=PIVOT_DIMS.map(d=>`<option value="${d[0]}">${esc(d[1])}</option>`).join("");
+  const measOpts=PIVOT_MEASURES.map(m=>`<option value="${m[0]}">${esc(m[1])}</option>`).join("");
+  document.getElementById("rollup").innerHTML =
+    `<div id="pivotPanel"><div class="pivotctls">`
+    +`<label class="pivotsel">Rows<select id="pivotRow">${dimOpts}</select></label>`
+    +`<label class="pivotsel">Columns<select id="pivotCol">${dimOpts}</select></label>`
+    +`<label class="pivotsel">Measure<select id="pivotMeas">${measOpts}</select></label>`
+    +`</div><div id="pivotMatrix"></div></div>`;
+  const rs=document.getElementById("pivotRow"), cs=document.getElementById("pivotCol"), ms=document.getElementById("pivotMeas");
+  rs.value=pivotRow; cs.value=pivotCol; ms.value=pivotMeas;
+  rs.addEventListener("change",()=>{pivotRow=rs.value;renderPivot();});
+  cs.addEventListener("change",()=>{pivotCol=cs.value;renderPivot();});
+  ms.addEventListener("change",()=>{pivotMeas=ms.value;renderPivot();});
+  renderPivot();
+}
+function renderPivot(){
+  const mx=document.getElementById("pivotMatrix"); if(!mx) return;
+  const meas=PIVOT_MEASURES.find(m=>m[0]===pivotMeas)||PIVOT_MEASURES[0];
+  const fmt=v=>pivotFmt(v,meas[2]);
+  const d=pivotData(pivotRow,pivotCol,pivotMeas);
+  if(!d.rowKeys.length){mx.innerHTML=`<p class="muted">No products to pivot.</p>`;return;}
+  const head=`<th class="rowhdr">${esc(meas[1])}</th>`
+    +d.colKeys.map(ck=>`<th>${esc(ck)}</th>`).join("")
+    +`<th class="totcol">Total</th>`;
+  const body=d.rowKeys.map(rk=>{
+    const cells=d.colKeys.map(ck=>{const v=d.cell[rk][ck];
+      return `<td class="${v==null?'dim':''}">${fmt(v)}</td>`;}).join("");
+    return `<tr><td class="rowhdr">${esc(rk)}</td>${cells}<td class="totcol">${fmt(d.rowTot[rk])}</td></tr>`;
+  }).join("");
+  const totrow=`<tr class="totrow"><td class="rowhdr">Total</td>`
+    +d.colKeys.map(ck=>`<td class="totcol">${fmt(d.colTot[ck])}</td>`).join("")
+    +`<td class="totcol">${fmt(d.grand)}</td></tr>`;
+  let note="";
+  if(d.extraRows||d.extraCols){
+    const parts=[];
+    if(d.extraRows) parts.push(d.extraRows+" more row"+(d.extraRows>1?"s":""));
+    if(d.extraCols) parts.push(d.extraCols+" more column"+(d.extraCols>1?"s":""));
+    note=`<p class="muted">Showing top ${d.rowKeys.length}×${d.colKeys.length} by ${esc(meas[1])}. …${parts.join(" and ")} folded into the totals (totals span the full universe).</p>`;
+  }
+  mx.innerHTML=`<div class="tablewrap"><table class="pivttbl"><thead><tr>${head}</tr></thead>`
+    +`<tbody>${body}${totrow}</tbody></table></div>`+note;
 }
 function renderMethod(){
   const pv=MODEL.provenance, sm=MODEL.srcmix||{};
@@ -529,6 +755,34 @@ function bind(id, key, scale){
   setP();
   el.addEventListener("input", ()=>{P[key] = key==="fixed" ? parseFloat(el.value||0) : parseFloat(el.value)/(scale||1); setP(); renderAll();});
 }
+// ── Theme (light/dark). Stamps data-theme on :root; the three-layer CSS above
+// resolves the rest. matchMedia is guarded so jsdom (which lacks it) never throws.
+// Charts register window.__cm3ThemeHook to re-mount their Vega views on toggle.
+function effTheme(){
+  const set=document.documentElement.getAttribute("data-theme");
+  if(set==="dark"||set==="light") return set;
+  if(typeof matchMedia==="function" && matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+  return "light";
+}
+function updateThemeBtn(){
+  const dark=effTheme()==="dark";
+  const ico=document.getElementById("themeIco"), txt=document.getElementById("themeTxt");
+  if(ico) ico.textContent = dark ? "☀" : "☾";
+  if(txt) txt.textContent = dark ? "Light" : "Dark";
+}
+function applyTheme(t){
+  document.documentElement.setAttribute("data-theme", t);
+  try{localStorage.setItem("cm3-theme", t);}catch(e){}
+  updateThemeBtn();
+  if(typeof window.__cm3ThemeHook==="function") window.__cm3ThemeHook();
+}
+(function initTheme(){
+  let saved=null; try{saved=localStorage.getItem("cm3-theme");}catch(e){}
+  if(saved==="dark"||saved==="light") document.documentElement.setAttribute("data-theme", saved);
+  updateThemeBtn();
+  const btn=document.getElementById("themeToggle");
+  if(btn) btn.addEventListener("click", ()=>applyTheme(effTheme()==="dark"?"light":"dark"));
+})();
 renderProv();
 setupRollnav();
 renderMethod();
@@ -558,9 +812,46 @@ _CHARTS_JS_LINE = "/*__CHARTS__*/\n"
 # setter does not reliably propagate through Vega-Lite's derived datasets.
 _CHARTS_JS = """\
 const chartViews = [];
-(function(){const host=document.getElementById("charts");CHARTS.forEach((sp,i)=>{const box=document.createElement("div");box.id="chart_"+i;box.style.margin="0 0 14px";host.appendChild(box);chartViews.push(vlEmbed(box,sp));const s=box.querySelector("svg");if(s){s.style.overflow="visible";s.style.maxWidth="100%";}});})();
+// Dark-mode Vega config (NOVEL — the audits use GSAP, not Vega, so there is no
+// in-repo prior art). Only the LIVE explorer views get this; the static md SVGs
+// (render_static_charts / vl_convert) are a separate, themeless-light path and
+// are never touched here. Text -> light, gridlines -> dim, background -> transparent.
+function chartCfg(dark){
+  return dark ? {
+    background:"transparent", view:{stroke:"transparent"},
+    axis:{labelColor:"#C9D1D9",titleColor:"#E6EDF3",gridColor:"rgba(238,241,243,.10)",domainColor:"rgba(238,241,243,.22)",tickColor:"rgba(238,241,243,.22)"},
+    legend:{labelColor:"#C9D1D9",titleColor:"#E6EDF3"},
+    title:{color:"#E6EDF3",subtitleColor:"#C9D1D9"}
+  } : {
+    background:"transparent", view:{stroke:"transparent"},
+    axis:{labelColor:"#5C6470",titleColor:"#0B0F0E",gridColor:"rgba(11,15,14,.08)",domainColor:"rgba(11,15,14,.18)",tickColor:"rgba(11,15,14,.18)"},
+    legend:{labelColor:"#5C6470",titleColor:"#0B0F0E"},
+    title:{color:"#0B0F0E"}
+  };
+}
+function isDarkTheme(){
+  if(typeof effTheme==="function") return effTheme()==="dark";
+  const set=document.documentElement.getAttribute("data-theme");
+  if(set==="dark"||set==="light") return set==="dark";
+  return typeof matchMedia==="function" && matchMedia("(prefers-color-scheme: dark)").matches;
+}
+// Live charts fill the card: override width with the container's measured width
+// (numeric, so it works with the minimal vendored embed shim — no reliance on
+// Vega "container" sizing). The STATIC md SVGs keep their fixed 560 from CHARTS.
+function liveWidth(){const h=document.getElementById("charts");const w=h?h.clientWidth:0;return w>60?w:560;}
+function themedSpec(sp){const s=Object.assign({},sp);s.background="transparent";s.width=liveWidth();s.autosize={type:"fit",contains:"padding"};s.config=chartCfg(isDarkTheme());return s;}
+function mountCharts(){
+  const host=document.getElementById("charts"); if(!host) return;
+  host.innerHTML=""; chartViews.length=0;
+  CHARTS.forEach((sp,i)=>{const box=document.createElement("div");box.id="chart_"+i;box.style.margin="0 0 14px";host.appendChild(box);chartViews.push(vlEmbed(box,themedSpec(sp)));const s=box.querySelector("svg");if(s){s.style.overflow="visible";s.style.maxWidth="100%";}});
+}
 function renderCharts(){const rows=rowsComputed();chartViews.forEach(v=>v.change("rows",vega.changeset().remove(()=>true).insert(rows)).run());}
+// Re-mount with the new theme config, then repopulate rows, when the header toggle fires.
+window.__cm3ThemeHook=function(){mountCharts();renderCharts();};
 const __renderAllBase=renderAll;renderAll=function(){__renderAllBase();renderCharts();};
+// Re-fit to the container on resize (debounced).
+var __cm3rz;window.addEventListener("resize",function(){clearTimeout(__cm3rz);__cm3rz=setTimeout(function(){mountCharts();renderCharts();},160);});
+mountCharts();
 renderCharts();"""
 
 
