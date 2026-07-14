@@ -1,0 +1,32 @@
+{
+  "_comment": "Per-skill Python<->JS parity vectors for google-ads-performance-reporting's use of _shared/analytics.py (HM-537): the exact concentration top_n, anomaly-rule shape, and pre_score weights this skill's perf_core.py/perf_spec.py splice. Auto-discovered by skills/google-ads/tests/run_parity.py's analytics-primitives gate (never edits the shared harness).",
+  "concentration": [
+    {"rows": [{"cost": 2000.0}, {"cost": 1000.0}, {"cost": 1000.0}, {"cost": 800.0}, {"cost": 500.0}, {"cost": 300.0}], "value_key": "cost", "top_n": 3},
+    {"rows": [{"conversions": 50}, {"conversions": 30}, {"conversions": 25}, {"conversions": 8}, {"conversions": 5}, {"conversions": 4}], "value_key": "conversions", "top_n": 3},
+    {"rows": [{"cost": 1000.0}], "value_key": "cost", "top_n": 3},
+    {"rows": [], "value_key": "cost", "top_n": 3}
+  ],
+  "signals": [
+    {
+      "rows": [
+        {"spend_delta": 0.30, "conv_delta": 0.05, "value_delta": 0.10},
+        {"spend_delta": -0.30, "conv_delta": -0.30, "value_delta": -0.30},
+        {"spend_delta": 0.10, "conv_delta": -0.20, "value_delta": -0.2727},
+        {"spend_delta": null, "conv_delta": null, "value_delta": null},
+        {"spend_delta": 0.25, "conv_delta": -0.25, "value_delta": -0.25}
+      ],
+      "rules": [
+        {"id": "spend_spike", "key": "spend_delta", "op": "gt", "value": 0.25},
+        {"id": "spend_drop", "key": "spend_delta", "op": "lt", "value": -0.25},
+        {"id": "conv_drop", "key": "conv_delta", "op": "lt", "value": -0.25},
+        {"id": "value_drop", "key": "value_delta", "op": "lt", "value": -0.25}
+      ]
+    }
+  ],
+  "pre_score": [
+    {"row": {"flags": ["value_drop"]}, "weights": {"spend_spike": 2.0, "spend_drop": 1.5, "conv_drop": 2.5, "value_drop": 2.0}},
+    {"row": {"flags": ["spend_drop", "conv_drop"]}, "weights": {"spend_spike": 2.0, "spend_drop": 1.5, "conv_drop": 2.5, "value_drop": 2.0}},
+    {"row": {"flags": ["spend_spike", "spend_drop", "conv_drop", "value_drop"]}, "weights": {"spend_spike": 2.0, "spend_drop": 1.5, "conv_drop": 2.5, "value_drop": 2.0}},
+    {"row": {"flags": []}, "weights": {"spend_spike": 2.0, "spend_drop": 1.5, "conv_drop": 2.5, "value_drop": 2.0}}
+  ]
+}

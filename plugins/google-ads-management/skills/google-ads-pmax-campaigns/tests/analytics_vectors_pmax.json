@@ -1,0 +1,31 @@
+{
+  "_comment": "M1.4 (HM-538) parity vectors, auto-discovered by skills/google-ads/tests/run_parity.py's analytics-primitives gate alongside _shared/tests/analytics_vectors.json. Exercises the exact concentration/signals shapes pmax_core.py's asset_group_concentration and cannibalization functions call: concentration(groups, 'cost', top_n=1) for the dominant-asset-group share, and a single 'ge' signals rule against a precomputed share field (None when the row is not flaggable).",
+  "concentration": [
+    {"rows": [{"cost": 450.0}, {"cost": 40.0}, {"cost": 10.0}], "value_key": "cost", "top_n": 1},
+    {"rows": [{"cost": 160.0}, {"cost": 140.0}], "value_key": "cost", "top_n": 1},
+    {"rows": [{"cost": 100.0}], "value_key": "cost", "top_n": 1},
+    {"rows": [{"cost": 0.0}, {"cost": 0.0}], "value_key": "cost", "top_n": 1}
+  ],
+  "signals": [
+    {
+      "rows": [
+        {"campaign": "Shopping-Core", "flaggable_top_share": 0.90},
+        {"campaign": "Brand-Steady", "flaggable_top_share": 0.5333},
+        {"campaign": "Solo-Group", "flaggable_top_share": null}
+      ],
+      "rules": [
+        {"id": "concentration_risk", "key": "flaggable_top_share", "op": "ge", "value": 0.80}
+      ]
+    },
+    {
+      "rows": [
+        {"campaign": "Prospecting", "flaggable_share": 0.6667},
+        {"campaign": "Unmatched", "flaggable_share": null},
+        {"campaign": "Borderline", "flaggable_share": 0.60}
+      ],
+      "rules": [
+        {"id": "cannibalization_risk", "key": "flaggable_share", "op": "ge", "value": 0.60}
+      ]
+    }
+  ]
+}

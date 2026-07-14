@@ -1,0 +1,28 @@
+{
+ "result": [
+  {
+   "campaign.id": "1001",
+   "campaign.name": "NonBrand_US_Search_CRM_2026",
+   "campaign.status": "ENABLED",
+   "campaign.advertising_channel_type": "SEARCH",
+   "campaign.bidding_strategy_type": "MAXIMIZE_CONVERSIONS",
+   "metrics.conversions": "12"
+  },
+  {
+   "campaign.id": "1002",
+   "campaign.name": "Brand_US_Search_CRM_2026",
+   "campaign.status": "ENABLED",
+   "campaign.advertising_channel_type": "SEARCH",
+   "campaign.bidding_strategy_type": "MANUAL_CPC",
+   "metrics.conversions": "150"
+  },
+  {
+   "campaign.id": "1003",
+   "campaign.name": "Shopping PMax Everything",
+   "campaign.status": "ENABLED",
+   "campaign.advertising_channel_type": "PERFORMANCE_MAX",
+   "campaign.bidding_strategy_type": "MAXIMIZE_CONVERSION_VALUE",
+   "metrics.conversions": "80"
+  }
+ ]
+}

@@ -1,0 +1,65 @@
+{
+ "meta": {
+  "client_name": "Acme Corp",
+  "account_id": "123-456-7890",
+  "currency": "CAD",
+  "window_curr": "2026-06-13 to 2026-07-12",
+  "window_prior": "2026-05-14 to 2026-06-12",
+  "source": "mcp",
+  "generated": "2026-07-12",
+  "reconciliation": {
+   "conversion_actions": {"rows": 6, "sums": {"conversions_30d": 683.0}},
+   "campaign_trend": {"rows": 6, "sums": {
+     "clicks_curr": 4270.0, "impressions_curr": 90400.0, "cost_curr": 2240.0, "conversions_curr": 197.0,
+     "clicks_prior": 2900.0, "impressions_prior": 58000.0, "cost_prior": 2050.0, "conversions_prior": 203.0
+   }},
+   "manual_checks": {"rows": 2, "sums": {}}
+  }
+ },
+ "params": {},
+ "conversion_actions": [
+  {"id": 1, "name": "Purchase - Primary", "status": "ENABLED", "type": "PURCHASE",
+   "category": "PURCHASE", "primary_for_goal": true, "counting_type": "ONE_PER_CLICK",
+   "attribution_model": "GOOGLE_SEARCH_ATTRIBUTION_DATA_DRIVEN", "conversions_30d": 120.0},
+  {"id": 2, "name": "Lead Form - Primary", "status": "ENABLED", "type": "UPLOAD_CLICKS",
+   "category": "SUBMIT_LEAD_FORM", "primary_for_goal": true, "counting_type": "MANY_PER_CLICK",
+   "attribution_model": "GOOGLE_ADS_LAST_CLICK", "conversions_30d": 0.0},
+  {"id": 3, "name": "Phone Call - Primary", "status": "ENABLED", "type": "WEBSITE",
+   "category": "SUBMIT_LEAD_FORM", "primary_for_goal": true, "counting_type": "ONE_PER_CLICK",
+   "attribution_model": "GOOGLE_SEARCH_ATTRIBUTION_DATA_DRIVEN", "conversions_30d": 45.0},
+  {"id": 4, "name": "Newsletter Signup", "status": "ENABLED", "type": "WEBSITE",
+   "category": "SIGNUP", "primary_for_goal": false, "counting_type": "MANY_PER_CLICK",
+   "attribution_model": "GOOGLE_SEARCH_ATTRIBUTION_DATA_DRIVEN", "conversions_30d": 10.0},
+  {"id": 5, "name": "Page View", "status": "ENABLED", "type": "WEBSITE",
+   "category": "PAGE_VIEW", "primary_for_goal": false, "counting_type": "ONE_PER_CLICK",
+   "attribution_model": "GOOGLE_SEARCH_ATTRIBUTION_DATA_DRIVEN", "conversions_30d": 500.0},
+  {"id": 6, "name": "Store Visit", "status": "ENABLED", "type": "STORE_VISITS",
+   "category": "STORE_VISIT", "primary_for_goal": false, "counting_type": "ONE_PER_CLICK",
+   "attribution_model": "GOOGLE_SEARCH_ATTRIBUTION_LINEAR", "conversions_30d": 8.0}
+ ],
+ "manual_checks": [
+  {"check": "Enhanced Conversions", "value": "Enabled (web + leads)", "data_source": "user_csv",
+   "note": "Confirmed via Conversion Settings export 2026-07-10"},
+  {"check": "Consent Mode v2", "value": "Advanced", "data_source": "user_csv", "note": ""}
+ ],
+ "campaign_trend": [
+  {"campaign_id": 101, "campaign": "Critical - LP suspect", "clicks_curr": 1000, "impressions_curr": 20000,
+   "cost_curr": 500.0, "conversions_curr": 20, "clicks_prior": 1000, "impressions_prior": 20000,
+   "cost_prior": 480.0, "conversions_prior": 50},
+  {"campaign_id": 102, "campaign": "High - CVR drop only", "clicks_curr": 500, "impressions_curr": 15000,
+   "cost_curr": 300.0, "conversions_curr": 25, "clicks_prior": 500, "impressions_prior": 10000,
+   "cost_prior": 290.0, "conversions_prior": 40},
+  {"campaign_id": 103, "campaign": "Watch - thin volume", "clicks_curr": 220, "impressions_curr": 4400,
+   "cost_curr": 150.0, "conversions_curr": 25, "clicks_prior": 200, "impressions_prior": 4000,
+   "cost_prior": 140.0, "conversions_prior": 25},
+  {"campaign_id": 104, "campaign": "Clean", "clicks_curr": 800, "impressions_curr": 16000,
+   "cost_curr": 800.0, "conversions_curr": 85, "clicks_prior": 800, "impressions_prior": 16000,
+   "cost_prior": 760.0, "conversions_prior": 80},
+  {"campaign_id": 105, "campaign": "No benchmark - new campaign", "clicks_curr": 150, "impressions_curr": 3000,
+   "cost_curr": 90.0, "conversions_curr": 10, "clicks_prior": 0, "impressions_prior": 0,
+   "cost_prior": 0.0, "conversions_prior": 0},
+  {"campaign_id": 106, "campaign": "Watch - below account CVR", "clicks_curr": 1600, "impressions_curr": 32000,
+   "cost_curr": 400.0, "conversions_curr": 32, "clicks_prior": 400, "impressions_prior": 8000,
+   "cost_prior": 380.0, "conversions_prior": 8}
+ ]
+}

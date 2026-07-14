@@ -1,0 +1,214 @@
+<style>
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.ga-field{margin:0 0 14px}
+.ga-field > label{display:block;font-size:13px;color:var(--text-secondary);margin:0 0 6px}
+.ga-fmts{display:flex;flex-wrap:wrap;gap:8px 16px}
+.ga-fmts label{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-primary)}
+</style>
+<h2 class="sr-only">Google Ads task launcher: choose a task, set its account or input files and output formats, then run it.</h2>
+<div style="padding:1rem 0;max-width:100%">
+  <div class="ga-field">
+    <label for="ga-task">Which task do you want to run?</label>
+    <select id="ga-task" style="width:100%"></select>
+  </div>
+  <div id="ga-blurb" style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--text-secondary);background:var(--surface-1);border-radius:var(--radius);padding:10px 12px;margin:0 0 16px"></div>
+  <div id="ga-detail"></div>
+  <div id="ga-status" style="font-size:12px;color:var(--text-danger);min-height:16px;margin:0 0 8px"></div>
+  <button id="ga-run" type="button" style="width:100%">Run task ↗</button>
+</div>
+<script>
+const CATALOG = __CATALOG__;
+const ACCOUNTS = __ACCOUNTS__;
+const FMT = {md:"a Markdown report", html:"a self-contained interactive HTML explorer", xlsx:"a formula-driven Excel workbook", pptx:"a PowerPoint deck", csv:"ready-to-apply CSV files"};
+const FMT_SHORT = {md:"Markdown", html:"HTML explorer", xlsx:"Excel", pptx:"PowerPoint", csv:"CSV"};
+const taskSel = document.getElementById("ga-task");
+const detail = document.getElementById("ga-detail");
+const blurb = document.getElementById("ga-blurb");
+const status = document.getElementById("ga-status");
+const runBtn = document.getElementById("ga-run");
+
+CATALOG.groups.forEach(g => {
+  const tasks = CATALOG.tasks.filter(t => t.group === g);
+  if (!tasks.length) return;
+  const og = document.createElement("optgroup");
+  og.label = g;
+  tasks.forEach(t => {
+    const o = document.createElement("option");
+    o.value = t.id;
+    o.textContent = t.label;
+    og.appendChild(o);
+  });
+  taskSel.appendChild(og);
+});
+
+const PRESELECT = "__PRESELECT__";
+if (PRESELECT && CATALOG.tasks.some(t => t.id === PRESELECT)) taskSel.value = PRESELECT;
+
+function task(){ return CATALOG.tasks.find(t => t.id === taskSel.value); }
+
+function fieldWrap(labelText, control){
+  const w = document.createElement("div");
+  w.className = "ga-field";
+  const l = document.createElement("label");
+  l.textContent = labelText;
+  if (control.id) l.setAttribute("for", control.id);
+  w.appendChild(l);
+  w.appendChild(control);
+  return w;
+}
+
+function renderDetail(){
+  const t = task();
+  status.textContent = "";
+  blurb.innerHTML = "";
+  const ic = document.createElement("i");
+  ic.className = "ti " + (t.icon || "ti-point");
+  ic.style.fontSize = "18px";
+  ic.setAttribute("aria-hidden", "true");
+  const bt = document.createElement("span");
+  bt.textContent = t.blurb;
+  blurb.appendChild(ic);
+  blurb.appendChild(bt);
+  detail.innerHTML = "";
+
+  if (t.inputs === "mcp"){
+    let acc;
+    if (ACCOUNTS && ACCOUNTS.length){
+      acc = document.createElement("select");
+      acc.id = "ga-account";
+      acc.style.width = "100%";
+      ACCOUNTS.forEach(a => {
+        const o = document.createElement("option");
+        o.value = a.id;
+        o.dataset.name = a.name || "";
+        o.textContent = (a.name ? a.name + " (" + a.id + ")" : a.id) + (a.currency ? " · " + a.currency : "");
+        acc.appendChild(o);
+      });
+    } else {
+      acc = document.createElement("input");
+      acc.type = "text";
+      acc.id = "ga-account";
+      acc.style.width = "100%";
+      acc.placeholder = "Account name or 10-digit customer ID";
+    }
+    detail.appendChild(fieldWrap("Which account?", acc));
+
+    if (t.window){
+      const win = document.createElement("select");
+      win.id = "ga-window";
+      win.style.width = "100%";
+      CATALOG.windows.forEach(wv => {
+        const o = document.createElement("option");
+        o.value = wv;
+        o.textContent = wv === "CUSTOM" ? "Custom date range…" : wv.replace(/_/g, " ").toLowerCase();
+        if (wv === "LAST_30_DAYS") o.selected = true;
+        win.appendChild(o);
+      });
+      detail.appendChild(fieldWrap("Date window", win));
+      const custom = document.createElement("div");
+      custom.id = "ga-custom";
+      custom.style.display = "none";
+      custom.style.gap = "8px";
+      custom.innerHTML = '<input type="date" id="ga-start" style="flex:1"><span style="align-self:center;color:var(--text-muted)">to</span><input type="date" id="ga-end" style="flex:1">';
+      detail.appendChild(custom);
+      win.addEventListener("change", () => {
+        custom.style.display = win.value === "CUSTOM" ? "flex" : "none";
+      });
+    }
+  } else {
+    (t.files || []).forEach(f => {
+      const inp = document.createElement("input");
+      inp.type = "text";
+      inp.id = "ga-file-" + f.key;
+      inp.style.width = "100%";
+      inp.placeholder = "Absolute path or drop the file in chat and paste its path";
+      detail.appendChild(fieldWrap(f.label + (f.required ? "" : " (optional)"), inp));
+    });
+  }
+
+  if (t.formats_upfront) {
+    const fmtBox = document.createElement("div");
+    fmtBox.className = "ga-fmts";
+    (t.formats || []).forEach(f => {
+      const lab = document.createElement("label");
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.className = "ga-fmt";
+      cb.value = f;
+      cb.checked = !(t.optIn || []).includes(f);
+      const span = document.createElement("span");
+      span.textContent = FMT_SHORT[f] || f;
+      lab.appendChild(cb);
+      lab.appendChild(span);
+      fmtBox.appendChild(lab);
+    });
+    detail.appendChild(fieldWrap("Desired output", fmtBox));
+  }
+
+  const notes = document.createElement("textarea");
+  notes.id = "ga-notes";
+  notes.style.width = "100%";
+  notes.placeholder = "Optional: goals, budget, target CPA/ROAS, anything the skill should know";
+  detail.appendChild(fieldWrap("Context for this run", notes));
+}
+
+function joinFormats(vals){
+  if (!vals.length) return "the skill's default outputs";
+  const parts = vals.map(v => FMT[v] || v);
+  if (parts.length === 1) return parts[0];
+  return parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1];
+}
+
+runBtn.addEventListener("click", () => {
+  const t = task();
+  status.textContent = "";
+  const fmtVals = [...detail.querySelectorAll(".ga-fmt:checked")].map(c => c.value);
+  const formats = joinFormats(fmtVals);
+  const notes = (document.getElementById("ga-notes").value || "").trim() || "none";
+  const tpl = CATALOG.routeTemplates[t.formats_upfront ? t.inputs + "_upfront" : t.inputs] || CATALOG.routeTemplates[t.inputs];
+  let account = "", window = "", files = "";
+
+  if (t.inputs === "mcp"){
+    const accEl = document.getElementById("ga-account");
+    if (accEl.tagName === "SELECT"){
+      const o = accEl.selectedOptions[0];
+      account = o.dataset.name ? o.dataset.name + " (" + o.value + ")" : o.value;
+    } else {
+      account = accEl.value.trim();
+      if (!account){ status.textContent = "Enter an account name or customer ID."; return; }
+    }
+    if (t.window){
+      const winEl = document.getElementById("ga-window");
+      if (winEl.value === "CUSTOM"){
+        const s = document.getElementById("ga-start").value, e = document.getElementById("ga-end").value;
+        if (!s || !e){ status.textContent = "Pick both custom dates."; return; }
+        window = "the period " + s + " to " + e;
+      } else {
+        window = "the " + winEl.value.replace(/_/g, " ").toLowerCase();
+      }
+    } else {
+      window = "the default window";
+    }
+  } else {
+    const provided = (t.files || []).map(f => {
+      const v = (document.getElementById("ga-file-" + f.key).value || "").trim();
+      return v ? f.label + ": " + v : null;
+    }).filter(Boolean);
+    const missingRequired = (t.files || []).some(f => f.required && !(document.getElementById("ga-file-" + f.key).value || "").trim());
+    if (missingRequired){ status.textContent = "Provide the required input file path."; return; }
+    files = provided.length ? provided.join("; ") : "ask the operator for the file paths";
+  }
+
+  const prompt = tpl
+    .replace("{skill}", t.skill)
+    .replace("{account}", account)
+    .replace("{window}", window)
+    .replace("{formats}", formats)
+    .replace("{notes}", notes)
+    .replace("{files}", files);
+  sendPrompt(prompt);
+});
+
+renderDetail();
+taskSel.addEventListener("change", renderDetail);
+</script>

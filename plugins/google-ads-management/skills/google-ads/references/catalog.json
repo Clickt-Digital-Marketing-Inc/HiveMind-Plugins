@@ -1,0 +1,212 @@
+{
+  "version": 1,
+  "groups": ["Management", "Audit", "Profitability", "MediaMetrics"],
+  "windows": ["LAST_7_DAYS", "LAST_14_DAYS", "LAST_30_DAYS", "THIS_MONTH", "LAST_MONTH", "CUSTOM"],
+  "routeTemplates": {
+    "mcp": "Run the {skill} skill on Google Ads account \"{account}\" for {window}. Additional context from the operator: {notes}. Analyze only — compute the results but do NOT build any output files yet. Then show the Google Ads results surface per the hub SKILL.md Step 4 (the in-Claude tuner for tunable tasks, otherwise the results card); its buttons export md/xlsx/html on demand at the chosen settings.",
+    "csv": "Run the {skill} skill using these input files: {files}. Additional context from the operator: {notes}. Analyze only — compute the results but do NOT build any output files yet. Then show the Google Ads results surface per the hub SKILL.md Step 4 (the in-Claude tuner for tunable tasks, otherwise the results card); its buttons export the deliverables on demand at the chosen settings.",
+    "mcp_upfront": "Run the {skill} skill on Google Ads account \"{account}\" for {window}. Produce these outputs in an artifacts/ folder: {formats}. Additional context from the operator: {notes}. When the run finishes, show the Google Ads results card and list every artifact path as a markdown link in your reply so the files are clickable."
+  },
+  "tasks": [
+    {
+      "id": "account-health",
+      "skill": "google-ads-account-health",
+      "plugin": "google-ads-management",
+      "group": "Management",
+      "label": "Account health & red flags",
+      "blurb": "Structural sweep: keyword sprawl, missing negatives, naming, automation-without-data, PMax brand cannibalization, disapprovals.",
+      "icon": "ti-activity",
+      "inputs": "mcp",
+      "window": true,
+      "formats": ["md", "xlsx"]
+    },
+    {
+      "id": "budget-pacing",
+      "skill": "google-ads-budget-pacing",
+      "plugin": "google-ads-management",
+      "group": "Management",
+      "label": "Budget & pacing",
+      "blurb": "MTD spend vs goal, 20% scale rule, 3x kill rule, account MER. Emits the md+html+xlsx bundle plus change tables.",
+      "icon": "ti-gauge",
+      "inputs": "mcp",
+      "window": true,
+      "formats": ["md", "html", "xlsx"],
+      "tunable": true
+    },
+    {
+      "id": "bidding-strategy",
+      "skill": "google-ads-bidding-strategy",
+      "plugin": "google-ads-management",
+      "group": "Management",
+      "label": "Bidding strategy",
+      "blurb": "Manual vs automated fit, Target CPA/ROAS, data-maturity score, learning-phase health, automated-bidding failure diagnosis.",
+      "icon": "ti-gavel",
+      "inputs": "mcp",
+      "window": true,
+      "formats": ["md", "html", "xlsx"],
+      "tunable": true
+    },
+    {
+      "id": "keywords-search-terms",
+      "skill": "google-ads-keywords-search-terms",
+      "plugin": "google-ads-management",
+      "group": "Management",
+      "label": "Keywords & search terms",
+      "blurb": "Search-query report audit, three-tier negatives, add-keyword finds, and the two-block waste filter (md+html+xlsx + Editor CSVs).",
+      "icon": "ti-search",
+      "inputs": "mcp",
+      "window": true,
+      "formats": ["md", "html", "xlsx"],
+      "tunable": true
+    },
+    {
+      "id": "quality-score",
+      "skill": "google-ads-quality-score",
+      "plugin": "google-ads-management",
+      "group": "Management",
+      "label": "Quality Score forensics",
+      "blurb": "6-step QS diagnosis when QS<5 or CPCs rise: search-term CTR, device split, ad relevance matrix, low-CTR pause, A/B setup.",
+      "icon": "ti-award",
+      "inputs": "mcp",
+      "window": true,
+      "formats": ["md", "html", "xlsx"],
+      "tunable": true
+    },
+    {
+      "id": "audience-targeting",
+      "skill": "google-ads-audience-targeting",
+      "plugin": "google-ads-management",
+      "group": "Management",
+      "label": "Audiences & remarketing",
+      "blurb": "Three-tier remarketing + bid adjustments, first-party readiness (Customer Match, Enhanced Conversions, Consent Mode), PMax signals.",
+      "icon": "ti-users",
+      "inputs": "mcp",
+      "window": true,
+      "formats": ["md", "xlsx"]
+    },
+    {
+      "id": "conversions-tracking",
+      "skill": "google-ads-conversions-tracking",
+      "plugin": "google-ads-management",
+      "group": "Management",
+      "label": "Conversions & tracking",
+      "blurb": "Weekly conversion health, primary actions/counting/attribution, CVR-drop diagnosis, automation-readiness check.",
+      "icon": "ti-target-arrow",
+      "inputs": "mcp",
+      "window": true,
+      "formats": ["md", "html", "xlsx"],
+      "tunable": true
+    },
+    {
+      "id": "performance-reporting",
+      "skill": "google-ads-performance-reporting",
+      "plugin": "google-ads-management",
+      "group": "Management",
+      "label": "Performance reporting",
+      "blurb": "Daily visibility glance or the monthly client report (spend, conversions, revenue, ROAS, top/bottom campaigns).",
+      "icon": "ti-report",
+      "inputs": "mcp",
+      "window": true,
+      "formats": ["md", "html", "xlsx"],
+      "tunable": true
+    },
+    {
+      "id": "competitive-analysis",
+      "skill": "google-ads-competitive-analysis",
+      "plugin": "google-ads-management",
+      "group": "Management",
+      "label": "Competitive analysis",
+      "blurb": "Weekly impression-share erosion, rising CPCs / auction pressure, rank vs budget lost IS. Hands off Auction Insights to a manual pull.",
+      "icon": "ti-swords",
+      "inputs": "mcp",
+      "window": true,
+      "formats": ["md", "html", "xlsx"],
+      "tunable": true
+    },
+    {
+      "id": "pmax-campaigns",
+      "skill": "google-ads-pmax-campaigns",
+      "plugin": "google-ads-management",
+      "group": "Management",
+      "label": "PMax campaigns (14-day momentum)",
+      "blurb": "Scale vs cut/investigate by comparing the last 14 days to the previous 14. Emits md+html (ROAS sliders)+xlsx.",
+      "icon": "ti-rocket",
+      "inputs": "mcp",
+      "window": true,
+      "formats": ["md", "html", "xlsx"],
+      "tunable": true
+    },
+    {
+      "id": "pmax-listing-groups",
+      "skill": "google-ads-pmax-listing-groups",
+      "plugin": "google-ads-management",
+      "group": "Management",
+      "label": "PMax listing groups",
+      "blurb": "Per-partition / per-product waste, campaign-benchmarked two-block filter (tunable expensiveness factor). Emits md+html+xlsx.",
+      "icon": "ti-list-tree",
+      "inputs": "mcp",
+      "window": true,
+      "formats": ["md", "html", "xlsx"],
+      "tunable": true
+    },
+    {
+      "id": "products",
+      "skill": "google-ads-products",
+      "plugin": "google-ads-management",
+      "group": "Management",
+      "label": "Product performance",
+      "blurb": "Zombie / surging / declining products across Shopping + PMax over 30d and two 14d windows. Emits md+html+xlsx + worklists.",
+      "icon": "ti-package",
+      "inputs": "mcp",
+      "window": true,
+      "formats": ["md", "html", "xlsx"],
+      "tunable": true
+    },
+    {
+      "id": "audit",
+      "skill": "google-ads-audit",
+      "plugin": "google-ads-audit",
+      "group": "Audit",
+      "label": "Full account audit",
+      "blurb": "Point-in-time 9-step account audit plus modern checks (PMax, Consent Mode v2, Enhanced Conversions, Demand Gen). Emits an 18-tab xlsx.",
+      "icon": "ti-clipboard-check",
+      "inputs": "mcp",
+      "window": true,
+      "formats": ["xlsx"],
+      "formats_upfront": true
+    },
+    {
+      "id": "cm3-by-product",
+      "skill": "cm3-by-product-report",
+      "plugin": "cm3-profitability",
+      "group": "Profitability",
+      "label": "CM3 by product",
+      "blurb": "Per-product contribution-margin report from a Shopping CSV (optional Shopify gross-profit CSV). Emits md+html+xlsx; pptx deck opt-in.",
+      "icon": "ti-currency-dollar",
+      "inputs": "csv",
+      "window": false,
+      "formats": ["md", "html", "xlsx", "pptx"],
+      "optIn": ["pptx"],
+      "tunable": true,
+      "files": [
+        {"key": "shopping_csv", "label": "Google Ads \"Shopping products\" CSV", "required": true},
+        {"key": "shopify_csv", "label": "Shopify \"Gross profit by product\" CSV (optional, for accurate COGS)", "required": false}
+      ]
+    },
+    {
+      "id": "mediametrics-google",
+      "skill": "mediametrics-google",
+      "plugin": "mediametrics-google",
+      "group": "MediaMetrics",
+      "label": "MediaMetrics (35-metric deep-dive)",
+      "blurb": "Deterministic statistical workbook from Google Ads CSV exports: 35 metrics, each with a plain-English read. Emits md+html+xlsx.",
+      "icon": "ti-chart-dots",
+      "inputs": "csv",
+      "window": false,
+      "formats": ["md", "html", "xlsx"],
+      "files": [
+        {"key": "raw_dir", "label": "Path to your \"Google Ads Reports\" folder (auto-resolves campaigns/keywords/ad_groups exports)", "required": true}
+      ]
+    }
+  ]
+}

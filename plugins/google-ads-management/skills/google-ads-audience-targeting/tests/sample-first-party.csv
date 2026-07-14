@@ -1,0 +1,6 @@
+Category,Item,Type,Status,Detail,Verified Date
+Enhanced Conversions,Enhanced Conversions for web enabled on the primary conversion action,config,Not configured,No enhanced_conversions_for_leads tag found.,2026-07-01
+Consent Mode v2,Consent Mode v2 configured for EU/EEA traffic,config,Partial - basic mode only,Advanced consent mode not enabled.,2026-07-01
+Customer Match,Customer Match list uploaded from CRM,manual,Unknown,Ask the client's CRM owner.,
+CMP,Consent Management Platform collecting consent,config,Configured and verified,OneTrust live on all pages.,2026-06-15
+Customer Match,Match rate reviewed manually in Ads UI,manual,Done - reviewed 2026-06-30,62% match rate reported in UI.,2026-06-30

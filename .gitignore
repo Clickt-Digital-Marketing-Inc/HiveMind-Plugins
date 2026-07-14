@@ -20,6 +20,7 @@ audits/
 *.csv
 
 # ...but the committed test fixtures (synthetic) must ship:
+!**/tests/*.csv
 !**/tests/fixtures/*.csv
 !**/tests/fixtures/**/*.csv
 !**/tests/sample-shopping.csv

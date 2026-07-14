@@ -1,0 +1,98 @@
+{
+ "meta": {
+  "client_name": "Acme Corp",
+  "account_id": "123-456-7890",
+  "currency": "CAD",
+  "window_30d": "2026-06-06 to 2026-07-05",
+  "generated": "2026-07-05",
+  "source": "user_csv",
+  "reconciliation": {
+   "ad_groups": {
+    "rows": 3,
+    "sums": {
+     "keyword_count": 72.0,
+     "impressions": 10000.0,
+     "clicks": 640.0
+    }
+   },
+   "campaigns": {
+    "rows": 3,
+    "sums": {
+     "negative_count": 5.0,
+     "conversions_30d": 242.0
+    }
+   },
+   "raw_files": [
+    {
+     "file": "adgroups-export.csv",
+     "sha256": "4fbcb809c745417dd37b9474f150dbc6a404a4139c11a0b1368384da31287642",
+     "bytes": 206
+    },
+    {
+     "file": "campaigns-export.csv",
+     "sha256": "4a6cdc1aa284ec38487a5a75a2c0a788c0d3a56e41cc5d18197e27f7cb39b7c3",
+     "bytes": 301
+    }
+   ]
+  }
+ },
+ "params": {},
+ "ad_groups": [
+  {
+   "campaign_id": "NonBrand_US_Search_CRM_2026",
+   "campaign": "NonBrand_US_Search_CRM_2026",
+   "ad_group_id": "Generic - CRM",
+   "ad_group": "Generic - CRM",
+   "keyword_count": 35.0,
+   "clicks": 40.0,
+   "impressions": 4000.0
+  },
+  {
+   "campaign_id": "NonBrand_US_Search_CRM_2026",
+   "campaign": "NonBrand_US_Search_CRM_2026",
+   "ad_group_id": "Demos - CRM",
+   "ad_group": "Demos - CRM",
+   "keyword_count": 12.0,
+   "clicks": 100.0,
+   "impressions": 1000.0
+  },
+  {
+   "campaign_id": "Brand_US_Search_CRM_2026",
+   "campaign": "Brand_US_Search_CRM_2026",
+   "ad_group_id": "Core",
+   "ad_group": "Core",
+   "keyword_count": 25.0,
+   "clicks": 500.0,
+   "impressions": 5000.0
+  }
+ ],
+ "campaigns": [
+  {
+   "campaign_id": "NonBrand_US_Search_CRM_2026",
+   "campaign": "NonBrand_US_Search_CRM_2026",
+   "status": "ENABLED",
+   "channel_type": "SEARCH",
+   "bidding_strategy_type": "MAXIMIZE_CONVERSIONS",
+   "conversions_30d": 12.0,
+   "negative_count": 0.0
+  },
+  {
+   "campaign_id": "Brand_US_Search_CRM_2026",
+   "campaign": "Brand_US_Search_CRM_2026",
+   "status": "ENABLED",
+   "channel_type": "SEARCH",
+   "bidding_strategy_type": "MANUAL_CPC",
+   "conversions_30d": 150.0,
+   "negative_count": 5.0
+  },
+  {
+   "campaign_id": "Shopping PMax Everything",
+   "campaign": "Shopping PMax Everything",
+   "status": "ENABLED",
+   "channel_type": "PERFORMANCE_MAX",
+   "bidding_strategy_type": "MAXIMIZE_CONVERSION_VALUE",
+   "conversions_30d": 80.0,
+   "negative_count": 0.0
+  }
+ ]
+}

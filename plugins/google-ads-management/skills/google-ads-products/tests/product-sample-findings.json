@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "client_name": "Sample Co",
+    "account_id": "000-000-0000",
+    "currency": "USD",
+    "window_30d": "2026-05-28 to 2026-06-26",
+    "window_14d": "2026-06-13 to 2026-06-26",
+    "window_prev14d": "2026-05-30 to 2026-06-12",
+    "generated": "2026-06-27"
+  },
+  "products": [
+    {"product_item_id": "SKU-ZOMBIE", "product_title": "Zombie | spends, never converts", "merchant_id": "111", "channels": ["SHOPPING"],
+     "conversions_30d": 0, "cost_30d": 120.0, "impressions_30d": 5200, "conversions_14d": 0, "impressions_14d": 2100, "conversions_prev14d": 0, "impressions_prev14d": 1800},
+    {"product_item_id": "SKU-SURGE", "product_title": "Surger", "merchant_id": "222", "channels": ["PERFORMANCE_MAX"],
+     "conversions_30d": 5, "cost_30d": 300.0, "impressions_30d": 9000, "conversions_14d": 5, "impressions_14d": 5000, "conversions_prev14d": 2, "impressions_prev14d": 4000},
+    {"product_item_id": "SKU-DECLINE", "product_title": "Decliner", "merchant_id": "333", "channels": ["SHOPPING", "PERFORMANCE_MAX"],
+     "conversions_30d": 10, "cost_30d": 400.0, "impressions_30d": 9000, "conversions_14d": 2, "impressions_14d": 5000, "conversions_prev14d": 8, "impressions_prev14d": 4000},
+    {"product_item_id": "SKU-NOMERCH", "product_title": "Wastes but no merchant id", "merchant_id": "", "channels": ["SHOPPING"],
+     "conversions_30d": 0, "cost_30d": 90.0, "impressions_30d": 1000, "conversions_14d": 0, "impressions_14d": 500, "conversions_prev14d": 0, "impressions_prev14d": 400},
+    {"product_item_id": "SKU-DUP", "product_title": "Dup product (shopping)", "merchant_id": "555", "channels": ["SHOPPING"],
+     "conversions_30d": 2, "cost_30d": 50.0, "impressions_30d": 1500, "conversions_14d": 0.5, "impressions_14d": 800, "conversions_prev14d": 0.5, "impressions_prev14d": 700},
+    {"product_item_id": "SKU-DUP", "product_title": "Dup product (pmax)", "merchant_id": "555", "channels": ["PERFORMANCE_MAX"],
+     "conversions_30d": 2, "cost_30d": 50.0, "impressions_30d": 1400, "conversions_14d": 0.5, "impressions_14d": 750, "conversions_prev14d": 0.5, "impressions_prev14d": 650},
+    {"product_item_id": "SKU-FRAC", "product_title": "Fractional, neither surge nor decline", "merchant_id": "666", "channels": ["SHOPPING"],
+     "conversions_30d": 3, "cost_30d": 70.0, "impressions_30d": 3000, "conversions_14d": 2.75, "impressions_14d": 1500, "conversions_prev14d": 2.0, "impressions_prev14d": 1400},
+    {"product_item_id": "SKU-INACTIVE", "product_title": "Inactive (no spend, no impressions)", "merchant_id": "", "channels": [],
+     "conversions_30d": 0, "cost_30d": 0, "impressions_30d": 0, "conversions_14d": 0, "impressions_14d": 0, "conversions_prev14d": 0, "impressions_prev14d": 0}
+  ]
+}

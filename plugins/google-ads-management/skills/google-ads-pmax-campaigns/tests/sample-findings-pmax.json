@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "client_name": "Acme Retail",
+    "account_id": "7654321",
+    "currency": "CAD",
+    "window_last": "2026-06-13 to 2026-06-26",
+    "window_prev": "2026-05-30 to 2026-06-12",
+    "generated": "2026-06-27"
+  },
+  "params": {
+    "roas_up_multiple": 1.50,
+    "roas_down_multiple": 0.50,
+    "min_cost": 0.0
+  },
+  "last_window": [
+    {"campaign_id": 1, "campaign": "PMax | Shopping - Core", "impressions": 10000, "clicks": 300, "cost": 500, "conversions": 50, "conversions_value": 5000},
+    {"campaign_id": 2, "campaign": "PMax - Prospecting", "impressions": 5000, "clicks": 100, "cost": 400, "conversions": 10, "conversions_value": 200},
+    {"campaign_id": 3, "campaign": "PMax - Brand Steady", "impressions": 3000, "clicks": 90, "cost": 300, "conversions": 20, "conversions_value": 1000},
+    {"campaign_id": 5, "campaign": "PMax - New Launch", "impressions": 2000, "clicks": 60, "cost": 100, "conversions": 5, "conversions_value": 500}
+  ],
+  "prev_window": [
+    {"campaign_id": 1, "campaign": "PMax | Shopping - Core", "impressions": 8000, "clicks": 250, "cost": 480, "conversions": 30, "conversions_value": 1440},
+    {"campaign_id": 2, "campaign": "PMax - Prospecting", "impressions": 6000, "clicks": 120, "cost": 420, "conversions": 40, "conversions_value": 1680},
+    {"campaign_id": 3, "campaign": "PMax - Brand Steady", "impressions": 3000, "clicks": 90, "cost": 300, "conversions": 20, "conversions_value": 1000},
+    {"campaign_id": 4, "campaign": "PMax - Dormant", "impressions": 0, "clicks": 0, "cost": 0, "conversions": 0, "conversions_value": 0}
+  ],
+  "asset_groups": [
+    {"campaign_id": 1, "campaign": "PMax | Shopping - Core", "asset_group_id": 101, "asset_group": "Core Products", "impressions": 9000, "clicks": 270, "cost": 450, "conversions": 45, "conversions_value": 4500},
+    {"campaign_id": 1, "campaign": "PMax | Shopping - Core", "asset_group_id": 102, "asset_group": "Seasonal", "impressions": 700, "clicks": 20, "cost": 40, "conversions": 4, "conversions_value": 400},
+    {"campaign_id": 1, "campaign": "PMax | Shopping - Core", "asset_group_id": 103, "asset_group": "Clearance", "impressions": 300, "clicks": 10, "cost": 10, "conversions": 1, "conversions_value": 100},
+    {"campaign_id": 3, "campaign": "PMax - Brand Steady", "asset_group_id": 301, "asset_group": "Brand Core", "impressions": 1600, "clicks": 48, "cost": 160, "conversions": 11, "conversions_value": 550},
+    {"campaign_id": 3, "campaign": "PMax - Brand Steady", "asset_group_id": 302, "asset_group": "Brand Expansion", "impressions": 1400, "clicks": 42, "cost": 140, "conversions": 9, "conversions_value": 450}
+  ],
+  "search_campaigns": [
+    {"campaign_id": 21, "campaign": "Search - Prospecting - NonBrand", "impressions": 4000, "clicks": 80, "cost": 200, "conversions": 3, "conversions_value": 150},
+    {"campaign_id": 22, "campaign": "Search - Widgets Generic", "impressions": 12000, "clicks": 300, "cost": 1000, "conversions": 25, "conversions_value": 2500}
+  ]
+}

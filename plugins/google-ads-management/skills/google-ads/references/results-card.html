@@ -1,0 +1,83 @@
+<style>
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.ga-art{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:0.5px solid var(--border)}
+.ga-art .p{font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);word-break:break-all}
+.ga-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.ga-acts button{flex:1;min-width:150px}
+</style>
+<h2 class="sr-only">Google Ads run complete: summary and links to the generated files.</h2>
+<div style="padding:1rem 0;max-width:100%">
+  <div style="background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem">
+    <div style="display:flex;gap:12px;align-items:center;margin:0 0 4px">
+      <i id="ga-icon" class="ti ti-circle-check" style="font-size:22px;color:var(--text-success)" aria-hidden="true"></i>
+      <div>
+        <p id="ga-title" style="font-weight:500;font-size:15px;margin:0"></p>
+        <p id="ga-scope" style="font-size:13px;color:var(--text-secondary);margin:0"></p>
+      </div>
+    </div>
+    <p id="ga-summary" style="font-size:14px;color:var(--text-primary);line-height:1.6;margin:12px 0 14px"></p>
+    <div id="ga-arts"></div>
+    <div class="ga-acts" id="ga-exports"></div>
+    <div class="ga-acts">
+      <button id="ga-explain" type="button">Explain the top finding ↗</button>
+      <button id="ga-adjust" type="button">Adjust and re-run ↗</button>
+      <button id="ga-another" type="button">Run another task ↗</button>
+    </div>
+  </div>
+</div>
+<script>
+const CARD = __CARD__;
+const ICON = {md:"ti-file-text", html:"ti-chart-dots", xlsx:"ti-table", pptx:"ti-presentation", csv:"ti-file-spreadsheet"};
+document.getElementById("ga-title").textContent = CARD.title || "Run complete";
+document.getElementById("ga-scope").textContent = CARD.scope || "";
+document.getElementById("ga-summary").textContent = CARD.summary || "";
+const arts = document.getElementById("ga-arts");
+(CARD.artifacts || []).forEach(a => {
+  const row = document.createElement("div");
+  row.className = "ga-art";
+  const ic = document.createElement("i");
+  ic.className = "ti " + (ICON[a.fmt] || "ti-file");
+  ic.style.fontSize = "18px";
+  ic.style.color = "var(--text-secondary)";
+  ic.setAttribute("aria-hidden", "true");
+  const box = document.createElement("div");
+  const lab = document.createElement("div");
+  lab.style.cssText = "font-size:13px;font-weight:500";
+  lab.textContent = a.label || a.fmt || "Artifact";
+  const p = document.createElement("div");
+  p.className = "p";
+  p.textContent = a.path || "";
+  box.appendChild(lab);
+  box.appendChild(p);
+  row.appendChild(ic);
+  row.appendChild(box);
+  arts.appendChild(row);
+});
+const EXP = {md:{label:"Save to HiveMind",icon:"ti-database-export"}, html:{label:"Download HTML",icon:"ti-chart-dots"}, xlsx:{label:"Export Excel",icon:"ti-table"}, pptx:{label:"Export PowerPoint",icon:"ti-presentation"}, csv:{label:"Export CSVs",icon:"ti-file-spreadsheet"}};
+const exportsEl = document.getElementById("ga-exports");
+const exFmts = CARD.exports || [];
+// export buttons need a skill + filename_stem to build a valid prompt; without them (or with no
+// exports — e.g. an audit/artifact-only card) drop the row entirely so it leaves no stray gap.
+if (exFmts.length && CARD.skill && CARD.filename_stem) {
+  exFmts.forEach(fmt => {
+    const m = EXP[fmt] || {label: "Export " + fmt, icon: "ti-file"};
+    const b = document.createElement("button");
+    b.type = "button";
+    b.innerHTML = '<i class="ti ' + m.icon + '" aria-hidden="true" style="font-size:16px;vertical-align:-2px;margin-right:6px"></i>' + m.label + " ↗";
+    b.addEventListener("click", () => {
+      if (fmt === "md") sendPrompt("Save the " + (CARD.title || "") + " report (" + CARD.skill + ") to HiveMind: regenerate the markdown and write it directly into the vault's raw/reports/ folder as " + CARD.filename_stem + ".md (overwrite if it already exists). Do not propose_note and do not ask for approval.");
+      else sendPrompt("Export the " + (CARD.title || "") + " report (" + CARD.skill + ") as " + fmt + " into the artifacts/ folder (filename stem " + CARD.filename_stem + "); then reply with the artifact path as a clickable markdown link.");
+    });
+    exportsEl.appendChild(b);
+  });
+} else {
+  exportsEl.remove();
+}
+const taskLabel = CARD.taskLabel || "this task";
+document.getElementById("ga-explain").addEventListener("click", () =>
+  sendPrompt("Explain the single most important finding from that " + taskLabel + " run and the first action I should take."));
+document.getElementById("ga-adjust").addEventListener("click", () =>
+  sendPrompt("Re-open the Google Ads menu for the " + taskLabel + " task so I can change the inputs and run it again."));
+document.getElementById("ga-another").addEventListener("click", () =>
+  sendPrompt("Open the Google Ads menu."));
+</script>

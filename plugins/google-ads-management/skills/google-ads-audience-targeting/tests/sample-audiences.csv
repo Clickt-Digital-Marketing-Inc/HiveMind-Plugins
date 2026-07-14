@@ -1,0 +1,8 @@
+Campaign,Ad group,Audience,Audience type,Bid adj.,Criterion status,Targeting,Impr.,Clicks,Cost,Conversions
+Search - Remarketing,Core,Cart abandoners 7d,REMARKETING,+50%,ENABLED,Targeting,10000,500,200.00,10
+Search - Remarketing,Core,Broad interest,AFFINITY,--,ENABLED,Targeting,5000,50,50.00,2
+Search - Remarketing,Core,Old list unused,REMARKETING,--,PAUSED,Targeting,0,0,0.00,0
+Search - Remarketing,Prospecting,Similar to converters,SIMILAR,+20%,ENABLED,Targeting,8000,200,300.00,0
+PMax - Auto Signals,Asset Group 1,Similar to converters,SIMILAR,--,ENABLED,Targeting,4000,120,80.00,3
+PMax - Auto Signals,Asset Group 1,Recent converters (30d),REMARKETING,--,ENABLED,Exclude,0,0,0.00,0
+Total: 6 audiences,,,,,,,27000,870,630.00,15

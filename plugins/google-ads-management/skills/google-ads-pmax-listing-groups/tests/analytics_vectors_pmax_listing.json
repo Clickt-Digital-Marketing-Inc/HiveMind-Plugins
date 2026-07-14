@@ -1,0 +1,37 @@
+{
+  "_comment": "Skill-owned Python<->JS parity vectors for the analytics-primitives gate (HM-539). Auto-discovered by skills/google-ads/tests/run_parity.py (run_analytics: skills/*/tests/analytics_vectors*.json). Shapes mirror pmax_listing_core's actual use of _shared/analytics.py: concentration(rows,'cost',top_n=3) over a listing-group/product universe, and signals() with the over_concentrated/weak_roas rule pair (see pmax_listing_core.annotate_signals). Values kept away from exact .5 rounding boundaries per the kernel-mirror contract.",
+  "concentration": [
+    {"rows": [{"cost": 400.0}, {"cost": 300.0}, {"cost": 300.0}], "value_key": "cost", "top_n": 3},
+    {"rows": [{"cost": 61.0}], "value_key": "cost", "top_n": 3},
+    {"rows": [{"cost": 500.0}, {"cost": 500.0}], "value_key": "cost", "top_n": 3},
+    {"rows": [{"cost": 0.0}, {"cost": 0.0}, {"cost": 0.0}], "value_key": "cost", "top_n": 3},
+    {"rows": [{"cost": 1234.56}, {"cost": 789.01}, {"cost": 45.23}, {"cost": 12.09}, {"cost": 3.34}], "value_key": "cost", "top_n": 3}
+  ],
+  "signals": [
+    {
+      "rows": [
+        {"cost_share": 0.4, "roas": 0.5},
+        {"cost_share": 0.3, "roas": 0.333},
+        {"cost_share": 0.3, "roas": 2.0},
+        {"cost_share": 0.5, "roas": 1.0},
+        {"cost_share": 0.5, "roas": 0.998},
+        {"cost_share": 1.0, "roas": null},
+        {"cost_share": 0.05, "roas": 0.1}
+      ],
+      "rules": [
+        {"id": "over_concentrated", "key": "cost_share", "op": "gt", "value": 0.30},
+        {"id": "weak_roas", "key": "roas", "op": "lt", "value": 1.00}
+      ]
+    },
+    {
+      "rows": [
+        {"cost_share": 0.29999, "roas": 0.0},
+        {"cost_share": 0.30001, "roas": 0.99999}
+      ],
+      "rules": [
+        {"id": "over_concentrated", "key": "cost_share", "op": "gt", "value": 0.30},
+        {"id": "weak_roas", "key": "roas", "op": "lt", "value": 1.00}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "client_name": "Demo Co",
+    "account_id": "444-555-6666",
+    "currency": "USD",
+    "period": "last 30 days",
+    "generated": "2026-06-26",
+    "monthly_goal": 30000,
+    "days_elapsed": 15,
+    "days_in_month": 30
+  },
+  "campaigns": [
+    {"campaign_id": 1, "campaign": "S | Brand", "channel": "SEARCH", "daily_budget": 300.0,
+     "cost": 4000.0, "mtd_spend": 2200.0, "conversions": 100,
+     "search_budget_lost_is": 0.25, "search_rank_lost_is": 0.05},
+    {"campaign_id": 2, "campaign": "S | Junk", "channel": "SEARCH", "daily_budget": 400.0,
+     "cost": 600.0, "mtd_spend": 320.0, "conversions": 0,
+     "search_budget_lost_is": 0.0, "search_rank_lost_is": 0.0},
+    {"campaign_id": 3, "campaign": "S | Competitive", "channel": "SEARCH", "daily_budget": 500.0,
+     "cost": 2000.0, "mtd_spend": 1100.0, "conversions": 30,
+     "search_budget_lost_is": 0.02, "search_rank_lost_is": 0.30},
+    {"campaign_id": 4, "campaign": "S | Starved", "channel": "SEARCH", "daily_budget": 100.0,
+     "cost": 800.0, "mtd_spend": 450.0, "conversions": 20,
+     "search_budget_lost_is": 0.05, "search_rank_lost_is": 0.05},
+    {"campaign_id": 5, "campaign": "S | Steady", "channel": "SEARCH", "daily_budget": 600.0,
+     "cost": 1500.0, "mtd_spend": 800.0, "conversions": 30,
+     "search_budget_lost_is": 0.0, "search_rank_lost_is": 0.0},
+    {"campaign_id": 6, "campaign": "PMax | NoBudgetData", "channel": "PERFORMANCE_MAX",
+     "cost": 500.0, "mtd_spend": 250.0, "conversions": 10}
+  ]
+}

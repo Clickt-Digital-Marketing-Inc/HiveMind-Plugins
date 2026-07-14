@@ -1,0 +1,292 @@
+{
+ "result": [
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2001"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2002"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2002"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2002"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2002"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2002"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2002"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2002"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2002"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2002"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2002"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2002"
+  },
+  {
+   "campaign.id": "1001",
+   "ad_group.id": "2002"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  },
+  {
+   "campaign.id": "1002",
+   "ad_group.id": "2003"
+  }
+ ]
+}

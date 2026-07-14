@@ -1,0 +1,4 @@
+Campaign,Campaign state,Campaign type,Bid strategy type,Conversions,Campaign negative keywords
+NonBrand_US_Search_CRM_2026,Enabled,Search,Maximize conversions,12,0
+Brand_US_Search_CRM_2026,Enabled,Search,Manual CPC,150,5
+Shopping PMax Everything,Enabled,Performance Max,Maximize conversion value,80,0

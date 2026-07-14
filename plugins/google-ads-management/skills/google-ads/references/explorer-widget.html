@@ -1,0 +1,266 @@
+<style>
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+/* Clickt HiveMind brand accent (teal #1F7A82) — scoped to the widget so only the accent + accent-tint change; surfaces/text stay on the Claude host theme (light/dark adaptive). */
+.gx-brand{--text-accent:#1F7A82;--bg-accent:#DAE9E6}
+@media(prefers-reduced-motion:reduce){.gx-brand *{transition:none!important}}
+.gx-prov{color:var(--text-muted);font-size:12px;margin:0 0 10px}
+.gx-about{font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0 0 14px}
+.gx-about .sum{margin:0 0 8px}
+.gx-about .leg{display:flex;flex-direction:column;gap:5px}
+.gx-about .leg .r{display:flex;gap:8px;align-items:baseline}
+.gx-about .leg .badge{flex:0 0 auto;align-self:flex-start}
+.gx-about .leg .d{color:var(--text-muted)}
+.gx-card{background:var(--surface-1);border-radius:12px;padding:12px 14px;margin:0 0 12px}
+.gx-card h2{font-size:12px;margin:0 0 10px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--text-secondary)}
+.gx-ctls{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.gx-ctl label{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-secondary);margin:0 0 6px}
+.gx-ctl .v{display:inline-block;min-width:2.4em;padding:1px 8px;border-radius:999px;background:var(--bg-accent);color:var(--text-accent);font-weight:600;font-size:11px;font-variant-numeric:tabular-nums;text-align:center}
+.gx-ctl input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;margin:6px 0;background:transparent;cursor:pointer}
+.gx-ctl input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:linear-gradient(90deg,var(--text-accent) 0 calc(var(--p,0)*1%),var(--border) calc(var(--p,0)*1%) 100%)}
+.gx-ctl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;margin-top:-5px;border-radius:50%;background:var(--surface-1);border:2px solid var(--text-accent);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:box-shadow .15s,transform .15s}
+.gx-ctl input[type=range]::-moz-range-track{height:6px;border-radius:999px;background:var(--border)}
+.gx-ctl input[type=range]::-moz-range-progress{height:6px;border-radius:999px;background:var(--text-accent)}
+.gx-ctl input[type=range]::-moz-range-thumb{width:16px;height:16px;border:2px solid var(--text-accent);border-radius:50%;background:var(--surface-1);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:box-shadow .15s,transform .15s}
+.gx-ctl input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.08)}.gx-ctl input[type=range]:hover::-moz-range-thumb{transform:scale(1.08)}
+.gx-ctl input[type=range]:active::-webkit-slider-thumb{transform:scale(1.12)}.gx-ctl input[type=range]:active::-moz-range-thumb{transform:scale(1.12)}
+.gx-ctl input[type=range]:focus{outline:none}
+.gx-ctl input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px color-mix(in srgb,var(--text-accent) 30%,transparent)}
+.gx-ctl input[type=range]:focus-visible::-moz-range-thumb{box-shadow:0 0 0 4px color-mix(in srgb,var(--text-accent) 30%,transparent)}
+.gx-ctl input[type=number],.gx-ctl select{height:30px;padding:0 8px;border:0.5px solid var(--border);border-radius:7px;background:var(--surface-2);color:var(--text-primary);font:inherit;font-size:12px;line-height:30px;transition:border-color .15s,box-shadow .15s}
+.gx-ctl input[type=number]{width:120px;font-variant-numeric:tabular-nums}
+.gx-ctl input[type=number]:focus,.gx-ctl select:focus{outline:none;border-color:var(--text-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--text-accent) 22%,transparent)}
+.gx-ctl .sub{color:var(--text-muted);font-size:11px;margin-top:6px}
+.gx-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.gx-chips label{position:relative;margin:0;cursor:pointer}
+.gx-chips label input{position:absolute;opacity:0;width:0;height:0}
+.gx-chips label span{display:inline-block;padding:4px 11px;border-radius:999px;border:0.5px solid var(--border);background:var(--surface-2);color:var(--text-secondary);font-size:12px;line-height:1.4;user-select:none;transition:background .15s,border-color .15s,color .15s}
+.gx-chips label:hover span{border-color:var(--text-accent)}
+.gx-chips label input:checked+span{background:var(--bg-accent);border-color:var(--text-accent);color:var(--text-accent);font-weight:600}
+.gx-chips label input:focus-visible+span{box-shadow:0 0 0 3px color-mix(in srgb,var(--text-accent) 30%,transparent)}
+:focus-visible{outline:2px solid var(--text-accent);outline-offset:2px}
+th:focus-visible{outline-offset:-2px}
+.gx-kpis{display:flex;flex-wrap:wrap;gap:10px}
+.gx-kpi{flex:1;min-width:96px;background:var(--surface-2);border-radius:8px;padding:8px 10px}
+.gx-kpi .n{font-size:20px;font-weight:500}
+.gx-kpi .l{font-size:11px;color:var(--text-muted)}
+.gx-tablewrap{overflow:auto;max-height:360px;border:0.5px solid var(--border);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:5px 8px;border-bottom:0.5px solid var(--border);text-align:left;white-space:nowrap}
+th{position:sticky;top:0;background:var(--surface-2);cursor:pointer}
+td.num,th.num{text-align:right}
+.badge{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:500}
+.b-accent{background:var(--bg-accent);color:var(--text-accent)}
+.b-danger{background:var(--bg-danger);color:var(--text-danger)}
+.b-success{background:var(--bg-success);color:var(--text-success)}
+.b-warning{background:var(--bg-warning);color:var(--text-warning)}
+.b-neutral{background:var(--surface-2);color:var(--text-secondary)}
+.gx-note{color:var(--text-muted);font-size:12px;margin-top:6px}
+#gx-charts svg{display:block;max-width:100%;height:auto;border-radius:8px;margin:0 0 10px}
+.gx-logic{font-size:12px;color:var(--text-secondary);background:var(--surface-2);border-radius:8px;padding:8px 10px;margin:6px 0}
+.gx-save{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.gx-save button{min-width:190px}
+.gx-cur{color:var(--text-accent);font-weight:500}
+.gx-tablewrap table .qual td{background:rgba(31,122,130,.12)}
+#gx-extra .card{background:var(--surface-1);border-radius:12px;padding:12px 14px;margin:0 0 12px}
+#gx-extra .card h2{font-size:12px;margin:0 0 8px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--text-secondary)}
+#gx-extra .logic{font-size:12px;color:var(--text-secondary);background:var(--surface-2);border-radius:8px;padding:8px 10px;margin:4px 0}
+#gx-extra .note{color:var(--text-muted);font-size:12px}
+#gx-extra table{width:100%;border-collapse:collapse;font-size:12px}
+#gx-extra th,#gx-extra td{padding:5px 8px;border-bottom:0.5px solid var(--border);text-align:left}
+#gx-extra th.num,#gx-extra td.num{text-align:right}
+#gx-extra td.cur{color:var(--text-accent);font-weight:500}
+</style>
+<h2 class="sr-only" id="gx-sr">Report tuner: adjust the parameters, preview the live results, then save the report to HiveMind at the tuned settings.</h2>
+<div class="gx-brand" style="padding:1rem 0;max-width:100%">
+  <div id="gx-title" style="font-size:16px;font-weight:500;margin:0 0 2px"></div>
+  <div class="gx-prov" id="gx-prov"></div>
+  <div class="gx-about" id="gx-about"></div>
+  <div class="gx-card"><h2>Parameters</h2><div class="gx-ctls" id="gx-controls"></div></div>
+  <div class="gx-card"><h2>Results (live)</h2><div class="gx-kpis" id="gx-kpis"></div></div>
+  <div class="gx-card" id="gx-chartscard" style="display:none"><h2>Charts</h2><div id="gx-charts"></div>
+    <div class="gx-note">Shown at the report defaults — use Download HTML for live charts that follow the sliders.</div></div>
+  <div id="gx-extra"></div>
+  <div class="gx-card"><h2 id="gx-tablehead">Results (live preview)</h2>
+    <div class="gx-tablewrap"><table><thead id="gx-thead"></thead><tbody id="gx-tbody"></tbody></table></div>
+    <div class="gx-note" id="gx-tcount"></div>
+  </div>
+  <div class="gx-card"><h2>Outputs</h2>
+    <div class="gx-save">
+      <button id="gx-save" type="button"><i class="ti ti-database-export" aria-hidden="true" style="font-size:16px;vertical-align:-2px;margin-right:6px"></i>Save to HiveMind ↗</button>
+      <button id="gx-xlsx" type="button"><i class="ti ti-table" aria-hidden="true" style="font-size:16px;vertical-align:-2px;margin-right:6px"></i>Export Excel ↗</button>
+      <button id="gx-html" type="button"><i class="ti ti-chart-dots" aria-hidden="true" style="font-size:16px;vertical-align:-2px;margin-right:6px"></i>Download HTML ↗</button>
+    </div>
+    <div class="gx-note" id="gx-savenote" style="margin-top:8px"></div>
+    <div class="gx-note" id="gx-savestate" style="min-height:14px;margin-top:6px"></div>
+  </div>
+</div>
+<script>
+const WIDGET = /*__DATA__*/;
+const MODEL = WIDGET.embed, SPEC = WIDGET.spec, SAVE = WIDGET.save;
+const CUR = (MODEL.provenance && MODEL.provenance.currency) || "";
+const ROW_CAP = 50;
+const P = Object.assign({}, MODEL.params || {});
+const NOUN = (SPEC.row_noun || "rows");
+const NOUN_T = NOUN.charAt(0).toUpperCase() + NOUN.slice(1);
+
+const money = v => (v==null?"":Number(v).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) + (CUR?(" "+CUR):""));
+const pct = v => (v==null?"":(Number(v)*100).toFixed(2)+"%");
+const fmtN = v => (v==null?"":Number(v).toLocaleString());
+const esc = s => String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function el(tag,attrs,html){const e=document.createElement(tag); if(attrs)for(const k in attrs)e.setAttribute(k,attrs[k]); if(html!=null)e.innerHTML=html; return e;}
+const H = {money,pct,fmtN,esc,el};
+
+let classify = (r,P) => ({block:"", status:r.status});
+let summarize = (rows,P) => MODEL.summary || {};
+let renderExtra = null;
+/*__KERNEL__*/
+/*__EXTRA__*/
+
+let sortKey=null, sortDir=-1;
+
+function blockClass(label){
+  return {"Block 1":"b-accent","Block 2":"b-warning","Winner":"b-accent","Expected CTR":"b-accent",
+    "Scale":"b-success","Raise":"b-success","Ad relevance":"b-warning","Rank-limited":"b-warning",
+    "Fix":"b-danger","Kill":"b-danger","Critical":"b-danger","Landing page":"b-danger",
+    "Hold":"b-neutral","Low budget":"b-neutral","OK":"b-neutral","Other":"b-neutral",
+    "Zombie":"b-danger","Surging":"b-success","Declining":"b-warning"}[label]||"b-neutral";
+}
+function badge(status,block){
+  if(block) return '<span class="badge '+blockClass(block)+'">'+esc(block)+'</span>';
+  if(status&&status!=="scored"&&status!=="measured") return '<span class="badge b-warning">'+esc(String(status).replace("_"," "))+'</span>';
+  return '<span class="badge b-neutral">'+esc(status||"")+'</span>';
+}
+function fmtCell(r,col,c){
+  const v=r[col.key];
+  switch(col.fmt){
+    case "money": return money(v);
+    case "pct": return pct(v);
+    case "int": return fmtN(v);
+    case "num": return (v==null?"":Number(v).toFixed(2));
+    case "status": return badge(r.status,c.block);
+    case "block": return c.block?('<span class="badge '+blockClass(c.block)+'">'+esc(c.block)+'</span>'):"";
+    default: return esc(v);
+  }
+}
+function renderProv(){
+  const pr=MODEL.provenance||{};
+  document.getElementById("gx-title").textContent = SPEC.title + " — tuner";
+  document.getElementById("gx-sr").textContent = SPEC.title + " tuner: adjust the parameters, preview the live results, then save the report to HiveMind at the tuned settings.";
+  document.getElementById("gx-tablehead").textContent = NOUN_T + " (live preview)";
+  const TOTAL = (MODEL.total_rows!=null?MODEL.total_rows:(MODEL.rows||[]).length);
+  const bits=[`${esc(pr.client_name||"")} ${esc(pr.account_id||"")}`,
+    `currency ${esc(CUR||"—")}`, `generated ${esc(pr.generated||"—")}`,
+    `${TOTAL.toLocaleString()} ${NOUN}`];
+  document.getElementById("gx-prov").textContent = bits.filter(Boolean).join(" · ");
+  const AB=SPEC.about||{}, abHost=document.getElementById("gx-about");
+  if(AB.summary || (AB.legend&&AB.legend.length)){
+    let h = AB.summary?`<div class="sum">${esc(AB.summary)}</div>`:"";
+    if(AB.legend&&AB.legend.length){
+      h+=`<div class="leg">`+AB.legend.map(L=>`<div class="r"><span class="badge ${blockClass(L.label)}">${esc(L.label)}</span><span class="d">${esc(L.desc)}</span></div>`).join("")+`</div>`;
+    }
+    abHost.innerHTML=h;
+  } else { abHost.style.display="none"; }
+  document.getElementById("gx-savenote").textContent =
+    "Writes the markdown at the current settings into your vault (raw/reports/" + SAVE.filename_stem + ".md).";
+}
+function renderControls(){
+  const host=document.getElementById("gx-controls"); host.innerHTML="";
+  const setP=(r,c)=>{const span=(c.max-c.min)||1; r.style.setProperty('--p',(((+r.value)-c.min)/span)*100);};
+  (SPEC.controls||[]).forEach(c=>{
+    const w=el("div",{class:"gx-ctl"});
+    if(c.kind==="slider"){
+      const svfmt=v=>{const n=+v; return Number.isInteger(n)?String(n):n.toFixed(2);};
+      w.innerHTML=`<label>${esc(c.label)} <span class="v" id="gv_${c.key}">${svfmt(P[c.key])}</span></label>`;
+      const r=el("input",{type:"range",min:c.min,max:c.max,step:c.step,value:P[c.key]});
+      setP(r,c);
+      r.oninput=()=>{P[c.key]=parseFloat(r.value); document.getElementById("gv_"+c.key).textContent=svfmt(P[c.key]); setP(r,c); renderAll();};
+      w.appendChild(r); if(c.sub) w.appendChild(el("div",{class:"sub"},esc(c.sub)));
+    } else if(c.kind==="number"){
+      w.innerHTML=`<label>${esc(c.label)}</label>`;
+      const n=el("input",{type:"number",min:(c.min!=null?c.min:0),step:(c.step!=null?c.step:1),value:P[c.key]});
+      n.style.width="100px"; n.oninput=()=>{P[c.key]=parseFloat(n.value||"0"); renderAll();};
+      w.appendChild(n);
+    } else if(c.kind==="select"){
+      w.innerHTML=`<label>${esc(c.label)}</label>`;
+      const sel=el("select");
+      (c.options||[]).forEach(([lab,val])=>{const o=el("option"); o.value=String(val); o.textContent=lab;
+        if(String(P[c.key])===String(val)) o.selected=true; sel.appendChild(o);});
+      sel.onchange=()=>{const raw=sel.value,n=Number(raw); P[c.key]=(raw!==""&&!isNaN(n))?n:raw; renderAll();};
+      w.appendChild(sel); if(c.sub) w.appendChild(el("div",{class:"sub"},esc(c.sub)));
+    } else if(c.kind==="multi"){
+      w.style.gridColumn="1 / -1";
+      w.innerHTML=`<label>${esc(c.label)}</label>`;
+      const box=el("div",{class:"gx-chips"});
+      (c.options||[]).forEach(([lab,val])=>{
+        const ol=el("label");
+        const cb=el("input",{type:"checkbox",value:String(val)});
+        if((P[c.key]||[]).includes(val)) cb.checked=true;
+        cb.onchange=()=>{const s=new Set(P[c.key]||[]); cb.checked?s.add(val):s.delete(val); P[c.key]=[...s]; renderAll();};
+        ol.appendChild(cb); ol.appendChild(el("span",null,esc(lab))); box.appendChild(ol);
+      });
+      w.appendChild(box); if(c.sub) w.appendChild(el("div",{class:"sub"},esc(c.sub)));
+    }
+    host.appendChild(w);
+  });
+}
+function renderKpis(){
+  const S=summarize(MODEL.rows,P);
+  document.getElementById("gx-kpis").innerHTML=(SPEC.kpis||[]).map(k=>{
+    let v=S[k.key]; if(k.money) v=money(v);
+    return `<div class="gx-kpi"><div class="n">${v==null?"—":esc(v)}</div><div class="l">${esc(k.label)}</div></div>`;
+  }).join("");
+}
+function renderTable(){
+  const cols=SPEC.columns||[];
+  if(sortKey==null){const mc=cols.find(c=>c.num); sortKey=mc?mc.key:(cols[0]&&cols[0].key);}
+  let rows=(MODEL.rows||[]).map(r=>({r,c:classify(r,P)}));
+  rows.sort((a,b)=>{
+    let av=(sortKey==="block")?a.c.block:a.r[sortKey], bv=(sortKey==="block")?b.c.block:b.r[sortKey];
+    if(typeof av==="string"||typeof bv==="string") return sortDir*String(av==null?"":av).localeCompare(String(bv==null?"":bv));
+    return sortDir*((av||0)-(bv||0));
+  });
+  const shown=rows.slice(0,ROW_CAP);
+  document.getElementById("gx-thead").innerHTML="<tr>"+cols.map(c=>
+    `<th class="${c.num?'num':''}" data-k="${c.key}">${esc(c.label)}${sortKey===c.key?(sortDir<0?' ▾':' ▴'):''}</th>`).join("")+"</tr>";
+  document.getElementById("gx-tbody").innerHTML=shown.map(({r,c})=>
+    `<tr class="${c.block?'qual':''}">`+cols.map(col=>`<td class="${col.num?'num':''}">${fmtCell(r,col,c)}</td>`).join("")+"</tr>").join("");
+  const total=(MODEL.total_rows!=null?MODEL.total_rows:rows.length);
+  document.getElementById("gx-tcount").textContent =
+    `Showing ${shown.length.toLocaleString()} of ${total.toLocaleString()} — full no-row-loss table is in the saved report and the on-disk explorer.`;
+  document.querySelectorAll("#gx-thead th").forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k; if(sortKey===k)sortDir*=-1; else{sortKey=k;sortDir=-1;} renderTable();});
+}
+function renderExtraHost(){const host=document.getElementById("gx-extra"); if(!renderExtra){host.innerHTML="";return;} host.className=""; const card=el("div"); renderExtra(card,H); host.innerHTML=""; host.appendChild(card);}
+function renderCharts(){
+  // Static SVGs generated by the skill's build pipeline (never hand-authored);
+  // rendered once at the report defaults — the on-disk explorer has live ones.
+  const cs=WIDGET.charts||[], card=document.getElementById("gx-chartscard");
+  if(!cs.length) return;
+  card.style.display="";
+  document.getElementById("gx-charts").innerHTML=cs.map(c=>c.svg).join("");
+}
+function renderAll(){renderKpis();renderExtraHost();renderTable();}
+
+document.getElementById("gx-save").addEventListener("click",()=>{
+  document.getElementById("gx-savestate").textContent="Saving at the current settings…";
+  const prompt =
+    `Save the ${SAVE.brand} report (${SAVE.skill}) to HiveMind at these tuned parameters: ${JSON.stringify(P)}. `+
+    `Regenerate the markdown at exactly these params and write it directly into the vault's raw/reports/ folder as `+
+    `${SAVE.filename_stem}.md (overwrite if it already exists). Do not propose_note and do not ask for approval — `+
+    `this is a direct save the operator authorized by clicking Save.`;
+  sendPrompt(prompt);
+});
+
+function gxExport(fmt,label){
+  document.getElementById("gx-savestate").textContent=label+" at the current settings…";
+  sendPrompt(
+    `Export the ${SAVE.brand} report (${SAVE.skill}) as ${fmt} at these tuned parameters: ${JSON.stringify(P)}. `+
+    `Rebuild from the run's findings at exactly these params, producing the ${fmt} in the artifacts/ folder `+
+    `(filename stem ${SAVE.filename_stem}); then reply with the artifact path as a clickable markdown link. `+
+    `Don't change any account data and don't re-pull from the API.`);
+}
+document.getElementById("gx-xlsx").addEventListener("click",()=>gxExport("xlsx","Building the Excel workbook"));
+document.getElementById("gx-html").addEventListener("click",()=>gxExport("html","Building the HTML explorer"));
+
+renderProv();renderControls();renderCharts();renderAll();
+</script>

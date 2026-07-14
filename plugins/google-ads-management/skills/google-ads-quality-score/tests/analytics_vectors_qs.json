@@ -1,0 +1,36 @@
+{
+  "_comment": "google-ads-quality-score's own analytics.py vectors (HM-541 dominant-QS-factor concentration). Auto-discovered by skills/google-ads/tests/run_parity.py's analytics-primitives gate (glob skills/*/tests/analytics_vectors*.json) alongside _shared/tests/analytics_vectors.json. These shapes mirror qs_core.component_drag / dominant_factor's two concentration passes (component-level top_n=1, ad-group-location top_n=3) and the worst_factor signals rule on the sample-findings.json fixture's numbers.",
+  "concentration": [
+    {"rows": [{"component": "Landing page", "cost": 1300.0}, {"component": "Ad relevance", "cost": 1200.0}, {"component": "Expected CTR", "cost": 1350.0}], "value_key": "cost", "top_n": 1},
+    {"rows": [{"ad_group": "MLA Calgary", "cost": 550.0}, {"ad_group": "Generic", "cost": 800.0}], "value_key": "cost", "top_n": 3},
+    {"rows": [{"component": "Landing page", "cost": 0.0}, {"component": "Ad relevance", "cost": 0.0}, {"component": "Expected CTR", "cost": 0.0}], "value_key": "cost", "top_n": 1},
+    {"rows": [{"component": "Landing page", "cost": 400.0}, {"component": "Ad relevance", "cost": 400.0}, {"component": "Expected CTR", "cost": 400.0}], "value_key": "cost", "top_n": 1},
+    {"rows": [{"ad_group": "Solo", "cost": 250.0}], "value_key": "cost", "top_n": 3}
+  ],
+  "signals": [
+    {
+      "rows": [
+        {"component": "Landing page", "cost": 1300.0, "max_cost": 1350.0},
+        {"component": "Ad relevance", "cost": 1200.0, "max_cost": 1350.0},
+        {"component": "Expected CTR", "cost": 1350.0, "max_cost": 1350.0}
+      ],
+      "rules": [{"id": "worst_factor", "key": "cost", "op": "ge", "value_key": "max_cost"}]
+    },
+    {
+      "rows": [
+        {"component": "Landing page", "cost": 400.0, "max_cost": 400.0},
+        {"component": "Ad relevance", "cost": 400.0, "max_cost": 400.0},
+        {"component": "Expected CTR", "cost": 400.0, "max_cost": 400.0}
+      ],
+      "rules": [{"id": "worst_factor", "key": "cost", "op": "ge", "value_key": "max_cost"}]
+    },
+    {
+      "rows": [
+        {"component": "Landing page", "cost": 0.0, "max_cost": 0.0},
+        {"component": "Ad relevance", "cost": 0.0, "max_cost": 0.0},
+        {"component": "Expected CTR", "cost": 0.0, "max_cost": 0.0}
+      ],
+      "rules": [{"id": "worst_factor", "key": "cost", "op": "ge", "value_key": "max_cost"}]
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "client_name": "Demo Co",
+    "account_id": "777-888-9999",
+    "currency": "USD",
+    "period": "last 30 days",
+    "generated": "2026-06-26"
+  },
+  "keywords": [
+    {"ad_group_id": 10, "ad_group": "HCA Alberta", "campaign": "S | NB", "keyword": "hca training alberta",
+     "match_type": "PHRASE", "quality_score": 4, "landing_page_exp": "BELOW_AVERAGE",
+     "ad_relevance": "AVERAGE", "expected_ctr": "ABOVE_AVERAGE",
+     "impressions": 1000, "clicks": 30, "cost": 500.0, "conversions": 5},
+    {"ad_group_id": 11, "ad_group": "PN Core", "campaign": "S | NB", "keyword": "practical nurse course",
+     "match_type": "PHRASE", "quality_score": 3, "landing_page_exp": "AVERAGE",
+     "ad_relevance": "BELOW_AVERAGE", "expected_ctr": "AVERAGE",
+     "impressions": 2000, "clicks": 40, "cost": 400.0, "conversions": 3},
+    {"ad_group_id": 12, "ad_group": "MLA Calgary", "campaign": "S | NB", "keyword": "medical lab assistant",
+     "match_type": "BROAD", "quality_score": 4, "landing_page_exp": "ABOVE_AVERAGE",
+     "ad_relevance": "AVERAGE", "expected_ctr": "BELOW_AVERAGE",
+     "impressions": 5000, "clicks": 60, "cost": 300.0, "conversions": 4},
+    {"ad_group_id": 13, "ad_group": "Generic", "campaign": "S | NB", "keyword": "online courses",
+     "match_type": "BROAD", "quality_score": 2, "landing_page_exp": "BELOW_AVERAGE",
+     "ad_relevance": "BELOW_AVERAGE", "expected_ctr": "BELOW_AVERAGE",
+     "impressions": 8000, "clicks": 50, "cost": 800.0, "conversions": 0},
+    {"ad_group_id": 14, "ad_group": "Brand", "campaign": "S | Brand", "keyword": "abes college",
+     "match_type": "EXACT", "quality_score": 4, "landing_page_exp": "AVERAGE",
+     "ad_relevance": "AVERAGE", "expected_ctr": "AVERAGE",
+     "impressions": 1200, "clicks": 200, "cost": 200.0, "conversions": 20},
+    {"ad_group_id": 12, "ad_group": "MLA Calgary", "campaign": "S | NB", "keyword": "lab tech program",
+     "match_type": "PHRASE", "quality_score": 4, "landing_page_exp": "ABOVE_AVERAGE",
+     "ad_relevance": "ABOVE_AVERAGE", "expected_ctr": "BELOW_AVERAGE",
+     "impressions": 300, "clicks": 1, "cost": 250.0, "conversions": 0},
+    {"ad_group_id": 15, "ad_group": "New", "campaign": "S | NB", "keyword": "brand new keyword",
+     "match_type": "PHRASE", "quality_score": null, "landing_page_exp": "BELOW_AVERAGE",
+     "ad_relevance": "BELOW_AVERAGE", "expected_ctr": "BELOW_AVERAGE",
+     "impressions": 20, "clicks": 0, "cost": 100.0, "conversions": 0},
+    {"ad_group_id": 16, "ad_group": "Winner", "campaign": "S | NB", "keyword": "good keyword",
+     "match_type": "EXACT", "quality_score": 7, "landing_page_exp": "AVERAGE",
+     "ad_relevance": "AVERAGE", "expected_ctr": "AVERAGE",
+     "impressions": 4000, "clicks": 320, "cost": 1000.0, "conversions": 40}
+  ]
+}

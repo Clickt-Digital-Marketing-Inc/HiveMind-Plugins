@@ -1,0 +1,36 @@
+{
+  "_comment": "Python<->JS parity vectors for THIS skill's actual _shared/analytics usage (audience_core.rules/weights/DEFAULT_PARAMS), auto-discovered by skills/google-ads/tests/run_parity.py (analytics-primitives entry) alongside _shared/tests/analytics_vectors.json. Rows mirror tests/sample-findings.json's 'Search - Remarketing' campaign (AudA..AudD) after audience_core.classify's derived fields (campaign_avg_cost/ctr/cpa, cost_if_zero_conv, cpa, is_paused) are attached, at DEFAULT_PARAMS (cost_multiple=2.0, ctr_factor=0.5).",
+  "concentration": [
+    {"rows": [{"cost": 300.0}, {"cost": 200.0}, {"cost": 80.0}, {"cost": 50.0}, {"cost": 0.0}],
+     "value_key": "cost", "top_n": 3}
+  ],
+  "signals": [
+    {
+      "_comment": "AudA (clean top spender, converting) / AudB (no bid adj + low ctr) / AudC (paused + no bid adj + zero conv + low ctr) / AudD (zero conv, wasted spend)",
+      "rows": [
+        {"bid_modifier": 1.5, "is_paused": 0.0, "conversions": 10, "cost_if_zero_conv": null, "cpa": 20.0,
+         "ctr": 0.05, "campaign_avg_cost": 137.5, "campaign_avg_cpa": 20.8333333333, "campaign_avg_ctr": 0.0326086957},
+        {"bid_modifier": 1.0, "is_paused": 0.0, "conversions": 2, "cost_if_zero_conv": null, "cpa": 25.0,
+         "ctr": 0.01, "campaign_avg_cost": 137.5, "campaign_avg_cpa": 20.8333333333, "campaign_avg_ctr": 0.0326086957},
+        {"bid_modifier": 1.0, "is_paused": 1.0, "conversions": 0, "cost_if_zero_conv": 0.0, "cpa": null,
+         "ctr": 0.0, "campaign_avg_cost": 137.5, "campaign_avg_cpa": 20.8333333333, "campaign_avg_ctr": 0.0326086957},
+        {"bid_modifier": 1.2, "is_paused": 0.0, "conversions": 0, "cost_if_zero_conv": 300.0, "cpa": null,
+         "ctr": 0.025, "campaign_avg_cost": 137.5, "campaign_avg_cpa": 20.8333333333, "campaign_avg_ctr": 0.0326086957}
+      ],
+      "rules": [
+        {"id": "no_bid_adjustment", "key": "bid_modifier", "op": "eq", "value": 1.0},
+        {"id": "paused_criterion", "key": "is_paused", "op": "eq", "value": 1.0},
+        {"id": "zero_conversions", "key": "conversions", "op": "eq", "value": 0.0},
+        {"id": "wasted_spend", "key": "cost_if_zero_conv", "op": "gt", "value_key": "campaign_avg_cost", "mult": 2.0},
+        {"id": "high_cpa", "key": "cpa", "op": "gt", "value_key": "campaign_avg_cpa", "mult": 2.0},
+        {"id": "low_ctr", "key": "ctr", "op": "lt", "value_key": "campaign_avg_ctr", "mult": 0.5}
+      ]
+    }
+  ],
+  "pre_score": [
+    {"row": {"flags": []}, "weights": {"no_bid_adjustment": 1.0, "paused_criterion": 3.0, "zero_conversions": 1.0, "wasted_spend": 3.0, "high_cpa": 3.0, "low_ctr": 1.0}},
+    {"row": {"flags": ["no_bid_adjustment", "low_ctr"]}, "weights": {"no_bid_adjustment": 1.0, "paused_criterion": 3.0, "zero_conversions": 1.0, "wasted_spend": 3.0, "high_cpa": 3.0, "low_ctr": 1.0}},
+    {"row": {"flags": ["no_bid_adjustment", "paused_criterion", "zero_conversions", "low_ctr"]}, "weights": {"no_bid_adjustment": 1.0, "paused_criterion": 3.0, "zero_conversions": 1.0, "wasted_spend": 3.0, "high_cpa": 3.0, "low_ctr": 1.0}},
+    {"row": {"flags": ["zero_conversions", "wasted_spend"]}, "weights": {"no_bid_adjustment": 1.0, "paused_criterion": 3.0, "zero_conversions": 1.0, "wasted_spend": 3.0, "high_cpa": 3.0, "low_ctr": 1.0}}
+  ]
+}

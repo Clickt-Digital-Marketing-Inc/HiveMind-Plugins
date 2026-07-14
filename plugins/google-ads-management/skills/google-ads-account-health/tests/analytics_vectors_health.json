@@ -1,0 +1,40 @@
+{
+  "_comment": "google-ads-account-health's own Python<->JS parity vectors for _shared/analytics.py, auto-discovered by skills/google-ads/tests/run_parity.py (glob skills/*/tests/analytics_vectors*.json). This skill has no HTML explorer/js_kernel of its own (reduced bundle — see references/account-health-filter.md), so these vectors exercise the SAME signals()/pre_score() rule and weight shapes health_core.py uses (CHECK_FLAG_SETS / WEIGHTS), over rows shaped like the five checks (including nullable fields on rows a rule doesn't apply to), to gate the shared primitives against this skill's actual configuration.",
+  "signals": [
+    {
+      "rows": [
+        {"keyword_count": 35, "ad_group_ctr": 0.01, "negative_count": null, "automated_bidding": null, "conversions_30d": null, "name_pattern_ok": null, "pmax_present": null, "brand_present": null},
+        {"keyword_count": 12, "ad_group_ctr": 0.10, "negative_count": null, "automated_bidding": null, "conversions_30d": null, "name_pattern_ok": null, "pmax_present": null, "brand_present": null},
+        {"keyword_count": 25, "ad_group_ctr": 0.10, "negative_count": null, "automated_bidding": null, "conversions_30d": null, "name_pattern_ok": null, "pmax_present": null, "brand_present": null},
+        {"keyword_count": null, "ad_group_ctr": null, "negative_count": 0, "automated_bidding": null, "conversions_30d": null, "name_pattern_ok": null, "pmax_present": null, "brand_present": null},
+        {"keyword_count": null, "ad_group_ctr": null, "negative_count": 5, "automated_bidding": null, "conversions_30d": null, "name_pattern_ok": null, "pmax_present": null, "brand_present": null},
+        {"keyword_count": null, "ad_group_ctr": null, "negative_count": null, "automated_bidding": 1, "conversions_30d": 12, "name_pattern_ok": null, "pmax_present": null, "brand_present": null},
+        {"keyword_count": null, "ad_group_ctr": null, "negative_count": null, "automated_bidding": 0, "conversions_30d": 150, "name_pattern_ok": null, "pmax_present": null, "brand_present": null},
+        {"keyword_count": null, "ad_group_ctr": null, "negative_count": null, "automated_bidding": null, "conversions_30d": null, "name_pattern_ok": 1, "pmax_present": null, "brand_present": null},
+        {"keyword_count": null, "ad_group_ctr": null, "negative_count": null, "automated_bidding": null, "conversions_30d": null, "name_pattern_ok": 0, "pmax_present": null, "brand_present": null},
+        {"keyword_count": null, "ad_group_ctr": null, "negative_count": null, "automated_bidding": null, "conversions_30d": null, "name_pattern_ok": null, "pmax_present": 1, "brand_present": 1},
+        {"keyword_count": null, "ad_group_ctr": null, "negative_count": null, "automated_bidding": null, "conversions_30d": null, "name_pattern_ok": null, "pmax_present": 1, "brand_present": 0}
+      ],
+      "rules": [
+        {"id": "sprawl_size", "key": "keyword_count", "op": "ge", "value": 20},
+        {"id": "sprawl_low_ctr", "key": "ad_group_ctr", "op": "lt", "value": 0.03},
+        {"id": "no_negatives", "key": "negative_count", "op": "le", "value": 0},
+        {"id": "automated_bidding", "key": "automated_bidding", "op": "eq", "value": 1},
+        {"id": "low_conversions", "key": "conversions_30d", "op": "lt", "value": 30},
+        {"id": "name_pattern_fail", "key": "name_pattern_ok", "op": "eq", "value": 0},
+        {"id": "pmax_present", "key": "pmax_present", "op": "eq", "value": 1},
+        {"id": "brand_present", "key": "brand_present", "op": "eq", "value": 1}
+      ]
+    }
+  ],
+  "pre_score": [
+    {"row": {"flags": ["sprawl_size", "sprawl_low_ctr"]}, "weights": {"sprawl_size": 3.0, "sprawl_low_ctr": 3.0, "no_negatives": 7.0, "automated_bidding": 4.0, "low_conversions": 5.0, "name_pattern_fail": 3.0, "pmax_present": 3.0, "brand_present": 3.5}},
+    {"row": {"flags": ["sprawl_size"]}, "weights": {"sprawl_size": 3.0, "sprawl_low_ctr": 3.0, "no_negatives": 7.0, "automated_bidding": 4.0, "low_conversions": 5.0, "name_pattern_fail": 3.0, "pmax_present": 3.0, "brand_present": 3.5}},
+    {"row": {"flags": ["no_negatives"]}, "weights": {"sprawl_size": 3.0, "sprawl_low_ctr": 3.0, "no_negatives": 7.0, "automated_bidding": 4.0, "low_conversions": 5.0, "name_pattern_fail": 3.0, "pmax_present": 3.0, "brand_present": 3.5}},
+    {"row": {"flags": ["automated_bidding", "low_conversions"]}, "weights": {"sprawl_size": 3.0, "sprawl_low_ctr": 3.0, "no_negatives": 7.0, "automated_bidding": 4.0, "low_conversions": 5.0, "name_pattern_fail": 3.0, "pmax_present": 3.0, "brand_present": 3.5}},
+    {"row": {"flags": ["name_pattern_fail"]}, "weights": {"sprawl_size": 3.0, "sprawl_low_ctr": 3.0, "no_negatives": 7.0, "automated_bidding": 4.0, "low_conversions": 5.0, "name_pattern_fail": 3.0, "pmax_present": 3.0, "brand_present": 3.5}},
+    {"row": {"flags": ["pmax_present", "brand_present"]}, "weights": {"sprawl_size": 3.0, "sprawl_low_ctr": 3.0, "no_negatives": 7.0, "automated_bidding": 4.0, "low_conversions": 5.0, "name_pattern_fail": 3.0, "pmax_present": 3.0, "brand_present": 3.5}},
+    {"row": {"flags": ["pmax_present"]}, "weights": {"sprawl_size": 3.0, "sprawl_low_ctr": 3.0, "no_negatives": 7.0, "automated_bidding": 4.0, "low_conversions": 5.0, "name_pattern_fail": 3.0, "pmax_present": 3.0, "brand_present": 3.5}},
+    {"row": {"flags": []}, "weights": {"sprawl_size": 3.0, "sprawl_low_ctr": 3.0}}
+  ]
+}

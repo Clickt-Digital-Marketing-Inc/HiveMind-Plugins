@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "client_name": "Sample Co",
+    "account_id": "000-000-0000",
+    "currency": "USD",
+    "window_30d": "2026-06-06 to 2026-07-05",
+    "source": "mcp",
+    "generated": "2026-07-05"
+  },
+  "audiences": [
+    {"campaign": "Search - Remarketing", "ad_group": "Core", "list_name": "Cart abandoners 7d",
+     "list_type": "REMARKETING", "bid_modifier": 1.5, "criterion_status": "ENABLED", "negative": false,
+     "impressions": 10000, "clicks": 500, "cost": 200.0, "conversions": 10},
+    {"campaign": "Search - Remarketing", "ad_group": "Core", "list_name": "Broad interest",
+     "list_type": "AFFINITY", "bid_modifier": 1.0, "criterion_status": "ENABLED", "negative": false,
+     "impressions": 5000, "clicks": 50, "cost": 50.0, "conversions": 2},
+    {"campaign": "Search - Remarketing", "ad_group": "Core", "list_name": "Old list unused",
+     "list_type": "REMARKETING", "bid_modifier": 1.0, "criterion_status": "PAUSED", "negative": false,
+     "impressions": 0, "clicks": 0, "cost": 0.0, "conversions": 0},
+    {"campaign": "Search - Remarketing", "ad_group": "Prospecting", "list_name": "Similar to converters",
+     "list_type": "SIMILAR", "bid_modifier": 1.2, "criterion_status": "ENABLED", "negative": false,
+     "impressions": 8000, "clicks": 200, "cost": 300.0, "conversions": 0},
+    {"campaign": "PMax - Auto Signals", "ad_group": "Asset Group 1", "list_name": "Similar to converters",
+     "list_type": "SIMILAR", "bid_modifier": 1.0, "criterion_status": "ENABLED", "negative": false,
+     "impressions": 4000, "clicks": 120, "cost": 80.0, "conversions": 3},
+    {"campaign": "PMax - Auto Signals", "ad_group": "Asset Group 1", "list_name": "Recent converters (30d)",
+     "list_type": "REMARKETING", "bid_modifier": 1.0, "criterion_status": "ENABLED", "negative": true,
+     "impressions": 0, "clicks": 0, "cost": 0.0, "conversions": 0}
+  ],
+  "first_party": [
+    {"category": "Enhanced Conversions", "item": "Enhanced Conversions for web enabled on the primary conversion action",
+     "row_type": "config", "readiness": "Not configured", "detail": "No enhanced_conversions_for_leads tag found.",
+     "verified_date": "2026-07-01"},
+    {"category": "Consent Mode v2", "item": "Consent Mode v2 configured for EU/EEA traffic",
+     "row_type": "config", "readiness": "Partial - basic mode only", "detail": "Advanced consent mode not enabled.",
+     "verified_date": "2026-07-01"},
+    {"category": "Customer Match", "item": "Customer Match list uploaded from CRM",
+     "row_type": "manual", "readiness": "Unknown", "detail": "Ask the client's CRM owner.",
+     "verified_date": ""},
+    {"category": "CMP", "item": "Consent Management Platform collecting consent",
+     "row_type": "config", "readiness": "Configured and verified", "detail": "OneTrust live on all pages.",
+     "verified_date": "2026-06-15"},
+    {"category": "Customer Match", "item": "Match rate reviewed manually in Ads UI",
+     "row_type": "manual", "readiness": "Done - reviewed 2026-06-30", "detail": "62% match rate reported in UI.",
+     "verified_date": "2026-06-30"}
+  ]
+}

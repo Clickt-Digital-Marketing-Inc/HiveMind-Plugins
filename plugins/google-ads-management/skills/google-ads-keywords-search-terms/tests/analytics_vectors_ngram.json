@@ -1,0 +1,9 @@
+{
+  "_comment": "Per-skill Python<->JS parity vectors for the n-gram concentration this skill layers on top of _shared/analytics.concentration (HM-536). Auto-discovered by skills/google-ads/tests/run_parity.py's analytics-primitives gate alongside _shared/tests/analytics_vectors.json. Rows are n-gram-cost shaped ({'ngram','cost','terms'}) — the same shape waste_filter_core.waste_ngrams() feeds into analytics.concentration(rows, 'cost', top_n). Kept away from exact .5 rounding boundaries per the kernel-mirror contract.",
+  "concentration": [
+    {"rows": [{"ngram": "cheap", "cost": 30.0, "terms": 1}, {"ngram": "brand", "cost": 30.0, "terms": 1}, {"ngram": "old", "cost": 200.0, "terms": 1}, {"ngram": "converter", "cost": 200.0, "terms": 1}, {"ngram": "gone cold", "cost": 200.0, "terms": 1}], "value_key": "cost", "top_n": 5},
+    {"rows": [{"ngram": "free", "cost": 412.3, "terms": 6}, {"ngram": "jobs", "cost": 88.15, "terms": 2}, {"ngram": "careers", "cost": 12.0, "terms": 1}], "value_key": "cost", "top_n": 2},
+    {"rows": [{"ngram": "solo", "cost": 17.75, "terms": 1}], "value_key": "cost", "top_n": 5},
+    {"rows": [], "value_key": "cost", "top_n": 5}
+  ]
+}

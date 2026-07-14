@@ -1,9 +1,9 @@
 # HiveMind Plugins
 
-Clickt's HiveMind plugins for **Claude Code**, in one marketplace. Two families:
-**deliverable** plugins that turn live ad/store data (or CSV exports) into
-self-contained, white-label client reports, and **workflow** plugins that run your
-day on Linear, Gmail, and Google Calendar.
+Clickt's HiveMind plugins for **Claude Code**, in one marketplace. **Deliverable**
+plugins turn live ad/store data (or CSV exports) into self-contained, white-label
+client reports; a **management suite** runs ongoing Google Ads work as done-with-you
+advisors; and **workflow** plugins run your day on Linear, Gmail, and Google Calendar.
 
 Authored by **Clickt Digital Marketing Inc.** ([clickt.ca](https://clickt.ca)).
 This repo is public and every plugin in it is free to install and run. No
@@ -20,6 +20,17 @@ formula-driven xlsx workbook from a single compute pass.
 | **meta-ads-audit** | Full Meta (Facebook/Instagram) audit against a 7-lever framework with a deterministic pre-scorer, Concentration, and Creative Signals (fatigue, reach saturation, effective frequency, ranking decomposition). | Meta Ads MCP **or** Ads Manager CSV exports |
 | **shopify-cro-audit** | 11-step Shopify conversion-rate-optimization audit; machine-computed funnel analytics, a 0–150 Funnel Health gauge, Concentration, and CVR Signals (Wilson CIs, z-tests, empirical-Bayes page CVRs). | Shopify MCP (ShopifyQL) and/or GA4 + Shopify CSV exports |
 | **cm3-profitability** | Per-product CM3 contribution-margin report; CM3 bands + rollups by campaign, category (L1–L5), product type (L1–L5), and vendor, with a live HTML explorer that re-bands every table as you tune assumptions. | Google Ads Shopping-products CSV (+ optional Shopify Gross-profit CSV) |
+
+### Management suite
+
+An ongoing-management layer rather than a one-shot report: an in-Claude menu that
+routes to focus-area **done-with-you advisors**, each of which diagnoses live data
+behind a transcription firewall, leads a prioritized recommendation loop, and hands
+you ready-to-apply Google Ads Editor CSVs.
+
+| Plugin | What it does | Data in |
+| --- | --- | --- |
+| **google-ads-management** | Menu hub + 12 Google Ads advisors — budget pacing, bidding strategy, keywords/search terms, Quality Score, audiences, conversions & tracking, performance reporting, competitive analysis, PMax campaigns, PMax listing groups, products, and account health. Each tunable skill emits the same 3-format bundle (interactive HTML + markdown + tunable xlsx) with Node↔Python kernel parity (account health & audience targeting ship a reduced md + xlsx bundle). | Google Ads MCP (GAQL) **or** Ads UI / Editor / Auction Insights CSV exports |
 
 ### Workflow plugins
 
@@ -56,13 +67,15 @@ servers.
    /plugin install meta-ads-audit@hivemind-plugins
    /plugin install shopify-cro-audit@hivemind-plugins
    /plugin install cm3-profitability@hivemind-plugins
+   /plugin install google-ads-management@hivemind-plugins
    /plugin install project-coordinator@hivemind-plugins
    /plugin install social-media-manager@hivemind-plugins
    /plugin install morning-briefing@hivemind-plugins
    ```
 3. **Set up what your chosen plugins need:**
-   - *Deliverable plugins*: Python 3 with `pip install openpyxl` (all four);
-     `cm3-profitability` also needs `pip install python-pptx vl-convert-python==1.7.0`.
+   - *Deliverable plugins & the management suite*: Python 3 with `pip install openpyxl`;
+     `google-ads-management` also needs `vl-convert-python==1.7.0` for its charts, and
+     `cm3-profitability` needs `pip install python-pptx vl-convert-python==1.7.0`.
    - *Workflow plugins*: no Python. Connect the MCP servers they use: Linear
      (all three), plus Gmail + Google Calendar (morning-briefing) and web access
      (social-media-manager).
@@ -70,12 +83,13 @@ servers.
 ## Requirements
 
 - **Claude Code** with plugin support.
-- **Deliverable plugins, Python 3.** The audits' HTML + markdown renderers are
-  standard-library only; `openpyxl` (>=3.1) is needed for the xlsx workbooks.
-  `cm3-profitability` additionally needs `python-pptx` and the exact pin
-  `vl-convert-python==1.7.0`. **LibreOffice** (optional) normalizes xlsx output.
-  Data comes from each plugin's own MCP (Google Ads / Meta Ads / Shopify) **or**
-  from CSV exports; `cm3-profitability` is CSV-only.
+- **Deliverable plugins & the management suite, Python 3.** The HTML + markdown
+  renderers are standard-library only; `openpyxl` (>=3.1) is needed for the xlsx
+  workbooks. `google-ads-management` needs `vl-convert-python==1.7.0` for its static
+  chart SVGs; `cm3-profitability` additionally needs `python-pptx` and the same
+  `vl-convert-python==1.7.0` pin. **LibreOffice** (optional) normalizes xlsx output.
+  Data comes from each plugin's own MCP (Google Ads / Meta Ads / Shopify) **or** from
+  CSV exports; `google-ads-management` takes either, `cm3-profitability` is CSV-only.
 - **Workflow plugins, MCP servers, no Python.** `project-coordinator` and
   `social-media-manager` use the Linear MCP (social also uses web access);
   `morning-briefing` uses the Gmail, Linear, and Google Calendar MCPs. See each

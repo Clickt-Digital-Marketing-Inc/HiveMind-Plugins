@@ -1,0 +1,40 @@
+{
+  "_comment": "Skill-specific Python<->JS parity vectors for _shared/analytics.py, auto-discovered by skills/google-ads/tests/run_parity.py (analytics-primitives entry) alongside _shared/tests/analytics_vectors.json. These exercise the exact rule/weight shapes google-ads-bidding-strategy's bidding_core.classify_row uses (the under_data / over_automated / under_automated signals rules and the under_data_automated / over_automated / under_automated pre_score weights), plus a spend-concentration vector over a realistic campaign cost distribution (bidding_core.summarize). Per docs/orchestration.md this file is a per-skill fixture, never an edit to the shared harness.",
+  "concentration": [
+    {"rows": [{"cost": 1000.0}, {"cost": 800.0}, {"cost": 600.0}, {"cost": 900.0}, {"cost": 0.0}, {"cost": 150.0}, {"cost": 50.0}], "value_key": "cost", "top_n": 3},
+    {"rows": [{"cost": 900.0}], "value_key": "cost", "top_n": 3},
+    {"rows": [{"cost": 0.0}, {"cost": 0.0}], "value_key": "cost", "top_n": 3}
+  ],
+  "signals": [
+    {
+      "rows": [
+        {"conv30": 90.0, "tier_gap": -4.0},
+        {"conv30": 10.0, "tier_gap": 1.0},
+        {"conv30": 60.0, "tier_gap": 0.0},
+        {"conv30": 45.0, "tier_gap": 3.0},
+        {"conv30": 5.0, "tier_gap": 0.0},
+        {"conv30": 30.0, "tier_gap": -1.0},
+        {"conv30": 29.9999, "tier_gap": 1.0001}
+      ],
+      "rules": [
+        {"id": "under_data", "key": "conv30", "op": "lt", "value": 30.0},
+        {"id": "over_automated", "key": "tier_gap", "op": "gt", "value": 1.0},
+        {"id": "under_automated", "key": "tier_gap", "op": "lt", "value": -1.0}
+      ]
+    },
+    {
+      "rows": [{"conv30": 8.0, "tier_gap": 2.0}, {"conv30": 14.9999, "tier_gap": -0.5001}],
+      "rules": [
+        {"id": "under_data", "key": "conv30", "op": "lt", "value": 15.0},
+        {"id": "over_automated", "key": "tier_gap", "op": "gt", "value": 0.5},
+        {"id": "under_automated", "key": "tier_gap", "op": "lt", "value": -0.5}
+      ]
+    }
+  ],
+  "pre_score": [
+    {"row": {"flags": ["under_data_automated"]}, "weights": {"under_data_automated": 8.0, "over_automated": 3.0, "under_automated": 2.0}},
+    {"row": {"flags": ["over_automated"]}, "weights": {"under_data_automated": 8.0, "over_automated": 3.0, "under_automated": 2.0}},
+    {"row": {"flags": ["under_automated"]}, "weights": {"under_data_automated": 8.0, "over_automated": 3.0, "under_automated": 2.0}},
+    {"row": {"flags": []}, "weights": {"under_data_automated": 8.0, "over_automated": 3.0, "under_automated": 2.0}}
+  ]
+}

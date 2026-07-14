@@ -1,0 +1,36 @@
+{
+  "_comment": "Per-skill Python<->JS parity vectors for _shared/analytics.py, auto-discovered by skills/google-ads/tests/run_parity.py (analytics-primitives entry) alongside _shared/tests/analytics_vectors.json. Modeled on this skill's own use: concentration() over Auction Insights competitor impression share, signals() for the is_drop/cpc_jump flag rules, pre_score() for the pressure ranking.",
+  "concentration": [
+    {"rows": [{"impression_share": 0.30}, {"impression_share": 0.15}, {"impression_share": 0.10}, {"impression_share": 0.05}], "value_key": "impression_share", "top_n": 3},
+    {"rows": [{"impression_share": 0.50}], "value_key": "impression_share", "top_n": 3},
+    {"rows": [], "value_key": "impression_share", "top_n": 3},
+    {"rows": [{"impression_share": 0.20}, {"impression_share": 0.20}, {"impression_share": 0.20}, {"impression_share": 0.20}, {"impression_share": 0.20}], "value_key": "impression_share", "top_n": 3}
+  ],
+  "signals": [
+    {
+      "rows": [
+        {"is_delta_pp": -0.10, "cpc_delta_pct": 0.02},
+        {"is_delta_pp": -0.02, "cpc_delta_pct": 0.20},
+        {"is_delta_pp": 0.03, "cpc_delta_pct": 0.05},
+        {"is_delta_pp": null, "cpc_delta_pct": 0.30},
+        {}
+      ],
+      "rules": [
+        {"id": "is_drop", "key": "is_delta_pp", "op": "le", "value": -0.05},
+        {"id": "cpc_jump", "key": "cpc_delta_pct", "op": "ge", "value": 0.15}
+      ]
+    },
+    {
+      "rows": [{"cost_this": 500.0, "min_cost": 50.0}, {"cost_this": 30.0, "min_cost": 50.0}, {"cost_this": 50.0, "min_cost": 50.0}],
+      "rules": [
+        {"id": "spend_eligible", "key": "cost_this", "op": "ge", "value_key": "min_cost", "mult": 1.0}
+      ]
+    }
+  ],
+  "pre_score": [
+    {"row": {"flags": ["is_drop"]}, "weights": {"is_drop": 2.0, "cpc_jump": 1.0}},
+    {"row": {"flags": ["cpc_jump"]}, "weights": {"is_drop": 2.0, "cpc_jump": 1.0}},
+    {"row": {"flags": ["is_drop", "cpc_jump"]}, "weights": {"is_drop": 2.0, "cpc_jump": 1.0}},
+    {"row": {"flags": []}, "weights": {"is_drop": 2.0, "cpc_jump": 1.0}}
+  ]
+}

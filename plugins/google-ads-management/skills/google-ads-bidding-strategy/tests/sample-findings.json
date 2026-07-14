@@ -1,0 +1,107 @@
+{
+ "meta": {
+  "client_name": "Acme Corp",
+  "account_id": "123-456-7890",
+  "currency": "CAD",
+  "window_30d": "2026-06-06 to 2026-07-05",
+  "generated": "2026-07-12",
+  "source": "mcp",
+  "reconciliation": {
+   "campaigns": {
+    "rows": 7,
+    "sums": {
+     "cost": 3500.0,
+     "conv30": 230.0,
+     "value": 10100.0
+    }
+   },
+   "raw_files": [
+    {
+     "file": "campaigns_raw.txt",
+     "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+     "bytes": 0
+    }
+   ]
+  }
+ },
+ "params": {},
+ "campaigns": [
+  {
+   "campaign_id": "1001",
+   "campaign": "Brand - Auto High Value",
+   "bidding_strategy_type": "MANUAL_CPC",
+   "ai_max_enabled": false,
+   "conv30": 90,
+   "cost": 1000.0,
+   "value": 5000.0,
+   "value_score": 90,
+   "tracking_score": 90
+  },
+  {
+   "campaign_id": "1002",
+   "campaign": "NonBrand - Target ROAS",
+   "bidding_strategy_type": "TARGET_ROAS",
+   "ai_max_enabled": false,
+   "conv30": 60,
+   "cost": 800.0,
+   "value": 3200.0,
+   "value_score": 70,
+   "tracking_score": 60
+  },
+  {
+   "campaign_id": "1003",
+   "campaign": "Shopping - ROAS Explore",
+   "bidding_strategy_type": "TARGET_ROAS",
+   "ai_max_enabled": true,
+   "conv30": 45,
+   "cost": 600.0,
+   "value": 1200.0,
+   "value_score": 10,
+   "tracking_score": 10
+  },
+  {
+   "campaign_id": "1004",
+   "campaign": "Test - Target CPA Early",
+   "bidding_strategy_type": "TARGET_CPA",
+   "ai_max_enabled": false,
+   "conv30": 10,
+   "cost": 900.0,
+   "value": 400.0,
+   "value_score": null,
+   "tracking_score": null
+  },
+  {
+   "campaign_id": "1005",
+   "campaign": "Paused - No Spend",
+   "bidding_strategy_type": "MAXIMIZE_CONVERSIONS",
+   "ai_max_enabled": false,
+   "conv30": 0,
+   "cost": 0.0,
+   "value": 0.0,
+   "value_score": null,
+   "tracking_score": null
+  },
+  {
+   "campaign_id": "1006",
+   "campaign": "Affiliate - Commission",
+   "bidding_strategy_type": "COMMISSION",
+   "ai_max_enabled": false,
+   "conv30": 20,
+   "cost": 150.0,
+   "value": 300.0,
+   "value_score": null,
+   "tracking_score": null
+  },
+  {
+   "campaign_id": "1007",
+   "campaign": "Local - Manual Small",
+   "bidding_strategy_type": "MANUAL_CPC",
+   "ai_max_enabled": false,
+   "conv30": 5,
+   "cost": 50.0,
+   "value": 0.0,
+   "value_score": 20,
+   "tracking_score": null
+  }
+ ]
+}
