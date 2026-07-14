@@ -1,0 +1,16 @@
+# Mapping for sample_data/google_segments.sample.csv
+google:
+  skip_rows: 2
+  segment_id: "Search keyword"
+  denominator: "Clicks"
+  funnel:
+    click: "Clicks"
+    engagement: "Engaged sessions"
+    add_to_cart: "Add to cart"
+    initiate_checkout: "Begin checkout"
+    purchase: "Purchases"
+  repeats: "Repeat purchases"
+  currency:
+    CM3_order: 42.00
+    repeat_rate: 0.50
+    CM3_repeat: 42.00

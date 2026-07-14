@@ -1,0 +1,16 @@
+# Mapping for sample_data/meta_segments.sample.csv
+meta:
+  skip_rows: 0
+  segment_id: "Ad name"
+  denominator: "Link clicks"
+  funnel:
+    click: "Link clicks"
+    engagement: "Landing page views"
+    add_to_cart: "Adds to cart"
+    initiate_checkout: "Checkouts initiated"
+    purchase: "Purchases"
+  repeats: "Repeat purchases"
+  currency:
+    CM3_order: 38.00
+    repeat_rate: 0.45
+    CM3_repeat: 40.00

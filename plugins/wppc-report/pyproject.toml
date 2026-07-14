@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wppc"
+version = "1.0.0"
+description = "Weighted Profit-Per-Click (wPPC) sabermetric reporting for Google & Meta Ads segment exports."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas>=2.0",
+    "pyyaml>=6.0",
+    "click>=8.1",
+    "openpyxl>=3.1",
+    # Static Vega-Lite chart SVGs for the markdown report (wppc/charts.py:
+    # render_chart_svg). Exact-pinned in lockstep with the vendored
+    # vega-lite.min.js major.minor — kept in sync with requirements.txt.
+    "vl-convert-python==1.7.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.4"]
+
+[project.scripts]
+wppc = "wppc.cli:cli"
+
+[tool.setuptools]
+packages = ["wppc"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

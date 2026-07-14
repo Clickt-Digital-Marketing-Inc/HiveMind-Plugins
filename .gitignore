@@ -23,3 +23,6 @@ audits/
 !**/tests/fixtures/*.csv
 !**/tests/fixtures/**/*.csv
 !**/tests/sample-shopping.csv
+
+# wPPC ships sample segment exports (sample_data/) that its tests read — keep them
+!plugins/wppc-report/sample_data/*.csv

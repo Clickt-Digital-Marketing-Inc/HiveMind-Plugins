@@ -1,0 +1,64 @@
+# wPPC column-mapping template.
+#
+# Drives ALL column-to-concept mapping. Copy this file, point each concept at the
+# exact column header in YOUR export, and pass it via `--mapping`. Column names
+# are never guessed: if a mapped column is absent from the CSV, the run fails with
+# a precise error naming the column and platform.
+#
+# Build TWO weight tables (one per platform) — conditional probabilities and
+# attribution differ. Never compare raw wPPC across Google vs Meta; only wPPC+
+# travels, indexed within its own platform.
+
+google:
+  # Google Ads UI exports prepend 2 rows (report title + date range) before the
+  # real header. Set skip_rows to however many preamble rows your export has.
+  skip_rows: 2
+
+  # The segment each row represents (keyword / search term / ad / product / audience).
+  segment_id: "Search keyword"
+
+  # The wPPC denominator — the scarce opportunity. Google: the click. NOT impressions.
+  denominator: "Clicks"
+
+  # One column per funnel state (cumulative reach: purchasers also counted in
+  # add_to_cart, etc.). engagement/add_to_cart/initiate_checkout typically come
+  # from GA4-linked conversion columns you add to the export.
+  funnel:
+    click: "Clicks"                    # GA4: click / arrived
+    engagement: "Engaged sessions"     # GA4 engaged session (>10s / 2+ views / conv)
+    add_to_cart: "Add to cart"         # GA4 add_to_cart
+    initiate_checkout: "Begin checkout"  # GA4 begin_checkout
+    purchase: "Purchases"              # GA4 purchase
+
+  # Repeat-purchase event count for the segment (GA4 new vs returning).
+  repeats: "Repeat purchases"
+
+  # Currency (per platform). CM3_order excludes ad cost.
+  currency:
+    CM3_order: 42.00     # avg contribution margin per order, EXCLUDING ad cost
+    repeat_rate: 0.50    # expected additional orders per new customer in LTV window
+    CM3_repeat: 42.00    # avg CM3 of a repeat order
+
+meta:
+  # Meta Ads Manager CSV exports usually have no preamble rows.
+  skip_rows: 0
+
+  segment_id: "Ad name"
+
+  # Meta: use Link Click, NOT impression-attributed reach.
+  denominator: "Link clicks"
+
+  funnel:
+    click: "Link clicks"
+    engagement: "Landing page views"      # Meta LandingPageView
+    add_to_cart: "Adds to cart"           # Meta AddToCart
+    initiate_checkout: "Checkouts initiated"  # Meta InitiateCheckout
+    purchase: "Purchases"                 # Meta Purchase
+
+  # Meta repeat is weak without server-side (CAPI / first-party match); model or omit.
+  repeats: "Repeat purchases"
+
+  currency:
+    CM3_order: 38.00
+    repeat_rate: 0.45
+    CM3_repeat: 40.00

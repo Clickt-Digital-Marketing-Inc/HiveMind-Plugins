@@ -1,0 +1,10 @@
+# Runtime dependencies for wPPC (derived from pyproject.toml's [project.dependencies]).
+pandas>=2.0
+pyyaml>=6.0
+click>=8.1
+openpyxl>=3.1
+
+# Static Vega-Lite chart rendering (wppc/charts.py:render_chart_svg). Exact-pinned:
+# must stay in lockstep with the vendored vega-lite.min.js major.minor — see
+# wppc/vendor/VERSIONS.md "Version-lock contract".
+vl-convert-python==1.7.0

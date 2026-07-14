@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "hivemind-plugins",
   "version": "1.0.0",
-  "description": "Clickt's HiveMind plugins for Claude Code — one marketplace bundling four marketing deliverables (Google Ads, Meta, and Shopify CRO account audits + the CM3 per-product contribution-margin report) and three workflow plugins (project coordinator, social media manager, and daily morning briefing) that run on Linear, Gmail, and Google Calendar.",
+  "description": "Clickt's HiveMind plugins for Claude Code — one marketplace bundling five marketing deliverables (Google Ads, Meta, and Shopify CRO account audits + the CM3 per-product contribution-margin report + the wPPC weighted-profit-per-click report) and three workflow plugins (project coordinator, social media manager, and daily morning briefing) that run on Linear, Gmail, and Google Calendar.",
   "owner": {
     "name": "Clickt Digital Marketing Inc.",
     "url": "https://clickt.ca"
@@ -56,6 +56,25 @@
       "version": "0.4.0",
       "category": "productivity",
       "description": "Daily Morning Briefing: summarizes Gmail conversations and drafts replies, reports Linear project progress and blocked issues, prioritizes your assigned issues, blocks focused work time on your calendar, and looks three weeks ahead for time-off bottlenecks. Runs on the Gmail, Linear, and Google Calendar MCPs."
+    },
+    {
+      "name": "wppc-report",
+      "source": "./plugins/wppc-report",
+      "version": "1.0.0",
+      "category": "marketing",
+      "description": "wPPC — Weighted Profit-Per-Click. Sabermetric linear-weights report for Google & Meta Ads segment exports: funnel events credited at expected CM3 value, indexed to the account baseline, shrunk for sample size, and scored above replacement (Margin Above Replacement). Emits a 3-format bundle from one model — an interactive, self-contained, white-label HTML report (primary; Scale/Cut/Watch decision lens + four charts), an Obsidian-ready markdown record, and a formula-driven multi-tab xlsx backup (Report/Weights/Charts/Run). Requires pandas, pyyaml, click, openpyxl, and vl-convert-python for the static chart SVGs.",
+      "keywords": [
+        "wppc",
+        "ppc",
+        "google-ads",
+        "meta-ads",
+        "sabermetrics",
+        "profit-per-click",
+        "mar",
+        "cm3",
+        "html",
+        "xlsx"
+      ]
     }
   ]
 }

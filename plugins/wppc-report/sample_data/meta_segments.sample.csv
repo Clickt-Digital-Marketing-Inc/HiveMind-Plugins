@@ -1,0 +1,12 @@
+Ad name,Link clicks,Landing page views,Adds to cart,Checkouts initiated,Purchases,Repeat purchases,Amount spent
+ad_creative_video_a,1800,1200,300,180,90,40,2200.00
+ad_creative_video_b,900,500,120,70,35,15,1300.00
+ad_carousel_bestsellers,1300,900,260,170,110,55,1500.00
+ad_static_sale,700,400,150,100,70,38,650.00
+ad_ugc_testimonial,500,380,140,95,65,33,560.00
+ad_retargeting_dpa,400,320,160,120,95,60,380.00
+ad_prospecting_broad,2200,900,150,60,25,6,3100.00
+ad_story_quick,150,90,20,12,6,2,180.00
+ad_collection_new,650,420,130,80,45,18,720.00
+ad_meme_engagement,1600,300,30,10,4,0,1900.00
+ad_test_tiny,6,4,2,1,1,0,12.00
