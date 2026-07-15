@@ -62,18 +62,18 @@ sys.path.insert(0, str(HERE))
 from audit_model import (  # noqa: E402
     SEVERITY_WEIGHTS, FLAG_SCORES, SEVERITY_IMPACT, GRADE_CUTOFFS,
     ROADMAP_BUCKETS, DEFAULT_ICE, SEV_CANON, FLAG_CANON,
-    SECTIONS, SECTION_WEIGHTS,
+    SECTIONS, SECTION_WEIGHTS, UNSCORED_SECTIONS,
 )
 
 # ---------------------------------------------------------------------------- config
 
-# Default category weights derive from the audit_model lever weights. CO/Competitive
-# Landscape is qualitative (weight 0) and stays OUT of the scored default map, exactly
-# as before. Integral floats collapse to int so cell values stay byte-identical.
+# Default category weights derive from the audit_model lever weights. Unscored
+# (qualitative) levers stay OUT of the scored default map, exactly as before.
+# Integral floats collapse to int so cell values stay byte-identical.
 DEFAULT_CATEGORY_WEIGHTS = {
     cat: (int(SECTION_WEIGHTS[code]) if float(SECTION_WEIGHTS[code]).is_integer()
           else SECTION_WEIGHTS[code])
-    for code, cat, _tab, _key in SECTIONS if code != "CO"
+    for code, cat, _tab, _key in SECTIONS if code not in UNSCORED_SECTIONS
 }
 
 # Controlled vocabularies (imported from audit_model). Drift here silently distorts the
@@ -82,11 +82,27 @@ ALLOWED_SEVERITIES = set(SEV_CANON.values())
 ALLOWED_FLAGS = set(FLAG_CANON.values())
 
 # (sheet_title, category_name, code, section_key) — derived from audit_model.SECTIONS
-# (the canonical order); the CO lever renders as the unscored 07_Competitive tab.
+# (the canonical order) and UNSCORED_SECTIONS (which levers get no scored tab);
+# the CO lever renders as the unscored 07_Competitive tab instead.
 ANALYSIS_TABS = [(tab, cat, code, key)
-                 for code, cat, tab, key in SECTIONS if code != "CO"]
-COMPETITIVE_TAB = next((tab, cat, key)
-                       for code, cat, tab, key in SECTIONS if code == "CO")
+                 for code, cat, tab, key in SECTIONS
+                 if code not in UNSCORED_SECTIONS]
+_UNSCORED_TABS = [(tab, cat, key) for code, cat, tab, key in SECTIONS
+                  if code in UNSCORED_SECTIONS]
+# The workbook renders exactly ONE unscored lever, as the qualitative
+# 07_Competitive tab. UNSCORED_SECTIONS is a set because compute_model's weight
+# rule is genuinely plural, but this consumer is not: a `next()` here would take
+# the first and let any other unscored lever vanish from the workbook — no
+# scored tab, no unscored tab, its checks silently absent from the client's
+# backup while md and html still list them. Fail at import instead; adding a
+# second qualitative lever is a real design decision that needs a tab.
+if len(_UNSCORED_TABS) != 1:
+    raise RuntimeError(
+        "build_audit_xlsx renders exactly one unscored lever as the Competitive "
+        "tab, but audit_model.UNSCORED_SECTIONS holds %d (%s). Give the new "
+        "lever its own tab before adding it."
+        % (len(_UNSCORED_TABS), ", ".join(sorted(UNSCORED_SECTIONS)) or "none"))
+COMPETITIVE_TAB = _UNSCORED_TABS[0]
 
 EXPECTED_TABS = [
     "00_Audit_Scope", "01_Executive_Summary",
@@ -312,9 +328,19 @@ def build_analysis_tab(wb, sheet_title, category, code, checks, section):
             ws.cell(row=r, column=5, value=chk.get("flag", "")).font = BODY_FONT  # E Flag
             # F Score (display, derived from FLAG_SCORES)
             ws.cell(row=r, column=6, value=_flag_score_formula(r))
-            # G W-Score, H W-Base (numeric, N/A & blank excluded)
-            ws.cell(row=r, column=7, value='=IF(OR(E{r}="N/A",E{r}=""),0,F{r}*D{r})'.format(r=r))
-            ws.cell(row=r, column=8, value='=IF(OR(E{r}="N/A",E{r}=""),0,D{r})'.format(r=r))
+            # G W-Score, H W-Base (numeric; N/A, blank, and UNRECOGNIZED flags
+            # excluded from BOTH sums — the exact audit_model.score_check rule).
+            # Gate on F (not E): _flag_score_formula yields "" for precisely the
+            # flags score_check refuses to score, so F="" is the single
+            # authoritative "not scored" signal. Gating on E alone let a drifted
+            # flag (e.g. "PARTIAL", which validate_and_normalize tolerates with a
+            # WARN) reach F*D = ""*5 = #VALUE!, which SUM propagated into the
+            # lever total and the Score cell's IFERROR then silently rendered
+            # as a plausible 0 — a whole lever's score lost, workbook green.
+            ws.cell(row=r, column=7,
+                    value='=IF(OR(E{r}="N/A",E{r}="",F{r}=""),0,F{r}*D{r})'.format(r=r))
+            ws.cell(row=r, column=8,
+                    value='=IF(OR(E{r}="N/A",E{r}="",F{r}=""),0,D{r})'.format(r=r))
             ws.cell(row=r, column=9, value=chk.get("observed", "")).font = BODY_FONT
             ws.cell(row=r, column=10, value=chk.get("expected", "")).font = BODY_FONT
             ws.cell(row=r, column=11, value=chk.get("recommendation", "")).font = BODY_FONT
@@ -390,7 +416,7 @@ def build_competitive(wb, section):
     return ws
 
 
-def build_exec_summary(wb, weights, findings, kpis=None):
+def build_exec_summary(wb, weights, findings, kpis=None, *, prescore=None):
     ws = wb.create_sheet("01_Executive_Summary")
     title_row(ws, "Executive Summary — Account Health", 6)
     set_widths(ws, [30, 12, 10, 12, 11, 30])
@@ -401,13 +427,23 @@ def build_exec_summary(wb, weights, findings, kpis=None):
     # scorecard table — category rows derive from audit_model.SECTIONS (CO unscored)
     sc_head = ["Category", "Weight", "Base", "Score(0-100)", "Included"]
     header_row(ws, 6, sc_head)
-    cats = [(cat, code) for code, cat, _tab, _key in SECTIONS if code != "CO"]
+    cats = [(cat, code) for code, cat, _tab, _key in SECTIONS
+            if code not in UNSCORED_SECTIONS]
     first, r = 7, 7
     for name, code in cats:
         ws.cell(row=r, column=1, value=name).font = BODY_FONT
         ws.cell(row=r, column=2, value=weights.get(name, DEFAULT_CATEGORY_WEIGHTS.get(name, 0)))
         ws.cell(row=r, column=3, value="=IFERROR(SUM(wbase_%s),0)" % code)
-        ws.cell(row=r, column=4, value="=IFERROR(SUM(wscore_%s)/C%d*100,0)" % (code, r))
+        # D holds the lever score UNROUNDED — B3's SUMPRODUCT reads this column,
+        # and health is defined over unrounded section scores (the wscore_/wbase_
+        # semantics audit_model mirrors). So round the DISPLAY only, never the
+        # value: "0.0" makes Excel show 11.3 for 11.25, matching what
+        # audit_model.round1 puts in score_pct for the md and the HTML. Left as
+        # General, this cell printed 11.25 beside their 11.3 — the same lever,
+        # two numbers, in one bundle.
+        d = ws.cell(row=r, column=4,
+                    value="=IFERROR(SUM(wscore_%s)/C%d*100,0)" % (code, r))
+        d.number_format = "0.0"
         ws.cell(row=r, column=5, value="=IF(C%d>0,1,0)" % r)
         for col in range(1, 6):
             ws.cell(row=r, column=col).border = BORDER
@@ -417,10 +453,15 @@ def build_exec_summary(wb, weights, findings, kpis=None):
     last = r - 1
     add_name(wb, "category_weights", "%s!$B$%d:$B$%d" % (q("01_Executive_Summary"), first, last))
 
-    # health score + grade formulas
+    # health score + grade formulas.
+    # ROUND(...,1) is load-bearing, not cosmetic: B4 grades THIS cell, and
+    # audit_model rounds before grading (`score = round(...,1)` then
+    # `grade(score)`). Without it the number_format would round only the
+    # DISPLAY, so a raw 59.99 would show "60.0" next to grade D while md/html
+    # show "60.0 / C" — same number, different letter, same client.
     hs = ws.cell(row=3, column=2,
-                 value="=IFERROR(SUMPRODUCT($D${f}:$D${l},$B${f}:$B${l},$E${f}:$E${l})/"
-                       "SUMPRODUCT($B${f}:$B${l},$E${f}:$E${l}),0)".format(f=first, l=last))
+                 value="=IFERROR(ROUND(SUMPRODUCT($D${f}:$D${l},$B${f}:$B${l},$E${f}:$E${l})/"
+                       "SUMPRODUCT($B${f}:$B${l},$E${f}:$E${l}),1),0)".format(f=first, l=last))
     hs.font = BIG_FONT; hs.alignment = CTR; hs.fill = HILITE_FILL; hs.number_format = "0.0"
     gr = ws.cell(row=4, column=2, value=_grade_formula("B3"))  # from GRADE_CUTOFFS
     gr.font = BIG_FONT; gr.alignment = CTR; gr.fill = HILITE_FILL
@@ -469,6 +510,34 @@ def build_exec_summary(wb, weights, findings, kpis=None):
         rr += 1
     if not ranked:
         ws.cell(row=rr, column=1, value="(no findings logged)").font = MUTED_FONT
+
+    # Machine-vs-narrative drift. This lands in the WORKBOOK (the auditor's
+    # editable working copy) and the md record, but deliberately NOT in the
+    # HTML: that one is the client-shareable deliverable, and "our findings
+    # disagree with our score" is a note to the auditor, to be resolved BEFORE
+    # sending — not a disclosure to paste in front of the client.
+    unrec = (prescore or {}).get("unreconciled") or []
+    if unrec:
+        rr += 1
+        cap = ws.cell(row=rr, column=1,
+                      value="⚠ Findings not reconciled with the machine results "
+                            "— resolve before sending")
+        cap.font = HEAD_FONT
+        ws.merge_cells(start_row=rr, start_column=1, end_row=rr, end_column=6)
+        rr += 1
+        for u in unrec:
+            if u.get("reason") == "cleared":
+                txt = ("%s scored %s by the pre-scorer, but a finding still "
+                       "argues it — drop or amend that finding."
+                       % (u.get("id", ""), u.get("result", "")))
+            else:
+                txt = ("%s scored %s by the pre-scorer, but no finding covers "
+                       "it — add one." % (u.get("id", ""), u.get("result", "")))
+            c = ws.cell(row=rr, column=1, value=txt)
+            c.font = BODY_FONT
+            c.alignment = WRAP
+            ws.merge_cells(start_row=rr, start_column=1, end_row=rr, end_column=6)
+            rr += 1
 
     ws.sheet_view.showGridLines = False
     return ws
@@ -854,10 +923,12 @@ def validate_and_normalize(checks, weights):
     return warns
 
 
-def build(payload, *, concentration=None, creative_signals=None):
+def build(payload, *, concentration=None, creative_signals=None, prescore=None):
     """Payload dict -> Workbook. concentration / creative_signals are the optional
     values-only report blocks (from concentration.py / creative_signals.py, computed
-    from raw pull files — never from the payload); each adds one OPTIONAL_TABS sheet."""
+    from raw pull files — never from the payload); each adds one OPTIONAL_TABS sheet.
+    prescore is the merge block (prescore.merge_into_findings); only its
+    `unreconciled` list is rendered — see build_exec_summary."""
     meta = payload.get("meta", {})
     weights = {**DEFAULT_CATEGORY_WEIGHTS, **(payload.get("category_weights") or {})}
     checks = payload.get("checks", []) or []
@@ -875,7 +946,8 @@ def build(payload, *, concentration=None, creative_signals=None):
     wb.remove(wb.active)  # drop default sheet; we create all explicitly in order
 
     build_scope(wb, meta)
-    build_exec_summary(wb, weights, findings, payload.get("kpis") or [])
+    build_exec_summary(wb, weights, findings, payload.get("kpis") or [],
+                       prescore=prescore)
     for sheet_title, category, code, section_key in ANALYSIS_TABS:
         build_analysis_tab(wb, sheet_title, category, code,
                            by_cat.get(category, []), sections.get(section_key))

@@ -165,14 +165,32 @@ def account_baselines(ad_rows) -> dict:
     """Totals-based account baselines (the MediaMetrics convention — NOT
     spend-weighted per-ad means): ctr = sum(clicks)/sum(impressions),
     cpm = sum(spend)/sum(impressions)*1000. Zero impressions -> 0.0 baselines
-    (fatigue then drops those terms). Values UNROUNDED."""
+    (fatigue then drops those terms). Values UNROUNDED.
+
+    Each ratio sums ONLY over rows carrying BOTH of its terms. `_f` maps a
+    missing key to 0.0, which is right for a scalar but WRONG for a ratio: on
+    the Meta path an absent metric is `"Not available (…)"` and meta_rows omits
+    the key entirely, so an ad with impressions but no clicks would have added
+    its impressions to the denominator and nothing to the numerator — silently
+    deflating the baseline that every ad's CTR-erosion term is measured
+    against. Absent is NOT zero (SKILL.md's data-accuracy rule); prescore's
+    account CTR already pairs its terms this way.
+
+    n_ctr_rows / n_cpm_rows report each ratio's coverage so callers can say
+    when it is partial. n_ads stays the row count (the block's public shape)."""
     rows = list(ad_rows or [])
-    clicks = sum(_f(r.get("clicks")) for r in rows)
-    impressions = sum(_f(r.get("impressions")) for r in rows)
-    spend = sum(_f(r.get("spend")) for r in rows)
-    ctr = clicks / impressions if impressions > 0 else 0.0
-    cpm = spend / impressions * 1000.0 if impressions > 0 else 0.0
-    return {"ctr": ctr, "cpm": cpm, "n_ads": len(rows)}
+    ctr_rows = [r for r in rows if r.get("clicks") is not None
+                and r.get("impressions") is not None]
+    cpm_rows = [r for r in rows if r.get("spend") is not None
+                and r.get("impressions") is not None]
+    ctr_imps = sum(_f(r.get("impressions")) for r in ctr_rows)
+    cpm_imps = sum(_f(r.get("impressions")) for r in cpm_rows)
+    ctr = (sum(_f(r.get("clicks")) for r in ctr_rows) / ctr_imps
+           if ctr_imps > 0 else 0.0)
+    cpm = (sum(_f(r.get("spend")) for r in cpm_rows) / cpm_imps * 1000.0
+           if cpm_imps > 0 else 0.0)
+    return {"ctr": ctr, "cpm": cpm, "n_ads": len(rows),
+            "n_ctr_rows": len(ctr_rows), "n_cpm_rows": len(cpm_rows)}
 
 
 def _by_spend(rows) -> list:
@@ -358,6 +376,16 @@ def compute_creative_signals(ad_rows, adset_rows=None, *, ref_date=None,
         notes.append("Quality/engagement/conversion rankings not present in "
                      "the input (raw API path) — rankings unlock on the "
                      "manual CSV export path.")
+    # Say so when a baseline covers only part of the account — it is the
+    # reference every per-ad erosion term is measured against.
+    if base["n_ctr_rows"] < base["n_ads"]:
+        notes.append(f"Baseline CTR computed over {base['n_ctr_rows']} of "
+                     f"{base['n_ads']} ads — the rest are missing clicks or "
+                     "impressions and are excluded (not counted as zero).")
+    if base["n_cpm_rows"] < base["n_ads"]:
+        notes.append(f"Baseline CPM computed over {base['n_cpm_rows']} of "
+                     f"{base['n_ads']} ads — the rest are missing spend or "
+                     "impressions and are excluded (not counted as zero).")
 
     return {
         "window": _window(rows),

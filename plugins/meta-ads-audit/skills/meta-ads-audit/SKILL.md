@@ -153,14 +153,18 @@ To use the skill, work through these steps in order.
    ```
    The tool owns the filenames (`meta-audit_{slug}_{date}.{md,html,xlsx}`), runs the
    workbook's `--check` gate automatically, **copies the bundle to `~/Downloads`** in
-   addition to the chosen outdir, and prints the paths (the last stdout line is a JSON
-   object with `outputs`/`health`/`grade`/`checks`/`findings`/`prescore_corrections`).
-   Flags: `--formats md,html` skips the xlsx (md/html need no openpyxl); `--no-animate`
-   builds motion-free HTML; explicit `--raw-campaigns`/`--raw-adsets`/`--raw-ads`/
-   `--raw-adsets-7d`/`--raw-datasets`/`--raw-dataset-quality` replace `--raw-dir`; on the
-   manual path use `--csv-dir` (or `--csv-campaigns`/`--csv-adsets`/`--csv-ads`) —
-   `--raw-*` and `--csv-*` are mutually exclusive. Omit the data files and the bundle
-   still builds, just without Concentration / Creative Signals / prescore.
+   addition to the chosen outdir (skipped when `~/Downloads` does not exist, when it
+   *is* the outdir, or under `--no-downloads`), and prints the paths (the last stdout
+   line is a JSON object with
+   `outputs`/`health`/`grade`/`checks`/`findings`/`prescore_corrections`).
+   Flags: `--formats md,html` skips the xlsx (md/html need no openpyxl; an unknown
+   format is an error, not a silent no-op); `--no-animate` builds motion-free HTML;
+   `--no-downloads` suppresses the `~/Downloads` copy; explicit
+   `--raw-campaigns`/`--raw-adsets`/`--raw-ads`/`--raw-adsets-7d`/`--raw-datasets`/
+   `--raw-dataset-quality` replace `--raw-dir`; on the manual path use `--csv-dir`
+   (or `--csv-campaigns`/`--csv-adsets`/`--csv-ads`) — `--raw-*` and `--csv-*` are
+   mutually exclusive. Omit the data files and the bundle still builds, just without
+   Concentration / Creative Signals / prescore.
 
    **The deterministic pre-scorer runs automatically** whenever raw/csv inputs are given:
    the mechanical checks and the KPI scorecard are recomputed in Python and **enforced
@@ -168,6 +172,22 @@ To use the skill, work through these steps in order.
    to stderr (`prescore: CR-06 PASS->FAIL (top-5 ads 78.0% > 70%)`), and the final JSON
    line reports `prescore_corrections`. Your `recommendation` text is always preserved.
    `--no-prescore` opts out (not recommended).
+
+   > **Corrections move the score, not your prose.** The pre-scorer enforces `checks`,
+   > `observed` and `kpis` — it never rewrites `findings[]`. Every check it MOVED whose
+   > narrative no longer follows is reported in `prescore.unreconciled` as
+   > `{id, result, reason}`, with a `prescore: WARNING …` line each, in **both**
+   > directions:
+   > - `reason: "missing"` — scored FAIL/FLAG and **no finding covers it**: the score
+   >   dropped and the roadmap is silent about why. **Add a finding.**
+   > - `reason: "cleared"` — scored PASS/N-A while **a finding still argues it**: the
+   >   score rose and the roadmap still tells the client to fix a non-problem.
+   >   **Drop or amend that finding.**
+   >
+   > **Act on every one**, then rebuild, so the roadmap matches the score you present.
+   > The warning reaches you on stderr and appears in the `.md` record and the `.xlsx`
+   > working copy — deliberately **not** in the client-facing HTML, which is the
+   > deliverable you send once they are resolved.
 
 8. **Surface results.** Point the user at the **`.html`** (the primary client-shareable
    deliverable) with its clickable path, and report the Health Score + grade and the top
@@ -227,6 +247,9 @@ the payload — so their row-level numbers never pass through the model.
 ## Honest-window rules
 - Every window label comes **from the data** (each row's `date_start`/`date_stop`), never
   from the requested preset — a "last_30d" pull is labeled with its actual dates.
+  `meta.windows` in the payload records what you *asked Meta for*; it is provenance for
+  the header only and must never be fed to Concentration / Creative Signals / the
+  pre-scorer, which read the files themselves.
 - Each input file carries its own window; mismatched windows stay honest because every
   observed/KPI line names the window it was measured on.
 - **CR-07 (frequency)** gets its full PASS/FLAG/FAIL bands only on a ≤ 8-day window
@@ -286,7 +309,8 @@ the payload — so their row-level numbers never pass through the model.
 
 ## Output contract
 - Three files, one stem: `meta-audit_<slug>_<YYYY-MM-DD>.{html,md,xlsx}` in the
-  user-chosen outdir, plus a copy of each in `~/Downloads`.
+  user-chosen outdir, plus a copy of each in `~/Downloads` (unless it is absent, is
+  itself the outdir, or `--no-downloads` was passed).
 - **HTML** — the primary client-shareable deliverable: self-contained (no external
   requests), white-label, live Health-Score gauge, a tab per lever, evidence tables,
   Concentration + Creative Signals panels, ICE re-ranking.

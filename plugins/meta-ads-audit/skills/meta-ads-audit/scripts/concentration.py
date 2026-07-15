@@ -193,24 +193,98 @@ def verdict(spend_hhi, conv_hhi) -> tuple[str, str]:
 
 # ── dimension assembly ──────────────────────────────────────────────────────
 
-def _aggregate(rows, name_of) -> list[tuple[str, float, float]]:
-    """Sum spend/conv_results per entity name; drop all-zero entities;
-    sort spend desc, name asc (deterministic).
+def _aggregate(rows, key_of, label_of=None) -> list[tuple[str, float, float, str]]:
+    """Sum spend/conv_results per entity; drop all-zero entities;
+    sort spend desc, label asc, key asc (deterministic).
+
+    Returns (label, spend, conv, key) 4-tuples. `_dimension` reads only the
+    first three (it indexes e[0..2]); the trailing key is what lets
+    `_dupe_caveat` describe the entities that SURVIVED the all-zero filter
+    rather than the raw rows.
+
+    key_of IDENTIFIES the entity, label_of DISPLAYS it (defaults to key_of).
+    The split matters: Meta entity names are NOT unique — reusing "Broad" or
+    "LAL 1%" across campaigns, or running one creative in several ad sets, is
+    the standard workflow. Keying by name silently merged those distinct
+    entities into one, which inflated every metric computed downstream (HHI,
+    Effective-N, Gini, Lorenz, ABC) and could flip the verdict. Key by the
+    entity's own id where the source provides one; the manual UI-export path
+    has no ids, so it falls back to the name (the best that data supports).
 
     The conversion side sums `conv_results` ONLY — rows whose result indicator
     is non-conversion (Reach, video views, …) contribute spend but zero
     conversions; `_excluded_indicators` surfaces them as a note."""
-    agg: dict[str, list[float]] = {}
+    label_of = label_of or key_of
+    agg: dict[str, list] = {}
     for r in rows:
-        name = name_of(r)
-        if name is None:
+        key = key_of(r)
+        if key is None:
             continue
-        e = agg.setdefault(str(name), [0.0, 0.0])
+        e = agg.setdefault(str(key), [0.0, 0.0, str(label_of(r) or key)])
         e[0] += num(r.get("spend"))
         e[1] += num(r.get("conv_results"))
-    ents = [(k, v[0], v[1]) for k, v in agg.items() if v[0] > 0 or v[1] > 0]
-    ents.sort(key=lambda e: (-e[1], e[0]))
+    ents = [(v[2], v[0], v[1], k) for k, v in agg.items() if v[0] > 0 or v[1] > 0]
+    ents.sort(key=lambda e: (-e[1], e[0], e[3]))
     return ents
+
+
+def _entity_key(r):
+    """Identity for aggregation: the entity's own id, else its name.
+
+    The fallback is the manual UI-export path, which carries no ids — there,
+    same-named rows are genuinely indistinguishable, so merging them is the
+    honest limit of that data (_dupe_caveat says so in the report)."""
+    return r.get("id") or r.get("name")
+
+
+def _entity_label(r):
+    """Display label: always the human name (never the opaque numeric id)."""
+    return r.get("name")
+
+
+def _dupe_caveat(rows, ents) -> str | None:
+    """Describe shared names among the entities the table actually SHOWS.
+
+    Two distinct situations, and they are properties of a NAME, not of the
+    dimension — an earlier cut decided both from one dimension-wide `id_less`
+    flag, so a single id-less row made the whole report claim rows had been
+    merged when none had, and hid the genuine shared-name case behind it:
+
+      split  — one name, several ids: distinct entities counted separately, so
+               the table legitimately shows more than one row with that name.
+      merged — one name, no id, several source rows: they collapsed into one
+               entity because the export cannot tell them apart. A limit of the
+               data, and the report should say so rather than imply precision.
+
+    `ents` is the post-filter entity list, so a name whose entities were all
+    dropped as all-zero is never described — it isn't on screen to explain.
+    Single pass over rows: accounts can carry thousands of ads.
+    """
+    surviving: dict[str, set] = {}
+    for label, _spend, _conv, key in ents:
+        surviving.setdefault(label, set()).add(key)
+    rows_by_name: dict[str, int] = {}
+    for r in rows or []:
+        name = r.get("name")
+        if name is None:
+            continue
+        name = str(name)
+        rows_by_name[name] = rows_by_name.get(name, 0) + 1
+    split = sum(1 for keys in surviving.values() if len(keys) > 1)
+    # keys == {label} means the entity was keyed by its own NAME — i.e. the row
+    # carried no id — so >1 source row under that name collapsed into it.
+    merged = sum(1 for label, keys in surviving.items()
+                 if keys == {label} and rows_by_name.get(label, 0) > 1)
+    parts = []
+    if split:
+        parts.append(f"{split} name(s) are shared by more than one entity — each "
+                     "is counted separately (keyed by its own id), so the table "
+                     "shows one row per entity.")
+    if merged:
+        parts.append(f"{merged} name(s) appear on more than one source row and "
+                     "carry no id — those rows are merged, which the export "
+                     "cannot distinguish.")
+    return " ".join(parts) or None
 
 
 def _excluded_indicators(rows) -> list[str]:
@@ -313,21 +387,27 @@ def compute_concentration(campaign_rows=None, adset_rows=None, ad_rows=None, *,
 
     dims, notes = [], []
 
+    # Entity dimensions key by the row's own id (falling back to name only when
+    # the source carries no id — the UI-export path); the name is the LABEL.
+    # See _aggregate: names collide by design in Meta accounts.
     if campaign_rows is not None:
-        ents = _aggregate(campaign_rows, lambda r: r.get("name"))
+        ents = _aggregate(campaign_rows, _entity_key, _entity_label)
         dims.append(_dimension("campaigns", "Campaigns", ents, len(campaign_rows),
                                window=win("campaigns", "structure", campaign_rows),
-                               top_n=top_n, lorenz_max=lorenz_max))
+                               top_n=top_n, lorenz_max=lorenz_max,
+                               caveat_extra=_dupe_caveat(campaign_rows, ents)))
     if adset_rows is not None:
-        ents = _aggregate(adset_rows, lambda r: r.get("name"))
+        ents = _aggregate(adset_rows, _entity_key, _entity_label)
         dims.append(_dimension("ad_sets", "Ad sets", ents, len(adset_rows),
                                window=win("ad_sets", "structure", adset_rows),
-                               top_n=top_n, lorenz_max=lorenz_max))
+                               top_n=top_n, lorenz_max=lorenz_max,
+                               caveat_extra=_dupe_caveat(adset_rows, ents)))
     if ad_rows is not None:
-        ents = _aggregate(ad_rows, lambda r: r.get("name"))
+        ents = _aggregate(ad_rows, _entity_key, _entity_label)
         dims.append(_dimension("ads", "Ads", ents, len(ad_rows),
                                window=win("ads", "creative", ad_rows),
-                               top_n=top_n, lorenz_max=lorenz_max))
+                               top_n=top_n, lorenz_max=lorenz_max,
+                               caveat_extra=_dupe_caveat(ad_rows, ents)))
     if campaign_rows is not None:
         if any("objective" in r for r in campaign_rows):
             ents = _aggregate(campaign_rows, lambda r: r.get("objective"))

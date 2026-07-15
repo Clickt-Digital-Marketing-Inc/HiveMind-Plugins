@@ -17,11 +17,14 @@ Meta deltas vs the google renderer:
 - Check tables show the model's `expected` column (no `verify`, no `applies_to`).
 - The business-model view toggle is REMOVED (Meta checks carry no `applies_to`);
   the business model renders as a static header chip only.
-- `healthOf()` is kept but rewritten to the LEVER-WEIGHTED formula, byte-consistent
-  with `audit_model.compute_model`: per-section earned/possible from the check rows,
-  weight from `s.weight` (fallback `SECT_W[s.code]`), health = Σ(score·w)/Σ(w) over
-  sections with possible > 0, rounded once.
-- Findings table gains a Bucket column (the model's ROADMAP bucket); the Area column
+- The JS health kernel is REMOVED. It was a verbatim port of google's `healthOf()`,
+  but nothing here ever called it — the gauge has always shown the Python-authoritative
+  `model.health.score`. It was dead code that the parity tests nonetheless asserted,
+  which bought false confidence: two of the three "three-way parity" assertions guarded
+  a code path no browser ran. Sections now display `s.score_pct` straight from the
+  model, so the HTML recomputes NO part of the score.
+- Findings table gains a Bucket column; unlike the model's build-time bucket, it is
+  recomputed live (`bucketVal`) because the ICE re-rank moves it. The Area column
   reads the finding's `category`.
 - Per-section evidence tables render whenever `s.evidence` ({columns, rows}) is present.
 - NEW Creative Signals tab, data-driven from `M.creative_signals` (fatigue table with
@@ -30,9 +33,13 @@ Meta deltas vs the google renderer:
 
 Design guarantees:
 - **White-label:** no logo, no Clickt credit — the report leads with the client's name.
-- **Score parity:** the JS kernel mirrors `audit_model`'s constants verbatim (asserted in
-  tests); the Health-Score *gauge* shows the Python-authoritative `model.health` so HTML,
-  md, and xlsx never disagree by a rounding step.
+- **Score parity by construction:** every scored number displayed here — health, grade,
+  per-lever `score_pct` — is computed once in Python and rendered verbatim, so there is
+  no second implementation to drift. The only constants still mirrored (`IMPACT`,
+  `BUCKETS`) are the ones the live ICE re-rank genuinely needs client-side; both are
+  asserted against `audit_model` in tests. Prefer displaying a Python value over
+  recomputing it: recomputation cost us a 0.1 divergence (JS half-up vs Python
+  half-even) on exact-boundary section scores.
 - **Motion:** GSAP for the score count-up, gauge sweep, and staggered reveals; every call is
   guarded by `prefers-reduced-motion` + `window.gsap` presence, and `animate=False` strips
   GSAP entirely, leaving a fully functional static report.
@@ -59,8 +66,27 @@ def _esc(s) -> str:
             .replace('"', "&quot;"))
 
 
+def _client_model(model: dict) -> dict:
+    """The model minus the auditor-only blocks. Copy, never mutate the caller's.
+
+    `prescore.unreconciled` names checks whose narrative the pre-scorer left
+    stale — a note for the AUDITOR to resolve before sending, which is why the
+    md record and the xlsx working copy render it and this report does not.
+    Declining to render it is not enough: the whole model is embedded as JSON in
+    this file, so view-source showed the client the exact list of checks whose
+    findings we know are wrong. Drop it from the payload too.
+    """
+    ps = model.get("prescore")
+    if not isinstance(ps, dict) or "unreconciled" not in ps:
+        return model
+    out = dict(model)
+    out["prescore"] = {k: v for k, v in ps.items() if k != "unreconciled"}
+    return out
+
+
 def render_html(model: dict, *, animate: bool = True) -> str:
     """Render the self-contained interactive report string from a computed model."""
+    model = _client_model(model)
     data = json.dumps(model, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     title = _esc(model.get("meta", {}).get("account_name", "") or "Meta Ads Audit")
     html = _TEMPLATE.replace("/*__TITLE__*/", title).replace("__DATA__", data)
@@ -80,9 +106,12 @@ def build_html(model: dict, path, *, animate: bool = True) -> None:
 
 # ==========================================================================
 # The template. Markers: /*__TITLE__*/, __DATA__ (JSON), /*__GSAP__*/.
-# NOTE for editors: no JS literal shaped [<digits>,'<A–F>'] may appear outside
-# the GRADES table (bucket/band data uses multi-char strings), and no external
-# reference substrings may appear outside the GSAP sentinels.
+# NOTE for editors: this template recomputes NO scored value — health, grade
+# and per-lever score_pct are displayed from the Python model. If you find
+# yourself writing scoring math here, emit it from audit_model instead. The
+# two mirrored tables (IMPACT, BUCKETS) are parity-asserted in tests because
+# the live ICE re-rank needs them. No external reference substrings may appear
+# outside the GSAP sentinels.
 # ==========================================================================
 _TEMPLATE = r"""<!doctype html>
 <html lang="en">
@@ -322,7 +351,7 @@ footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);color:v
 
   <footer>
     <span id="footL"></span>
-    <span>Self-contained · recomputes in your browser</span>
+    <span>Self-contained · re-ranks in your browser</span>
   </footer>
 </main>
 
@@ -332,33 +361,28 @@ footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);color:v
 (function(){
 "use strict";
 var M = JSON.parse(document.getElementById('data').textContent);
-var SEV_W = {Critical:5, High:3, Medium:1.5, Low:0.5};
-var FLAG  = {PASS:1, FLAG:0.5, FAIL:0};
-var IMPACT= {Critical:9, High:7, Medium:5, Low:3};
-var GRADES= [[90,'A'],[75,'B'],[60,'C'],[40,'D'],[0,'F']];
-var SECT_W= {DI:20, AR:20, BP:15, AT:10, CR:25, CO:0, FP:10};
+/* Mirrored constants: ONLY what this view recomputes live. Everything the
+   score depends on (health, grade, section score_pct) is computed once in
+   Python and displayed verbatim — parity by construction, not by assertion.
+   These two tables exist because the Findings tab lets the user re-rank ICE
+   client-side, which Python cannot precompute. Both are asserted against
+   audit_model in tests/test_audit.py; keep them byte-consistent. */
+var IMPACT = {Critical:9, High:7, Medium:5, Low:3};   // audit_model.SEVERITY_IMPACT
+var BUCKETS= [[500,'30-day'],[250,'60-day'],[100,'90-day'],[0,'Parking lot']];  // ROADMAP_BUCKETS
 var reduce = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion:reduce)').matches;
 function gsapOn(){ return (typeof window!=='undefined' && window.gsap && !reduce) ? window.gsap : null; }
 
-function esc(s){ s=(s==null?'':''+s); return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+/* Quotes included: esc() is used in ATTRIBUTE contexts too (e.g. class="sev-"+
+   esc(c.severity)), and compute_model passes an unrecognized severity through
+   verbatim, so a text-only escape could break out of the attribute. Mirrors
+   Python's _esc, which already escaped quotes — the two must not disagree. */
+function esc(s){ s=(s==null?'':''+s); return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function el(id){ return document.getElementById(id); }
-function gradeOf(s){ for(var i=0;i<GRADES.length;i++){ if(s>=GRADES[i][0]) return GRADES[i][1]; } return 'F'; }
-function scoreCheck(c){ if(!(c.result in FLAG)) return null; var w=SEV_W[c.severity]||0; return {e:FLAG[c.result]*w,p:w}; }
-function healthOf(){
-  /* Lever-weighted health — byte-consistent with audit_model.compute_model:
-     per-section e/p from check rows, section score UNROUNDED, weight from the
-     model (fallback SECT_W), sections with possible=0 excluded, round once. */
-  var num=0, den=0;
-  M.sections.forEach(function(s){
-    var e=0,p=0;
-    s.checks.forEach(function(c){ var r=scoreCheck(c); if(r){ e+=r.e; p+=r.p; } });
-    if(p>0){
-      var w = (typeof s.weight==='number')? s.weight : (SECT_W[s.code]||0);
-      num += (e/p*100)*w; den += w;
-    }
-  });
-  var sc = den? Math.round(num/den*10)/10 : 0;
-  return {score:sc, grade:gradeOf(sc)};
+function bucketOf(p){
+  /* audit_model.bucket_for mirror — live because the ICE re-rank changes the
+     priority this reads. */
+  for(var i=0;i<BUCKETS.length;i++){ if(p>=BUCKETS[i][0]) return BUCKETS[i][1]; }
+  return BUCKETS[BUCKETS.length-1][1];
 }
 
 /* ---- palette helpers ---- */
@@ -441,8 +465,13 @@ function renderBars(){
   });
 }
 function sectionPct(s){
-  var e=0,p=0; s.checks.forEach(function(c){ var r=scoreCheck(c); if(r){e+=r.e;p+=r.p;} });
-  return p? Math.round(e/p*1000)/10 : null;
+  /* Python-authoritative (audit_model computes score_pct; N/A already excluded
+     and possible=0 already -> null). Recomputing it here re-derived the SAME
+     number through DIFFERENT rounding — JS Math.round is half-up, Python's
+     round() is half-even — so a section on an exact .x5 boundary (e.g.
+     2.25/20) rendered 11.3 in the HTML and 11.2 in the md/xlsx. Display the
+     one number; never recompute what Python already decided. */
+  return (s.score_pct == null) ? null : s.score_pct;
 }
 renderBars();
 
@@ -526,14 +555,35 @@ function show(id){
 }
 
 /* ---- findings + live ICE ---- */
-var ICE = M.findings.map(function(f){ return {f:f, conf:(+f.confidence||5), ease:(+f.ease||5)}; });
+/* Seed from the model, do NOT re-default: compute_model already filled impact/
+   confidence/ease (SEVERITY_IMPACT for impact, DEFAULT_ICE 5 for the rest), so
+   `||5` here was a second, DISAGREEING default — it treats a legitimate 0 as
+   falsy and silently substitutes 5. A finding with confidence 0 scored priority
+   0 / "Parking lot" in Python and md/xlsx, while this row showed ICE 210 and
+   (once the Horizon column started following the live value) "90-day". Trust
+   the number Python computed; fall back only when the key is truly absent. */
+function iceSeed(v){ return (typeof v === 'number' && isFinite(v)) ? v : 5; }
+var ICE = M.findings.map(function(f){
+  return {f:f, conf:iceSeed(f.confidence), ease:iceSeed(f.ease)};
+});
 var fSort = {k:'ice', dir:-1};
 var fSev = {}, fBkt = {};
-function iceVal(r){ return (r.f.impact||0) * r.conf * r.ease; }
+/* impact falls back to 0 (not 5) when absent — same intent as the old falsy
+   guard, but it honours a real 0 instead of swallowing it. compute_model
+   always fills impact, so the fallback is defence, not policy. */
+function iceSeed0(v){ return (typeof v === 'number' && isFinite(v)) ? v : 0; }
+function iceVal(r){ return iceSeed0(r.f.impact) * r.conf * r.ease; }
+/* Horizon must track the LIVE ICE value, not the build-time one: the user
+   edits Confidence/Ease right in this table, so f.bucket (computed by Python
+   from the ORIGINAL ICE) goes stale the moment they do — the row would show a
+   re-ranked ICE beside a horizon that no longer follows from it, and the
+   Horizon filter chips would filter on the stale value. The xlsx recalculates
+   this on edit; now so does the HTML. */
+function bucketVal(r){ return bucketOf(iceVal(r)); }
 function findingsRows(){
   var rows = ICE.filter(function(r){
     if(Object.keys(fSev).length && !fSev[r.f.severity]) return false;
-    if(Object.keys(fBkt).length && !fBkt[String(r.f.bucket)]) return false;
+    if(Object.keys(fBkt).length && !fBkt[String(bucketVal(r))]) return false;
     return true;
   });
   rows.sort(function(a,b){
@@ -692,7 +742,7 @@ function renderFindings(){
       '<td><span class="rank">'+(idx+1)+'</span></td>'+
       '<td><b>'+esc(r.f.title)+'</b><br><span class="muted" style="font-size:12.5px">'+esc(r.f.recommendation||'')+'</span></td>'+
       '<td><span class="sev sev-'+esc(r.f.severity)+'">'+esc(r.f.severity)+'</span></td>'+
-      '<td><span class="hzn">'+esc(r.f.bucket||'')+'</span></td>'+
+      '<td><span class="hzn">'+esc(bucketVal(r))+'</span></td>'+
       '<td><input class="num" data-i="'+i+'" data-t="conf" type="number" min="1" max="10" value="'+r.conf+'"></td>'+
       '<td><input class="num" data-i="'+i+'" data-t="ease" type="number" min="1" max="10" value="'+r.ease+'"></td>'+
       '<td><span class="ice">'+iceVal(r)+'</span></td>'+

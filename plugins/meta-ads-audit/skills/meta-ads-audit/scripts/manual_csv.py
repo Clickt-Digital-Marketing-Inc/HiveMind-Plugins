@@ -281,17 +281,20 @@ def _normalize_row(row: dict, header: list[str], *, level: str) -> dict:
         d["conv_results"] = d["results"]
 
     # ctr — fraction 0-1; recomputed from counts when both present, else the
-    # CTR (all) column /100 when it carried a '%' or parses > 1 (CONTRACTS §1).
+    # CTR (all) column, which Ads Manager ALWAYS emits on the percent scale
+    # ("0.87" = 0.87%, with or without a '%' sign) — so convert unconditionally.
+    # A "fraction if <= 1" heuristic is exactly backwards here: Meta all-click
+    # CTR is typically 0.5-1.5%, so the common case looks like a fraction and
+    # rendered 100x high ("0.87" -> 87.00%).
     if d.get("impressions"):
         if "clicks" in d:
             d["ctr"] = d["clicks"] / d["impressions"]
     if "ctr" not in d:
         col = _col(header, "CTR (all)")
         if col is not None:
-            s = str(row.get(col) or "")
-            v = _num(s)
+            v = _num(row.get(col))
             if v is not None:
-                d["ctr"] = v / 100.0 if ("%" in s or v > 1) else v
+                d["ctr"] = v / 100.0
 
     # cpm — recomputed spend/impressions*1000 when possible (CONTRACTS §1).
     if "spend" in d and d.get("impressions"):

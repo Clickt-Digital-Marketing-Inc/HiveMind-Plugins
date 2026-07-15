@@ -6,10 +6,14 @@
 Run: python3 tests/test_audit.py
 
 Guards: lever-WEIGHTED Health-Score correctness (hand oracles), N/A exclusion,
-JS<->Python<->Excel constant parity (incl. SECT_W), self-containment (GSAP
-sentinel + checksum), determinism, concentration metrics, bounded embeds,
-creative signals (MediaMetrics mirrors), meta_rows raw-shape parsing, the
-manual UI-CSV path, the deterministic pre-scorer, and merge semantics.
+JS<->Python<->Excel constant parity, self-containment (GSAP sentinel +
+checksum), determinism, concentration metrics, bounded embeds, creative
+signals (MediaMetrics mirrors), meta_rows raw-shape parsing, the manual UI-CSV
+path, the deterministic pre-scorer, merge semantics, and — section 13 — a
+DIFFERENTIAL parity sweep that recalculates the workbook through LibreOffice
+and asserts its health+grade equal the model's. Constant parity proves the
+kernels share inputs; only the differential sweep proves they agree on output.
+Section 13 skips (never fails) when soffice is unavailable.
 """
 from __future__ import annotations
 
@@ -17,7 +21,10 @@ import copy
 import hashlib
 import json
 import math
+import random
 import re
+import shutil
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -216,15 +223,105 @@ def js_map(name):
     return out
 
 
-check("JS SEV_W == audit_model.SEVERITY_WEIGHTS", js_map("SEV_W") == audit_model.SEVERITY_WEIGHTS)
-check("JS FLAG == audit_model.FLAG_SCORES", js_map("FLAG") == audit_model.FLAG_SCORES)
+# The HTML mirrors ONLY what it recomputes live (the ICE re-rank). Everything
+# else is displayed from the Python model, so there is no second implementation
+# to assert. Mirroring a constant the browser never reads is worse than not
+# mirroring it: the old SEV_W/FLAG/SECT_W/GRADES assertions all passed while
+# guarding a healthOf() no caller invoked, which is why a live rounding
+# divergence in sectionPct went unnoticed. Assert the live ones, and assert
+# that the dead kernel stays dead.
 check("JS IMPACT == audit_model.SEVERITY_IMPACT", js_map("IMPACT") == audit_model.SEVERITY_IMPACT)
-check("JS SECT_W == audit_model.SECTION_WEIGHTS", js_map("SECT_W") == audit_model.SECTION_WEIGHTS)
-js_grades = [(int(n), g) for n, g in re.findall(r"\[(\d+),'([A-F])'\]", tpl)]
-check("GRADES parity regex finds EXACTLY the 5 grade pairs (pollution guard)",
-      js_grades == [tuple(x) for x in audit_model.GRADE_CUTOFFS] and len(js_grades) == 5,
-      str(js_grades))
+js_buckets = re.search(r"var BUCKETS\s*=\s*\[(.*?)\];", tpl)
+js_bkt = [(int(n), lbl) for n, lbl in
+          re.findall(r"\[(\d+),'([^']+)'\]", js_buckets.group(1))]
+check("JS BUCKETS == audit_model.ROADMAP_BUCKETS",
+      js_bkt == [tuple(x) for x in audit_model.ROADMAP_BUCKETS], str(js_bkt))
+check("HTML recomputes NO score: the dead JS health kernel is gone",
+      not any(sym in tpl for sym in ("healthOf", "scoreCheck", "gradeOf",
+                                     "SECT_W", "GRADES", "SEV_W")))
+check("sectionPct displays the model's score_pct (no JS re-rounding)",
+      "s.score_pct" in tpl and "Math.round(e/p" not in tpl)
+check("Findings Horizon recomputes from the LIVE ICE (bucketVal), not f.bucket",
+      "bucketVal(r)" in tpl and "esc(r.f.bucket" not in tpl)
+# The ICE seed must not re-default what Python already filled: `||5` treats a
+# legitimate confidence/ease of 0 as falsy and substitutes 5, so the row showed
+# an ICE (and, once Horizon followed the live value, a bucket) that Python's
+# priority/bucket contradicted. Guard the falsy-zero form specifically.
+check("ICE seeds from the model without a second, disagreeing default",
+      "iceSeed(f.confidence)" in tpl and "iceSeed(f.ease)" in tpl
+      and "+f.confidence||5" not in tpl and "+f.ease||5" not in tpl
+      and "(r.f.impact||0)" not in tpl)
 check("no xmlns on inline SVG (template)", "xmlns" not in tpl)
+# Competitive Landscape is structurally weight-0: the workbook builds no CO row,
+# so a nonzero CO weight is a number ONLY compute_model could honour — health
+# would move in md/html while the xlsx silently disagreed. (Found by the
+# section-13 differential sweep, not by constant parity.)
+_co = audit_model.compute_model({
+    "meta": {"account_name": "CO"},
+    "category_weights": {"Competitive Landscape": 40.0, "Creative Performance": 60.0},
+    "checks": [{"id": "CO-01", "category": "Competitive Landscape", "name": "a",
+                "severity": "Critical", "flag": "FAIL"},
+               {"id": "CR-02", "category": "Creative Performance", "name": "b",
+                "severity": "Critical", "flag": "PASS"}]})
+check("a Competitive Landscape weight override is ignored (pinned to 0), not honoured",
+      _co["health"]["score"] == 100.0
+      and [s for s in _co["sections"] if s["code"] == "CO"][0]["weight"] == 0.0,
+      str(_co["health"]))
+check("...and the ignored override is warned about, not silently dropped",
+      any("is qualitative" in w for w in _co["warnings"]), str(_co["warnings"]))
+# "CO is special" was spelled out in six places across two files; it now has ONE
+# declaration that both the model and the workbook read.
+check("UNSCORED_SECTIONS is the single source: SECTION_WEIGHTS agrees with it",
+      all(audit_model.SECTION_WEIGHTS[c] == 0.0
+          for c in audit_model.UNSCORED_SECTIONS)
+      and audit_model.UNSCORED_SECTIONS == frozenset({"CO"}))
+# The set is plural because compute_model's weight rule is; the workbook is not
+# — it renders exactly ONE unscored lever as the Competitive tab. A second would
+# vanish from the workbook while md/html still listed it, so the mismatch has to
+# fail loudly rather than let next() pick a winner.
+check("the workbook refuses to import if UNSCORED_SECTIONS stops being exactly one",
+      len([1 for code, _c, _t, _k in audit_model.SECTIONS
+           if code in audit_model.UNSCORED_SECTIONS]) == 1)
+
+# round1 — the kernel adopts Excel's half-away rule. Python's round() is
+# half-even, so a .x5 boundary printed one number in the model and another in
+# the workbook. Ported from google-ads-audit (same defect, one decimal over).
+check("round1 rounds half UP (Excel/JS rule), unlike Python's banker's round()",
+      audit_model.round1(62.25) == 62.3 and round(62.25, 1) == 62.2
+      and audit_model.round1(6.25) == 6.3 and audit_model.round1(11.25) == 11.3,
+      str(audit_model.round1(62.25)))
+check("round1 leaves non-boundary values alone",
+      audit_model.round1(59.9901) == 60.0 and audit_model.round1(0.0) == 0.0
+      and audit_model.round1(43.74) == 43.7)
+_tie = audit_model.compute_model({
+    "meta": {"account_name": "Tie"},
+    "category_weights": {"Creative Performance": 62.25, "Attribution": 37.75},
+    "checks": [{"id": "CR-02", "category": "Creative Performance", "name": "a",
+                "severity": "Critical", "flag": "PASS"},
+               {"id": "AT-02", "category": "Attribution", "name": "b",
+                "severity": "Critical", "flag": "FAIL"}]})
+check("health on an exact .x5 tie uses Excel's rule (62.3, not banker's 62.2)",
+      _tie["health"]["score"] == 62.3, str(_tie["health"]["score"]))
+# earned = H FLAG(3×.5=1.5) + M FLAG(1.5×.5=.75) = 2.25
+# possible = 3 + 1.5 + 5+5+5 (C FAIL ×3) + 0.5 (L FAIL) = 20  ->  11.25 exactly
+_pct = audit_model.compute_model({
+    "meta": {"account_name": "Pct"},
+    "checks": [{"id": "CR-05", "category": "Creative Performance", "name": "b",
+                "severity": "High", "flag": "FLAG"},
+               {"id": "CR-02", "category": "Creative Performance", "name": "a",
+                "severity": "Medium", "flag": "FLAG"},
+               {"id": "CR-03", "category": "Creative Performance", "name": "c",
+                "severity": "Critical", "flag": "FAIL"},
+               {"id": "CR-06", "category": "Creative Performance", "name": "d",
+                "severity": "Critical", "flag": "FAIL"},
+               {"id": "CR-07", "category": "Creative Performance", "name": "e",
+                "severity": "Critical", "flag": "FAIL"},
+               {"id": "CR-08", "category": "Creative Performance", "name": "f",
+                "severity": "Low", "flag": "FAIL"}]})
+_cr = [s for s in _pct["sections"] if s["code"] == "CR"][0]
+check("lever score_pct on a .x5 tie (2.25/20 = 11.25) is 11.3, matching Excel",
+      _cr["earned"] == 2.25 and _cr["possible"] == 20.0
+      and _cr["score_pct"] == 11.3, str(_cr["score_pct"]))
 
 try:
     import build_audit_xlsx as bax
@@ -323,6 +420,70 @@ check("single entity: hhi 10000 / eff_n 1 / gini 0 / lorenz / abc A",
       and conc.lorenz_points([7]) == [[0.0, 0.0], [1.0, 1.0]]
       and conc.pareto_abc([7]) == ["A"])
 
+# Entity identity: Meta names are NOT unique (reusing "Broad"/"LAL 1%" across
+# campaigns, or one creative across ad sets, is the standard workflow). Keying
+# by name merged distinct entities and inflated EVERY downstream metric — 4
+# evenly-split ads read as 2, doubling HHI (2500 -> 5000), halving Effective-N
+# (4 -> 2) and flipping the verdict (diversified -> fragility).
+_dupe_ads = [{"id": str(i), "name": ("Broad", "Broad", "LAL 1%", "LAL 1%")[i - 1],
+              "spend": 25.0, "conv_results": 5.0,
+              "date_start": "2026-06-01", "date_stop": "2026-06-30"}
+             for i in (1, 2, 3, 4)]
+_d_ads = [d for d in conc.compute_concentration(ad_rows=_dupe_ads)["dimensions"]
+          if d["key"] == "ads"][0]
+check("duplicate NAMES with distinct ids stay 4 entities (keyed by id)",
+      _d_ads["n_entities"] == 4 and _d_ads["n_rows_raw"] == 4, str(_d_ads["n_entities"]))
+check("dupe-name oracle: HHI 2500 / eff-N 4 / diversified (not 5000 / 2 / fragility)",
+      _d_ads["spend"]["hhi"] == 2500.0 and _d_ads["spend"]["eff_n"] == 4.0
+      and _d_ads["verdict_key"] == "diversified", str(_d_ads["spend"]))
+check("shared names are called out in the caveat",
+      "shared by more than one entity" in (_d_ads["caveat"] or ""), str(_d_ads["caveat"]))
+# The caveat describes what the TABLE shows: entities dropped by the all-zero
+# filter must not be described (they are not on screen to explain).
+_drop = [{"id": "1", "name": "Broad", "spend": 0.0, "conv_results": 0.0},
+         {"id": "2", "name": "Broad", "spend": 0.0, "conv_results": 0.0},
+         {"id": "3", "name": "Solo", "spend": 50.0, "conv_results": 10.0}]
+_d_drop = [d for d in conc.compute_concentration(ad_rows=_drop)["dimensions"]
+           if d["key"] == "ads"][0]
+check("a shared name whose entities were ALL dropped (all-zero) is not described",
+      _d_drop["n_entities"] == 1
+      and "shared by more than one entity" not in (_d_drop["caveat"] or ""),
+      str(_d_drop["caveat"]))
+# split/merged are properties of a NAME, not of the dimension: one id-less row
+# used to flip the whole report to "rows were merged" when none had been, and
+# hid the genuine shared-name case behind it.
+_mix = [{"id": "1", "name": "Broad", "spend": 25.0, "conv_results": 5.0},
+        {"id": "2", "name": "Broad", "spend": 25.0, "conv_results": 5.0},
+        {"name": "Solo", "spend": 50.0, "conv_results": 10.0}]
+_d_mix = [d for d in conc.compute_concentration(ad_rows=_mix)["dimensions"]
+          if d["key"] == "ads"][0]
+check("mixed id presence: nothing merged, so the caveat reports the SPLIT only",
+      _d_mix["n_entities"] == 3
+      and "shared by more than one entity" in (_d_mix["caveat"] or "")
+      and "carry no id" not in (_d_mix["caveat"] or ""), str(_d_mix["caveat"]))
+check("entity label is the NAME, never the opaque id",
+      {t["name"] for t in _d_ads["top"]} == {"Broad", "LAL 1%"},
+      str([t["name"] for t in _d_ads["top"]]))
+# id-less rows (the UI-export path) must still merge — that IS the limit of
+# that data — but must SAY so rather than pretend precision it lacks.
+_idless = [{"name": "Broad", "spend": 25.0, "conv_results": 5.0},
+           {"name": "Broad", "spend": 25.0, "conv_results": 5.0},
+           {"name": "LAL 1%", "spend": 50.0, "conv_results": 10.0}]
+_d_idless = [d for d in conc.compute_concentration(ad_rows=_idless)["dimensions"]
+             if d["key"] == "ads"][0]
+check("id-less rows merge by name but admit it in the caveat",
+      _d_idless["n_entities"] == 2
+      and "carry no id" in (_d_idless["caveat"] or ""), str(_d_idless["caveat"]))
+# Objectives are a genuine many-rows-to-one-bucket dimension: keyed by VALUE.
+_obj_rows = [{"id": "1", "name": "c1", "objective": "OUTCOME_LEADS", "spend": 10.0,
+              "conv_results": 1.0},
+             {"id": "2", "name": "c2", "objective": "OUTCOME_LEADS", "spend": 10.0,
+              "conv_results": 1.0}]
+_d_obj = [d for d in conc.compute_concentration(campaign_rows=_obj_rows)["dimensions"]
+          if d["key"] == "objectives"][0]
+check("objectives still group BY VALUE (2 campaigns, 1 objective)",
+      _d_obj["n_entities"] == 1, str(_d_obj["n_entities"]))
+
 rows6 = json.loads((FIX / "conc_rows_6.json").read_text())
 ads31 = json.loads((FIX / "conc_ads_31.json").read_text())
 block = conc.compute_concentration(
@@ -415,6 +576,26 @@ base = cs.account_baselines([
 check("totals-based baselines ctr .01 / cpm 7.5",
       approx(base["ctr"], 0.01) and approx(base["cpm"], 7.5) and base["n_ads"] == 2,
       str(base))
+# Absent is NOT zero. On the Meta path a missing metric is "Not available (…)"
+# and meta_rows omits the key; _f() maps that to 0.0, which is right for a
+# scalar and WRONG for a ratio — an ad with impressions but no clicks used to
+# add its impressions to the denominator and nothing to the numerator, halving
+# the baseline that every ad's CTR-erosion term is measured against.
+base_gap = cs.account_baselines([{"name": "a", "spend": 10.0, "impressions": 1000.0,
+                                  "clicks": 9.0},
+                                 {"name": "b", "spend": 10.0, "impressions": 1000.0}])
+check("baseline CTR pairs its terms: 0.009 over the 1 ad that has clicks (not 0.0045)",
+      approx(base_gap["ctr"], 0.009) and base_gap["n_ctr_rows"] == 1
+      and base_gap["n_cpm_rows"] == 2 and base_gap["n_ads"] == 2, str(base_gap))
+_blk_gap = cs.compute_creative_signals(
+    [{"name": "a", "spend": 10.0, "impressions": 1000.0, "clicks": 9.0},
+     {"name": "b", "spend": 10.0, "impressions": 1000.0}], [])
+check("partial baseline coverage is stated in the notes",
+      any("Baseline CTR computed over 1 of 2 ads" in n for n in _blk_gap["notes"]),
+      str(_blk_gap["notes"]))
+check("baselines block keeps its public shape (ctr/cpm/n_ads only)",
+      set(_blk_gap["baselines"]) == {"ctr", "cpm", "n_ads"},
+      str(_blk_gap["baselines"]))
 
 cs_block = cs.compute_creative_signals(ads31)
 check("cs bounded embed: 25 ads + tail 6", len(cs_block["ads"]) == 25
@@ -614,6 +795,28 @@ check("ui campaigns meta: window + inclusive days + provenance",
       uc_meta["window"] == "2026-06-11 – 2026-07-10" and uc_meta["window_days"] == 30
       and uc_meta["n_rows_raw"] == 3
       and set(uc_meta["stamp"]) == {"file", "sha256", "bytes"}, str(uc_meta))
+
+# The 'CTR (all)' fallback fires only when 'Clicks (all)' is absent — which the
+# committed fixtures never are, so this path shipped unexecuted. Ads Manager
+# emits CTR on the PERCENT scale ("0.87" = 0.87%), and Meta all-click CTR is
+# typically 0.5-1.5%: the old "fraction if <= 1" heuristic therefore guessed
+# wrong for the COMMON case and rendered 0.87% as 87.00%.
+with tempfile.TemporaryDirectory() as td:
+    _p = Path(td) / "ctr_only.csv"
+    _p.write_text(
+        "Ad name,Amount spent (CAD),Impressions,CTR (all),Results,Result indicator,"
+        "Reporting starts,Reporting ends\n"
+        "Sub-one,100.00,10000,0.87,5,Purchases,2026-07-04,2026-07-10\n"
+        "With-sign,100.00,10000,1.25%,5,Purchases,2026-07-04,2026-07-10\n"
+        "Over-one,100.00,10000,2.50,5,Purchases,2026-07-04,2026-07-10\n",
+        encoding="utf-8")
+    _c = {r["name"]: r for r in mc.ads_rows(str(_p))[0]}
+    check("CSV 'CTR (all)' is percent-scale: 0.87 -> 0.0087 (NOT 0.87)",
+          approx(_c["Sub-one"]["ctr"], 0.0087), str(_c["Sub-one"].get("ctr")))
+    check("CSV 'CTR (all)' with a % sign parses identically (1.25% -> 0.0125)",
+          approx(_c["With-sign"]["ctr"], 0.0125), str(_c["With-sign"].get("ctr")))
+    check("CSV 'CTR (all)' > 1 still percent-scale (2.50 -> 0.025)",
+          approx(_c["Over-one"]["ctr"], 0.025), str(_c["Over-one"].get("ctr")))
 
 ua_rows, ua_meta = mc.ads_rows(str(FIX / "ui_ads.csv"))
 u1 = {r["name"]: r for r in ua_rows}
@@ -879,6 +1082,52 @@ mrow = next(c for c in merged["checks"] if c["id"] == "CR-06")
 check("recommendation preserved on the corrected check",
       mrow["recommendation"] == "keep monitoring" and mrow["flag"] == "FAIL"
       and "78.0%" in mrow["observed"])
+# The score is machine-enforced; findings[] is not — so drift runs BOTH ways.
+# Direction 1 (missing): machine scores FAIL/FLAG, no finding covers it.
+check("corrections with no matching finding are reported as unreconciled/missing",
+      blockp["unreconciled"] == [{"id": "CR-03", "result": "FLAG", "reason": "missing"},
+                                 {"id": "CR-06", "result": "FAIL", "reason": "missing"}],
+      str(blockp["unreconciled"]))
+check("...and each gets a WARNING log line naming the drift",
+      sum(1 for l in plog if l.startswith("prescore: WARNING CR-")
+          and "the narrative did not" in l) == 2, str(plog))
+_rec = copy.deepcopy(pre)
+_rec["findings"] = [{"id": "F-001", "title": "Top-5 ad spend concentration",
+                     "category": "Creative Performance", "severity": "High",
+                     "evidence": "CR-06: top-5 ads hold 78.0% of spend",
+                     "recommendation": "diversify"},
+                    {"id": "F-002", "title": "CR-03 hold-through", "category":
+                     "Creative Performance", "severity": "Medium",
+                     "evidence": "x", "recommendation": "y"}]
+_m2, _b2, _l2 = ps.merge_into_findings(_rec, pres_ads)
+check("a finding that cites the check id reconciles it (no false alarm)",
+      _b2["unreconciled"] == [], str(_b2["unreconciled"]))
+
+# Direction 2 (cleared): the machine CLEARS a check a finding still argues —
+# the score rose while the roadmap still tells the client to fix it. Only
+# reporting direction 1 made this half a feature; a live run corrects
+# `AR-02 FAIL->PASS`, so the uncovered direction is the routine one.
+_clr = copy.deepcopy(pre)
+for _c in _clr["checks"]:
+    if _c["id"] == "CR-06":
+        _c["flag"] = "FAIL"          # the model drafted a failure...
+_clr["findings"] = [{"id": "F-001", "title": "Top-5 ad concentration",
+                     "category": "Creative Performance", "severity": "High",
+                     "evidence": "CR-06 shows top-5 ads dominating",
+                     "recommendation": "diversify"}]
+_pass6 = copy.deepcopy(pres_ads)
+_pass6["checks"]["CR-06"] = dict(_pass6["checks"]["CR-06"],
+                                 result="PASS", observed="top-5 ads 41.0% <= 70%")
+_m3, _b3, _l3 = ps.merge_into_findings(_clr, _pass6)
+check("a CLEARED check that a finding still argues is reported (reason=cleared)",
+      {"id": "CR-06", "result": "PASS", "reason": "cleared"} in _b3["unreconciled"],
+      str(_b3["unreconciled"]))
+check("...with a log line telling the auditor to drop or amend the finding",
+      any("CR-06 machine-scored PASS but a finding still argues it" in l
+          for l in _l3), str(_l3))
+check("an untouched check is never reported as drift (only corrected/injected)",
+      all(u["id"] in {c["id"] for c in _b3["corrected"]} | set(_b3["injected"])
+          for u in _b3["unreconciled"]), str(_b3["unreconciled"]))
 m_merged = audit_model.compute_model(merged, generated="2026-07-10T00:00:00",
                                      prescore=blockp)
 check("correction flips health 100.0 -> 53.7 / D (hand oracle)",
@@ -916,9 +1165,32 @@ check("md prescore footer names the corrected ids",
       "checks machine-scored" in md_p
       and "CR-06" in md_p.rsplit("checks machine-scored", 1)[1][:250],
       repr(md_p.rsplit("checks machine-scored", 1)[-1][:120]))
-js_grades_p = re.findall(r"\[(\d+),'([A-F])'\]", audit_html._TEMPLATE)
-check("GRADES parity unpolluted after prescore/conc rendering",
-      [(int(n), g) for n, g in js_grades_p] == audit_model.GRADE_CUTOFFS)
+# The old guard here re-scanned the WHOLE template for [NN,'X'] grade literals,
+# so any stray JS literal of that shape could corrupt it (hence "pollution").
+# The BUCKETS check in section 3 is scoped to the `var BUCKETS = [...]`
+# declaration, so it cannot be polluted by data or markup. What is worth
+# asserting after a data-heavy render is that the rendered document still
+# carries the live kernel and no scoring math sneaked back in (html_p above).
+check("rendered html keeps the live ICE kernel and recomputes no score",
+      "var BUCKETS" in html_p and "function bucketOf" in html_p
+      and "healthOf" not in html_p and "scoreCheck" not in html_p)
+# Where machine-vs-narrative drift surfaces is a deliberate split: the md
+# record and the xlsx working copy warn the AUDITOR; the HTML is the
+# client-shareable deliverable and must not carry "our findings disagree with
+# our score" — that is a note to resolve before sending, not a disclosure.
+check("md record surfaces unreconciled drift to the auditor",
+      "Findings not reconciled with the machine results" in md_p
+      and "CR-06" in md_p.split("Findings not reconciled")[1][:400], md_p[-400:])
+check("the CLIENT-facing html does NOT carry the drift warning",
+      "not reconciled" not in html_p.lower())
+# Not rendering it is not enough: the whole model is embedded as JSON, so
+# view-source handed the client the exact list of checks whose findings we know
+# are stale. It must be absent from the PAYLOAD, not just the UI.
+check("...and does not embed unreconciled in its data block either",
+      "unreconciled" not in html_p and '"corrected"' in html_p,
+      "unreconciled leaked into the client deliverable")
+check("stripping it does not mutate the caller's model (md still sees it)",
+      (m_merged.get("prescore") or {}).get("unreconciled") is not None)
 
 # renderers with concentration + creative signals blocks
 m_full = audit_model.compute_model(PAYLOAD, generated="2026-07-10T00:00:00",
@@ -940,6 +1212,28 @@ f2 = audit_html.render_html(audit_model.compute_model(
     PAYLOAD, generated="TS2", concentration=block, creative_signals=cs_block))
 check("HTML with all blocks deterministic modulo generated",
       f1.replace("TS1", "TS") == f2.replace("TS2", "TS"))
+
+# Adversarial client-controlled strings. Account names are client data and flow
+# into BOTH renderers' headers; the md's YAML frontmatter is the fragile one (a
+# bare quote closes the scalar and the whole block stops parsing, defeating the
+# "Obsidian-ingestible" promise).
+_adv = copy.deepcopy(PAYLOAD)
+_adv["meta"]["account_name"] = 'Acme "Prime" Ltd </script><script>x()</script>'
+_m_adv = audit_model.compute_model(_adv, generated="2026-07-10T00:00:00")
+_md_adv = audit_md.render_md(_m_adv)
+_fm = _md_adv.split("---")[1]
+check("md frontmatter escapes quotes in the account name (block stays parseable)",
+      '\\"Prime\\"' in _fm and _fm.count('title: "') == 1
+      and all(l.count('"') % 2 == 0 for l in _fm.strip().splitlines()
+              if ": " in l and '"' in l),
+      repr([l for l in _fm.strip().splitlines() if l.startswith("title:")]))
+_html_adv = audit_html.render_html(_m_adv)
+check("html never emits a literal </script> from client data",
+      "</script><script>x()" not in _html_adv)
+check("html data block survives the account name (still valid JSON)",
+      json.loads(re.search(r'<script id="data" type="application/json">(.*?)</script>',
+                           _html_adv, re.S).group(1).replace("<\\/", "</")
+                 )["meta"]["account_name"] == _adv["meta"]["account_name"])
 
 # ============================================================================
 # 12: workbook — tabs, named ranges, optional tabs, corrected flags, ICE seeds
@@ -1017,6 +1311,267 @@ else:
               rows_cr.get("CR-06") == "FAIL" and rows_cr.get("CR-03") == "FLAG",
               str(rows_cr))
         check("check() green on the merged workbook", bax.check(str(x3)) == 0)
+
+
+# ============================================================================
+print("--- 13: differential parity (Python vs RECALCULATED xlsx) ---")
+#
+# Everything above asserts the three kernels share the same INPUTS (constants).
+# This asserts they produce the same OUTPUT for the same payload — which is a
+# different claim, and the only one a client can actually see. It exists
+# because two real defects lived exactly in that gap while 234 checks stayed
+# green:
+#   * the Score cell wasn't ROUNDed, but its number_format was, so the grade
+#     formula graded a raw 59.99 as D while md/html displayed "60.0 / C";
+#   * a flag outside the vocabulary (validate_and_normalize tolerates it with
+#     a WARN) made F*D -> #VALUE!, which SUM propagated and the Score cell's
+#     IFERROR then rendered as a plausible 0 — a whole lever silently lost.
+# Neither is visible to openpyxl, which reads FORMULAS; both need a real
+# recalculation. soffice is the gate: skip (never fail) when it is absent, so
+# the suite still runs anywhere the plugin installs.
+_SOFFICE = next((p for p in (
+    "/Applications/LibreOffice.app/Contents/MacOS/soffice",
+    "/usr/bin/soffice", "/usr/local/bin/soffice",
+) if Path(p).exists()), None) or shutil.which("soffice")
+
+
+def _recalc(xlsx_path, outdir):
+    """Round-trip a workbook through LibreOffice so formulas hold VALUES."""
+    subprocess.run([_SOFFICE, "--headless", "--convert-to", "xlsx",
+                    "--outdir", str(outdir), str(xlsx_path)],
+                   check=True, capture_output=True, timeout=180)
+    return Path(outdir) / Path(xlsx_path).name
+
+
+def _rand_payload(rng, n=14):
+    """A deterministic pseudo-random payload. Weights are floats so raw health
+    lands on cutoff boundaries often enough to catch rounding drift."""
+    cats = [c for _code, c, _t, _k in audit_model.SECTIONS]
+    checks = []
+    for i in range(n):
+        checks.append({
+            "id": "X-%02d" % i, "category": rng.choice(cats), "name": "c%d" % i,
+            "severity": rng.choice(["Critical", "High", "Medium", "Low"]),
+            "flag": rng.choice(["PASS", "FLAG", "FAIL", "N/A"]),
+            "observed": "", "expected": "", "recommendation": "",
+        })
+    return {
+        "meta": {"account_id": "1", "account_name": "Diff", "currency": "USD",
+                 "business_model": "Lead Gen", "generated_for_date": "2026-07-15",
+                 "windows": {"structure": "", "creative": "", "trend": ""},
+                 "auditor": "t", "out_of_scope": []},
+        "category_weights": {c: round(rng.uniform(5, 40), 4) for c in cats},
+        "checks": checks, "findings": [],
+    }
+
+
+if _SOFFICE is None:
+    skip_note("differential recalc parity (soffice not found)")
+else:
+    try:
+        from openpyxl import load_workbook as _lw2
+    except ImportError:
+        skip_note("differential recalc parity (openpyxl unavailable)")
+    else:
+        rng = random.Random(20260715)  # seeded: deterministic, no wall clock
+        cases = [_rand_payload(rng) for _ in range(12)]
+        # Pin the two regressions explicitly, so they fail loudly by name even
+        # if the random sweep drifts. Health lands at exactly 59.9901 raw.
+        cases.append({
+            "meta": {"account_id": "1", "account_name": "Edge", "currency": "USD",
+                     "business_model": "Lead Gen", "generated_for_date": "2026-07-15",
+                     "windows": {"structure": "", "creative": "", "trend": ""},
+                     "auditor": "t", "out_of_scope": []},
+            "category_weights": {"Creative Performance": 59.9901,
+                                 "Attribution": 40.0099},
+            "checks": [
+                {"id": "CR-02", "category": "Creative Performance", "name": "a",
+                 "severity": "Critical", "flag": "PASS", "observed": "",
+                 "expected": "", "recommendation": ""},
+                {"id": "AT-02", "category": "Attribution", "name": "b",
+                 "severity": "Critical", "flag": "FAIL", "observed": "",
+                 "expected": "", "recommendation": ""}],
+            "findings": [],
+        })
+        cases.append({  # exact .x5 tie: Python round() is half-EVEN (62.2),
+            # Excel ROUND is half-AWAY (62.3). round1 makes the kernel share
+            # Excel's rule. Weights 62.25/37.75 with a 100/0 split land the raw
+            # quotient exactly on the boundary.
+            "meta": {"account_id": "1", "account_name": "Tie", "currency": "USD",
+                     "business_model": "Lead Gen", "generated_for_date": "2026-07-15",
+                     "windows": {"structure": "", "creative": "", "trend": ""},
+                     "auditor": "t", "out_of_scope": []},
+            "category_weights": {"Creative Performance": 62.25,
+                                 "Attribution": 37.75},
+            "checks": [
+                {"id": "CR-02", "category": "Creative Performance", "name": "a",
+                 "severity": "Critical", "flag": "PASS", "observed": "",
+                 "expected": "", "recommendation": ""},
+                {"id": "AT-02", "category": "Attribution", "name": "b",
+                 "severity": "Critical", "flag": "FAIL", "observed": "",
+                 "expected": "", "recommendation": ""}],
+            "findings": [],
+        })
+        cases.append({  # drifted flag vocab: excluded from BOTH sums, not #VALUE!
+            "meta": {"account_id": "1", "account_name": "Drift", "currency": "USD",
+                     "business_model": "Lead Gen", "generated_for_date": "2026-07-15",
+                     "windows": {"structure": "", "creative": "", "trend": ""},
+                     "auditor": "t", "out_of_scope": []},
+            "checks": [
+                {"id": "CR-02", "category": "Creative Performance", "name": "a",
+                 "severity": "Critical", "flag": "PASS", "observed": "",
+                 "expected": "", "recommendation": ""},
+                {"id": "CR-05", "category": "Creative Performance", "name": "b",
+                 "severity": "Critical", "flag": "PASS", "observed": "",
+                 "expected": "", "recommendation": ""},
+                {"id": "CR-03", "category": "Creative Performance", "name": "c",
+                 "severity": "Critical", "flag": "PARTIAL", "observed": "",
+                 "expected": "", "recommendation": ""}],
+            "findings": [],
+        })
+        mismatches = []
+        with tempfile.TemporaryDirectory() as td:
+            for i, p in enumerate(cases):
+                model = audit_model.compute_model(copy.deepcopy(p))
+                x = Path(td) / ("d%02d.xlsx" % i)
+                bax.build(copy.deepcopy(p)).save(x)
+                out = Path(td) / ("r%02d" % i)
+                out.mkdir()
+                ws = _lw2(_recalc(x, out), data_only=True)["01_Executive_Summary"]
+                xl_score, xl_grade = ws["B3"].value, ws["B4"].value
+                py_score = model["health"]["score"]
+                py_grade = model["health"]["grade"]
+                # `float(xl_score or 0)` would turn an UNEVALUATED cell (None)
+                # into 0.0 and pass vacuously against an all-N/A payload whose
+                # model health is also 0.0 — the sweep must fail, not shrug,
+                # when the workbook computed nothing. And the tolerance is exact
+                # (1e-9, not 0.05): both sides now round with audit_model.round1
+                # / Excel ROUND, so ANY difference is a real divergence. A loose
+                # tolerance here would have hidden exactly the .x5 tie this
+                # section exists to catch.
+                if xl_score is None:
+                    mismatches.append("case %d: xlsx B3 did not evaluate" % i)
+                elif not approx(float(xl_score), py_score, 1e-9) \
+                        or xl_grade != py_grade:
+                    mismatches.append("case %d: python %r/%s vs xlsx %r/%s"
+                                      % (i, py_score, py_grade, xl_score, xl_grade))
+        check("recalculated xlsx health+grade == audit_model for all %d payloads"
+              % len(cases), not mismatches, "; ".join(mismatches[:4]))
+
+        # The sweep above compares the HEADLINE only, which is how a lever score
+        # displaying 11.25 beside the md's 11.3 slipped through: D's value is
+        # deliberately unrounded (health reads it), so parity there is about the
+        # DISPLAY rule. Assert the number_format that carries it.
+        tie = {"meta": {"account_id": "1", "account_name": "Disp", "currency": "USD",
+                        "business_model": "Lead Gen", "generated_for_date": "2026-07-15",
+                        "windows": {"structure": "", "creative": "", "trend": ""},
+                        "auditor": "t", "out_of_scope": []},
+               "checks": [
+                   {"id": "CR-05", "category": "Creative Performance", "name": "b",
+                    "severity": "High", "flag": "FLAG"},
+                   {"id": "CR-02", "category": "Creative Performance", "name": "a",
+                    "severity": "Medium", "flag": "FLAG"},
+                   {"id": "CR-03", "category": "Creative Performance", "name": "c",
+                    "severity": "Critical", "flag": "FAIL"},
+                   {"id": "CR-06", "category": "Creative Performance", "name": "d",
+                    "severity": "Critical", "flag": "FAIL"},
+                   {"id": "CR-07", "category": "Creative Performance", "name": "e",
+                    "severity": "Critical", "flag": "FAIL"},
+                   {"id": "CR-08", "category": "Creative Performance", "name": "f",
+                    "severity": "Low", "flag": "FAIL"}],
+               "findings": []}
+        with tempfile.TemporaryDirectory() as td2:
+            xt = Path(td2) / "disp.xlsx"
+            bax.build(copy.deepcopy(tie)).save(xt)
+            ws_f = _lw2(xt)["01_Executive_Summary"]
+            fmts, raw = {}, {}
+            for rr2 in range(7, 14):
+                nm = ws_f.cell(row=rr2, column=1).value
+                if nm:
+                    fmts[nm] = ws_f.cell(row=rr2, column=4).number_format
+            out2 = Path(td2) / "rc"
+            out2.mkdir()
+            ws_v = _lw2(_recalc(xt, out2), data_only=True)["01_Executive_Summary"]
+            for rr2 in range(7, 14):
+                nm = ws_v.cell(row=rr2, column=1).value
+                if nm:
+                    raw[nm] = ws_v.cell(row=rr2, column=4).value
+            model_t = audit_model.compute_model(copy.deepcopy(tie))
+            cr_t = [s for s in model_t["sections"] if s["code"] == "CR"][0]
+            check("lever Score cell keeps the UNROUNDED value (health SUMPRODUCT reads it)",
+                  approx(raw.get("Creative Performance"), 11.25, 1e-9),
+                  str(raw.get("Creative Performance")))
+            check("lever Score cell rounds for DISPLAY to match the model's score_pct",
+                  fmts.get("Creative Performance") == "0.0" and cr_t["score_pct"] == 11.3,
+                  "fmt=%r score_pct=%r" % (fmts.get("Creative Performance"),
+                                           cr_t["score_pct"]))
+
+
+# ============================================================================
+print("--- 14: build_audit end-to-end (the orchestrator seam) ---")
+#
+# Every section above tests a leaf module. build_audit.py — which uniquely owns
+# window plumbing, raw/csv exclusion, the prescore->model wiring and the final
+# JSON line — had NO coverage, and that is exactly where the honest-window
+# violation lived: it seeded concentration's window labels from the payload's
+# REQUESTED preset ("last_30d"), so a 7-day pull could be labelled "last_30d".
+# Unit fixtures could never catch it because they hand compute_concentration
+# the correct labels the real caller never produced.
+#
+# The fixtures make a clean discriminator: sample-payload's meta.windows say
+# "last_30d"/"last_90d" while the captured pulls carry real dates.
+_BUILD = SCRIPTS / "build_audit.py"
+with tempfile.TemporaryDirectory() as td:
+    raw = Path(td) / "raw"
+    raw.mkdir()
+    for key, fname in (("campaigns", "raw_shape_campaigns.json"),
+                       ("adsets", "raw_shape_adsets.json"),
+                       ("ads", "raw_shape_ads.json")):
+        shutil.copy(FIX / fname, raw / (key + ".json"))
+    out = Path(td) / "out"
+    proc = subprocess.run(
+        [sys.executable, str(_BUILD), "--input", str(HERE / "sample-payload.json"),
+         "--outdir", str(out), "--brand", "E2E", "--formats", "md,html",
+         "--raw-dir", str(raw), "--business-model", "Lead Gen",
+         "--no-downloads"],  # never write to a real ~/Downloads from tests
+        capture_output=True, text=True, timeout=180)
+    check("build_audit exits 0 with raw pulls + payload", proc.returncode == 0,
+          proc.stderr[-400:])
+    tail = json.loads(proc.stdout.strip().splitlines()[-1])
+    check("final stdout line is the JSON contract "
+          "(outputs/health/grade/checks/findings/prescore_corrections)",
+          {"outputs", "health", "grade", "checks", "findings",
+           "prescore_corrections"} <= set(tail), proc.stdout[-200:])
+    html_e2e = Path(tail["outputs"]["html"]).read_text(encoding="utf-8")
+    model_e2e = json.loads(re.search(
+        r'<script id="data" type="application/json">(.*?)</script>',
+        html_e2e, re.S).group(1).replace("<\\/", "</"))
+    wins = {d["key"]: d["window"] for d in model_e2e["concentration"]["dimensions"]}
+    check("concentration windows are DATA-derived, never the requested preset",
+          all(re.match(r"^\d{4}-\d{2}-\d{2} – \d{4}-\d{2}-\d{2}$", w)
+              for w in wins.values()), str(wins))
+    check("no dimension is labelled with a preset string from meta.windows",
+          not any(w in ("last_30d", "last_90d", "last_7d") for w in wins.values()),
+          str(wins))
+    check("an unknown --formats value fails loudly instead of writing nothing "
+          "and exiting 0",
+          subprocess.run(
+              [sys.executable, str(_BUILD), "--input", str(HERE / "sample-payload.json"),
+               "--outdir", str(out), "--formats", "pdf", "--no-downloads"],
+              capture_output=True, text=True, timeout=120).returncode == 1)
+    check("the ads window reports the pull's OWN captured span",
+          wins.get("ads") == "2026-04-12 – 2026-07-10", str(wins.get("ads")))
+    check("--no-downloads honoured: bundle written only to --outdir",
+          sorted(p.suffix for p in out.iterdir()) == [".html", ".md"],
+          str(sorted(p.name for p in out.iterdir())))
+    # The raw/csv exclusion is a guard the orchestrator alone enforces.
+    bad = subprocess.run(
+        [sys.executable, str(_BUILD), "--input", str(HERE / "sample-payload.json"),
+         "--outdir", str(out), "--formats", "md", "--raw-dir", str(raw),
+         "--csv-dir", str(raw), "--no-downloads"],
+        capture_output=True, text=True, timeout=120)
+    check("--raw-* and --csv-* are mutually exclusive (exit 1, named reason)",
+          bad.returncode == 1 and "not both" in bad.stderr, bad.stderr[-200:])
 
 print()
 if SKIPS:

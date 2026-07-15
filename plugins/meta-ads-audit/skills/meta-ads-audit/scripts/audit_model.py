@@ -34,7 +34,26 @@ clock in this module (`generated` / meta.generated_for_date are inputs).
 """
 from __future__ import annotations
 
+import math
 import re
+
+
+def round1(x: float) -> float:
+    """Percent to 1dp, rounding half UP — the rule Excel and JS both use.
+
+    Python's built-in round() is banker's: round(62.25, 1) == 62.2, while
+    Excel's ROUND(62.25,1) == 62.3. Three runtimes, three rounding rules, and a
+    score landing on a .x5 boundary printed 62.2 in the model and 62.3 in the
+    workbook — the same class of divergence as an unrounded grade cell, one
+    decimal over.
+
+    The xlsx cannot simply be handed Python's number: its Health Score is a LIVE
+    formula (edit a Flag in Excel and the score moves), which is the workbook's
+    whole point. So the three share the RULE instead, and the kernel adopts
+    Excel's. Scores are never negative, so half-up == half-away-from-zero.
+    Ported verbatim from google-ads-audit's audit_model.round1.
+    """
+    return math.floor(x * 10 + 0.5) / 10
 
 # --- Canonical scoring constants (mirrored verbatim by audit_html.py's JS kernel,
 #     and imported by build_audit_xlsx.py; parity is asserted in tests) -----------
@@ -69,6 +88,16 @@ SECTIONS = [
 # contributes nothing to either sum even when it carries scorable checks.
 SECTION_WEIGHTS = {"DI": 20.0, "AR": 20.0, "BP": 15.0, "AT": 10.0, "CR": 25.0,
                    "CO": 0.0, "FP": 10.0}
+
+# Qualitative levers: no scored workbook tab, and weight PINNED to 0 in every
+# renderer. THE single declaration — build_audit_xlsx derives ANALYSIS_TABS,
+# COMPETITIVE_TAB, DEFAULT_CATEGORY_WEIGHTS and its exec-summary rows from this,
+# and compute_model refuses to weight them. "CO is special" used to be spelled
+# out in six places across two files; a seventh reader would have had to
+# rediscover it, and any one of them drifting reintroduces a health score the
+# workbook cannot reproduce (a payload weight for CO moved md/html while the
+# xlsx, which builds no CO row, could not follow).
+UNSCORED_SECTIONS = frozenset({"CO"})
 
 _CHECK_KEYS = ("id", "name", "severity", "flag", "observed", "expected",
                "recommendation")
@@ -236,13 +265,26 @@ def compute_model(payload: dict, *, brand: str = "", generated: str | None = Non
         total_possible += sec_possible
 
         weight_default = SECTION_WEIGHTS[code]
-        weight_raw = overrides.get(cat, weight_default)
-        try:
-            weight = float(weight_raw)
-        except (TypeError, ValueError):
-            warnings.append("category_weights[%r]: non-numeric %r -> default %.1f"
-                            % (cat, weight_raw, weight_default))
-            weight = weight_default
+        # An unscored lever is structurally weight-0: the workbook builds no row
+        # for it, so a nonzero weight is a value ONLY this function could honour
+        # — health would move in md/html while the xlsx, unable to represent it,
+        # disagreed. Pinned here from UNSCORED_SECTIONS rather than trusted to
+        # callers or to SECTION_WEIGHTS staying 0.
+        if code in UNSCORED_SECTIONS:
+            if cat in overrides:
+                warnings.append(
+                    "category_weights[%r]: %s is qualitative and always weight 0 "
+                    "(the workbook builds no scored tab for it) -> %r ignored"
+                    % (cat, cat, overrides[cat]))
+            weight = 0.0
+        else:
+            weight_raw = overrides.get(cat, weight_default)
+            try:
+                weight = float(weight_raw)
+            except (TypeError, ValueError):
+                warnings.append("category_weights[%r]: non-numeric %r -> default %.1f"
+                                % (cat, weight_raw, weight_default))
+                weight = weight_default
 
         score_s = (sec_earned / sec_possible * 100.0) if sec_possible > 0 else None
         included = sec_possible > 0
@@ -260,13 +302,23 @@ def compute_model(payload: dict, *, brand: str = "", generated: str | None = Non
             "checks": checks_out,
             "earned": round(sec_earned, 4),
             "possible": round(sec_possible, 4),
-            "score_pct": (round(score_s, 1) if score_s is not None else None),
+            # round1, not round(): the HTML and md display this verbatim, and
+            # the workbook's D cell shows the same lever score rounded for
+            # display by Excel's half-away rule ("0.0" number_format, set in
+            # build_exec_summary — the value itself stays unrounded because the
+            # health SUMPRODUCT reads it). round() is half-even, so an exact .x5
+            # lever score (2.25/20 = 11.25) printed 11.2 here and 11.3 there.
+            "score_pct": (round1(score_s) if score_s is not None else None),
             "evidence": evidence_in.get(section_key) or None,
         })
 
     # Round ONCE, at the end, from unrounded section scores (Excel wscore_/wbase_
     # parity). Denominator 0 (nothing included, or only weight-0 levers) → 0.0.
-    score = round(weighted_num / weighted_den, 1) if weighted_den > 0 else 0.0
+    # round1 shares Excel's rule — the workbook computes this same quotient in a
+    # LIVE formula and rounds it with ROUND(), so the kernel must round the same
+    # way or a .x5 boundary ships two different numbers (and, at a cutoff, two
+    # different grades).
+    score = round1(weighted_num / weighted_den) if weighted_den > 0 else 0.0
     letter = grade(score)
 
     # --- findings: ICE defaults + priority + roadmap bucket ----------------------

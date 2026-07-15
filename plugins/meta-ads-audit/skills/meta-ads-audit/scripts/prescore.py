@@ -1016,14 +1016,25 @@ def merge_into_findings(payload: dict, prescore: dict | None
     check row (category from the SECTIONS prefix map, framework name/expected,
     empty recommendation) when the model omitted it. Category B: fill observed
     only when blank. KPI rows: replace by casefolded metric name in
-    payload["kpis"] (created if absent), append unmatched. Returns
-    (merged_payload, model_block, stderr_log_lines)."""
+    payload["kpis"] (created if absent), append unmatched.
+
+    NOTE the name is historical: this enforces machine results over the
+    payload's checks / observed / kpis. It does NOT rewrite payload["findings"]
+    — those stay model-authored. It does report every check it MOVED whose
+    narrative no longer follows, in both directions, as
+    block["unreconciled"] = [{id, result, reason}] (reason "missing": scored
+    FAIL/FLAG with no finding covering it; reason "cleared": scored PASS/N-A
+    while a finding still argues it) plus a WARNING log line each, so a moved
+    score never ships beside stale prose.
+
+    Returns (merged_payload, model_block, stderr_log_lines)."""
     if prescore is None:
         return payload, None, []
     merged = copy.deepcopy(payload)
     checks_list = merged.setdefault("checks", [])
     applied, injected, evidence_filled, kpis_replaced = [], [], [], []
     corrected, log = [], []
+    landed: dict = {}   # cid -> canonical machine result, filled in the loop below
 
     def find_check(cid):
         for c in checks_list:
@@ -1066,6 +1077,10 @@ def merge_into_findings(payload: dict, prescore: dict | None
             row["observed"] = p["observed"]
             row["severity"] = sev
         applied.append(cid)
+        # Canonical landing value, captured where it is already computed —
+        # re-deriving it later from prescore["checks"] invited a second, subtly
+        # different canonicalization of the same field.
+        landed[cid] = res
 
     for cid in sorted(prescore.get("evidence", {})):
         row = find_check(cid)
@@ -1085,10 +1100,57 @@ def merge_into_findings(payload: dict, prescore: dict | None
             else:
                 kpi_list.append(dict(row))
 
+    # --- reconcile the NARRATIVE against the corrections -----------------------
+    # The score is machine-enforced, but findings[] — the ICE-ranked roadmap the
+    # advisor reads aloud (SKILL.md step 8: "the top 3-5 quick wins") — is
+    # model-authored and nothing here rewrites it. So a check corrected
+    # PASS->FAIL moves the Health Score while the prose beside it still argues
+    # the overturned verdict, and an injected FAIL can enter the deliverable
+    # with no finding at all. We do NOT fabricate a finding (that judgment is
+    # the model's); we surface the gap loudly so it cannot pass unnoticed.
+    # Findings carry no check-id field, so match on the id appearing anywhere in
+    # the finding's own text — deliberately generous: a false "reconciled" is
+    # quiet, a false "unreconciled" is merely a nudge.
+    def _mentions(cid):
+        for f in merged.get("findings", []) or []:
+            if not isinstance(f, dict):
+                continue
+            blob = " ".join(str(f.get(k, "")) for k in
+                            ("title", "evidence", "recommendation", "id"))
+            if cid in blob:
+                return True
+        return False
+
+    # Drift runs BOTH ways, and only reporting one direction is half a feature:
+    #   missing — machine says FAIL/FLAG and no finding covers it. The score
+    #             dropped; the roadmap is silent about why.
+    #   cleared — machine says PASS/N-A and a finding still argues the problem.
+    #             The score rose; the roadmap still tells the client to fix
+    #             something the data says is fine. Real and routine: a live run
+    #             logs `AR-02 FAIL->PASS` and `AR-01 FLAG->PASS`.
+    # Only checks the machine actually MOVED (corrected) or added (injected) are
+    # candidates — an untouched check agreeing with its finding is not drift.
+    changed = {c["id"] for c in corrected} | set(injected)
+    unreconciled = []
+    for cid in sorted(changed):
+        res = landed.get(cid, "")
+        mentioned = _mentions(cid)
+        if res in ("FAIL", "FLAG") and not mentioned:
+            unreconciled.append({"id": cid, "result": res, "reason": "missing"})
+            log.append(f"prescore: WARNING {cid} machine-scored {res} but no "
+                       "finding mentions it — the score moved, the narrative "
+                       "did not")
+        elif res not in ("FAIL", "FLAG") and mentioned:
+            unreconciled.append({"id": cid, "result": res, "reason": "cleared"})
+            log.append(f"prescore: WARNING {cid} machine-scored {res} but a "
+                       "finding still argues it — drop or amend that finding, "
+                       "or the report tells the client to fix a non-problem")
+
     block = {"applied": sorted(applied), "corrected": corrected,
              "injected": sorted(injected),
              "evidence_filled": sorted(evidence_filled),
              "kpis_replaced": sorted(kpis_replaced),
+             "unreconciled": unreconciled,
              "skipped": prescore.get("skipped", []),
              "notes": prescore.get("notes", [])}
     return merged, block, log

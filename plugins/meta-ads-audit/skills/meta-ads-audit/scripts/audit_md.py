@@ -22,6 +22,15 @@ def _c(s) -> str:
     return str("" if s is None else s).replace("|", "\\|").replace("\n", " ").strip()
 
 
+def _y(s) -> str:
+    """One YAML double-quoted scalar, escaped. Client-controlled strings (account
+    name above all) reach the frontmatter, and a stray `"` there silently breaks
+    the whole block for any vault parser."""
+    out = str("" if s is None else s).replace("\\", "\\\\").replace('"', '\\"')
+    out = out.replace("\n", " ").replace("\r", " ")
+    return '"%s"' % out
+
+
 def _row(cells) -> str:
     return "| " + " | ".join(_c(c) for c in cells) + " |"
 
@@ -55,17 +64,21 @@ def render_md(model: dict) -> str:
     L: list[str] = []
 
     # --- frontmatter ---
+    # Every quoted scalar goes through _y: an account name containing a double
+    # quote (Acme "Prime" Ltd) would otherwise close the string early and leave
+    # the whole block unparseable — which defeats the point of an
+    # Obsidian-ingestible record, and account names are client-controlled.
     L += [
         "---",
-        f'title: "Meta Ads Audit — {P.get("account_name","")}"',
-        f'client: "{P.get("account_name","")}"',
-        f'account: "{P.get("account_id","")}"',
+        f'title: {_y("Meta Ads Audit — " + str(P.get("account_name","")))}',
+        f'client: {_y(P.get("account_name",""))}',
+        f'account: {_y(P.get("account_id",""))}',
         f"health_score: {H['score']}",
-        f'grade: "{grade_letter}"',
-        f'business_model: "{P.get("business_model","")}"',
-        f'window_structure: "{windows.get("structure","")}"',
-        f'window_creative: "{windows.get("creative","")}"',
-        f'generated: "{P.get("generated","")}"',
+        f'grade: {_y(grade_letter)}',
+        f'business_model: {_y(P.get("business_model",""))}',
+        f'window_structure: {_y(windows.get("structure",""))}',
+        f'window_creative: {_y(windows.get("creative",""))}',
+        f'generated: {_y(P.get("generated",""))}',
         "tags: [meta-ads, audit]",
         "---",
         "",
@@ -272,6 +285,27 @@ def render_md(model: dict) -> str:
             ids = ", ".join(c["id"] for c in PS["corrected"])
             line += f" · corrections applied over the drafted findings: {ids}"
         L += [line + "._", ""]
+        # Machine-vs-narrative drift belongs IN the record, not only on stderr:
+        # this section is the auditor's working copy, and an unreconciled check
+        # means the score and the roadmap disagree about the same account.
+        unrec = PS.get("unreconciled") or []
+        if unrec:
+            L += ["> [!warning] Findings not reconciled with the machine results",
+                  "> The Health Score reflects these corrections; the findings "
+                  "below were written before them. Resolve each before sending:"]
+            for u in unrec:
+                # .get, not [] — the xlsx twin of this block already reads the
+                # same rows defensively, and a renderer is the wrong place to
+                # raise over a malformed note.
+                uid, res = u.get("id", ""), u.get("result", "")
+                if u.get("reason") == "cleared":
+                    L.append(f"> - **{uid}** scored **{res}** by the pre-scorer, "
+                             "but a finding still argues it — drop or amend that "
+                             "finding.")
+                else:
+                    L.append(f"> - **{uid}** scored **{res}** by the pre-scorer, "
+                             "but no finding covers it — add one.")
+            L.append("")
     L += ["---",
           f"_Generated {P.get('generated','')} · self-contained interactive HTML and a "
           f"formula-driven .xlsx accompany this record._", ""]

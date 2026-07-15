@@ -71,9 +71,10 @@ def _load_input_rows(args) -> tuple[dict, dict, dict] | None:
     ads / adsets_7d entity row lists plus datasets (deduped list) and
     dataset_quality ({channel: [events]}) — the latter two raw-path only.
     windows carries per-dimension labels only on the CSV path (each file's own
-    date range); the raw path's labels come from findings meta. CR-07's
-    window mode needs no plumbing here — prescore derives window_days from
-    the rows' own date_start/date_stop."""
+    date range); on the raw path it stays empty so concentration derives each
+    label from the rows' own date_start..date_stop (never the requested
+    preset). CR-07's window mode needs no plumbing here — prescore derives
+    window_days from the rows' own date_start/date_stop."""
     use_csv = any([args.csv_campaigns, args.csv_adsets, args.csv_ads,
                    args.csv_dir])
     if use_csv:
@@ -205,6 +206,21 @@ def main() -> int:
                          "--csv-* (UI exports), not both.\n")
         return 1
 
+    # Validate --formats HERE, beside the other argument guards and BEFORE any
+    # work: `--formats pdf` used to parse the payload, load every raw pull, run
+    # concentration + creative signals + the pre-scorer, print all the
+    # `prescore: …` correction lines, build the model — and only then discover
+    # it had nothing to write. (It also exited 0 with an empty outputs{}, which
+    # reads as a successful build until you look for the file.)
+    formats = [f.strip().lower() for f in args.formats.split(",") if f.strip()]
+    unknown = [f for f in formats if f not in ("html", "md", "xlsx")]
+    if unknown or not formats:
+        sys.stderr.write("ERROR: --formats takes a comma-separated subset of "
+                         "html,md,xlsx%s\n"
+                         % ("" if not unknown else " — unknown: "
+                            + ", ".join(repr(f) for f in unknown)))
+        return 1
+
     meta = findings.get("meta", {}) or {}
     conc = cs = pres = None
     try:
@@ -214,10 +230,15 @@ def main() -> int:
         return 1
     if loaded:
         rows, files, windows = loaded
-        if not csv_given:  # raw path: window labels come from findings meta
-            wmeta = dict(meta.get("windows", {}) or {})
-            windows = {k: wmeta[k] for k in ("structure", "creative")
-                       if wmeta.get(k)}
+        # NOTE: the raw path deliberately leaves `windows` empty so
+        # concentration falls back to _window_from_rows — the rows' own
+        # date_start..date_stop span. Do NOT seed it from meta["windows"]:
+        # those are the REQUESTED presets ("last_30d"), not what the file
+        # holds, and SKILL.md's honest-window rule is explicit that "every
+        # window label comes from the data … never from the requested preset".
+        # Seeding them here also routed payload text into a block documented as
+        # deriving exclusively from the raw pulls, and mislabeled a 7-day pull
+        # as "last_30d". The CSV path supplies real per-file ranges instead.
         if any(rows[k] is not None for k in _ENTITY_KEYS):
             conc = conc_mod.compute_concentration(
                 campaign_rows=rows["campaigns"], adset_rows=rows["adsets"],
@@ -256,7 +277,6 @@ def main() -> int:
     outdir = Path(args.outdir).expanduser()
     outdir.mkdir(parents=True, exist_ok=True)
 
-    formats = [f.strip().lower() for f in args.formats.split(",") if f.strip()]
     written: dict[str, str] = {}
 
     if "html" in formats:
@@ -280,7 +300,8 @@ def main() -> int:
             p = outdir / f"{stem}.xlsx"
             try:
                 wb = build_audit_xlsx.build(findings, concentration=conc,
-                                            creative_signals=cs)
+                                            creative_signals=cs,
+                                            prescore=pres_block)
                 wb.save(p)
             except Exception as e:  # noqa: BLE001 — exit 2 per contract
                 sys.stderr.write(f"ERROR: xlsx build failed: {e}\n")
