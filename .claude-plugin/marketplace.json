@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "hivemind-plugins",
   "version": "1.0.0",
-  "description": "Clickt's HiveMind plugins for Claude Code — one marketplace bundling five marketing deliverables (Google Ads, Meta, and Shopify CRO account audits + the CM3 per-product contribution-margin report + the wPPC weighted-profit-per-click report) and three workflow plugins (project coordinator, social media manager, and daily morning briefing) that run on Linear, Gmail, and Google Calendar.",
+  "description": "Clickt's HiveMind plugins for Claude Code — one marketplace bundling five marketing deliverables (Google Ads, Meta, and Shopify CRO account audits + the CM3 per-product contribution-margin report + the wPPC weighted-profit-per-click report) and four workflow plugins (decision memos, project coordinator, social media manager, and daily morning briefing) — most running on Linear, Gmail, and Google Calendar.",
   "owner": {
     "name": "Clickt Digital Marketing Inc.",
     "url": "https://clickt.ca"
@@ -42,6 +42,13 @@
       "version": "2.0.0",
       "category": "marketing",
       "description": "Ongoing, cadence-based Google Ads management as done-with-you advisors — dual input (read-only Google Ads MCP or a user CSV export), fronted by an interactive in-Claude menu: invoke 'manage Google Ads' to open the google-ads hub, which lists every task and routes to it. A shared foundation (account selection, GAQL cookbook, 2026 benchmarks, dual-input + advisor output contract) plus account health & red flags, budget pacing, bidding strategy, keywords/search terms, Quality Score forensics, audience targeting, conversions & tracking, performance reporting, competitive analysis, PMax campaigns, PMax listing groups, and product performance. Diagnoses account data against thresholds behind a transcription firewall, then leads a prioritized recommendation loop and offers ready-to-apply Google Ads Editor CSVs — emitting the md + interactive-HTML + tunable-xlsx bundle (or a reduced md + xlsx bundle for account health & audience targeting), with Node<->Python kernel parity across every tunable skill. HTML + markdown are standard-library only; the xlsx backup needs openpyxl and the static chart SVGs need vl-convert-python."
+    },
+    {
+      "name": "memo",
+      "source": "./plugins/memo",
+      "version": "0.2.0",
+      "category": "productivity",
+      "description": "Turn a raw idea into a decision memo a director can act on in one read. Asked to \"write this up for the directors\", agents reliably produce a fluent memo full of [X hours] placeholders and invented specifics — plans, phases, benchmarks the teammate never said — delivered under their name. This inverts the order: the interrogation is the product, the memo is the receipt. Gates prose behind questioning, scales depth to stakes (a meeting-time change gets three questions; a budget-committing build gets the full treatment), marks every claim measured/estimated/assumed/derived with derived figures inheriting their weakest input, and runs a nine-test adversarial battery — including one aimed at the drafter's own arithmetic — before recommending anything. Emits a single markdown memo: the ask first, real options including doing nothing, a reasoned recommendation, and an honest account of what would kill it."
     },
     {
       "name": "project-coordinator",

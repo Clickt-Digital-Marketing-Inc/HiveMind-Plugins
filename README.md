@@ -39,6 +39,7 @@ servers.
 
 | Plugin | What it does | Runs on |
 | --- | --- | --- |
+| **memo** | Interrogate a raw idea, scale the depth to the stakes, pressure-test it against the objections a director would actually raise, then write a decision memo: the ask first, real options, a reasoned recommendation, and an honest account of what would kill it. Every claim marked measured/estimated/assumed/derived. | Nothing — no MCP, no Python |
 | **project-coordinator** | Refine an idea into a brief, plan the work into Linear, structure the project folder, and keep every issue executable as a standalone prompt (software or marketing projects). | Linear MCP |
 | **social-media-manager** | Plan a batch of posts: trend scan (Reddit + news), a voice-true interview that builds a persistent voice profile, then a writing prompt + a Higgsfield media prompt per post, each filed as a scheduled Linear issue. | Linear MCP + web |
 | **morning-briefing** | Summarize Gmail and draft replies, report Linear progress + blockers, prioritize your issues, block focus time on your calendar, and flag 3-week time-off bottlenecks. | Gmail + Linear + Google Calendar MCPs |
@@ -68,6 +69,7 @@ servers.
    /plugin install shopify-cro-audit@hivemind-plugins
    /plugin install cm3-profitability@hivemind-plugins
    /plugin install google-ads-management@hivemind-plugins
+   /plugin install memo@hivemind-plugins
    /plugin install project-coordinator@hivemind-plugins
    /plugin install social-media-manager@hivemind-plugins
    /plugin install morning-briefing@hivemind-plugins
@@ -77,8 +79,9 @@ servers.
      `google-ads-management` also needs `vl-convert-python==1.7.0` for its charts, and
      `cm3-profitability` needs `pip install python-pptx vl-convert-python==1.7.0`.
    - *Workflow plugins*: no Python. Connect the MCP servers they use: Linear
-     (all three), plus Gmail + Google Calendar (morning-briefing) and web access
-     (social-media-manager).
+     (project-coordinator, social-media-manager, morning-briefing), plus Gmail +
+     Google Calendar (morning-briefing) and web access (social-media-manager).
+     `memo` needs nothing — it writes a markdown file and stops.
 
 ## Requirements
 
