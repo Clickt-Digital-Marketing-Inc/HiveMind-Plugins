@@ -38,7 +38,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 try:
@@ -55,10 +58,15 @@ except ImportError:  # pragma: no cover - environment guard
     sys.exit(2)
 
 # Scoring constants + the analysis-tab list are single-sourced in audit_model so the
-# xlsx formulas, the markdown, and the HTML explorer can never disagree.
+# xlsx formulas, the markdown, and the HTML explorer can never disagree. The formula
+# builders below INTERPOLATE these values rather than restating them, which is what
+# makes that claim structurally true instead of merely intended.
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from audit_model import SEVERITY_WEIGHTS, SEVERITY_IMPACT, ANALYSIS_TABS  # noqa: E402
+from audit_model import (  # noqa: E402
+    SEVERITY_WEIGHTS, FLAG_SCORES, SEVERITY_IMPACT, GRADE_CUTOFFS, ANALYSIS_TABS,
+    DEFAULT_SEVERITY, DEFAULT_IMPACT, normalize_findings,
+)
 
 # --------------------------------------------------------------------------
 # Palette — Clickt org-wide design system (teal / lime / purple + ember signal)
@@ -87,7 +95,7 @@ BORDER = Border(left=THIN, right=THIN, top=THIN, bottom=THIN)
 WRAP_TOP = Alignment(wrap_text=True, vertical="top")
 CENTER = Alignment(horizontal="center", vertical="center")
 
-# SEVERITY_WEIGHTS, SEVERITY_IMPACT, ANALYSIS_TABS are imported from audit_model above.
+# Scoring constants and ANALYSIS_TABS are imported from audit_model above.
 ALL_TABS = (
     ["00_README", "01_Audit_Scope", "02_Data_Inventory"]
     + [name for name, _ in ANALYSIS_TABS]
@@ -243,16 +251,48 @@ def build_data_inventory(wb, inventory):
     ws.freeze_panes = "A4"
 
 
+def _num(v) -> str:
+    """5.0 -> '5', 1.5 -> '1.5'. Keeps interpolated formulas free of float noise."""
+    return str(int(v)) if float(v) == int(v) else str(v)
+
+
+def _lookup_formula(cell: str, pairs, fallback: str) -> str:
+    """=IF(cell="k1",v1,IF(cell="k2",v2,...,fallback)) generated from `pairs`.
+
+    Generated, not restated: change a weight in audit_model and the workbook
+    formula changes with it. Editing one side only — the drift these builders
+    exist to prevent — is no longer expressible.
+    """
+    expr = fallback
+    for key, val in reversed(list(pairs)):
+        expr = f'IF({cell}="{key}",{val},{expr})'
+    return f"={expr}"
+
+
 # Check-table columns: A=Check B=verify C=applies D=Severity E=Result
 # F=Observed G=Recommendation H=SevWeight I=Flag J=Earned K=Possible
 def _severity_weight_formula(row):
-    return (f'=IF(D{row}="Critical",5,IF(D{row}="High",3,'
-            f'IF(D{row}="Medium",1.5,IF(D{row}="Low",0.5,0))))')
+    return _lookup_formula(f"D{row}",
+                           [(s, _num(w)) for s, w in SEVERITY_WEIGHTS.items()], "0")
 
 
 def _flag_formula(row):
-    return (f'=IF(E{row}="PASS",1,IF(E{row}="FLAG",0.5,'
-            f'IF(E{row}="FAIL",0,"")))')
+    return _lookup_formula(f"E{row}",
+                           [(r, _num(v)) for r, v in FLAG_SCORES.items()], '""')
+
+
+def _grade_formula(cell: str) -> str:
+    """=IF(NOT(ISNUMBER(B3)),"",IF(B3>=90,"A",...,"F")) from GRADE_CUTOFFS.
+
+    Last GRADE_CUTOFFS pair is the catch-all. The ISNUMBER guard is load-bearing:
+    when nothing is scoreable B3 is blank, and Excel ranks text above every number,
+    so a bare `B3>=90` would grade an unscored audit "A".
+    """
+    *bands, (_, fallback) = GRADE_CUTOFFS
+    expr = f'"{fallback}"'
+    for cutoff, letter in reversed(bands):
+        expr = f'IF({cell}>={_num(cutoff)},"{letter}",{expr})'
+    return f'=IF(NOT(ISNUMBER({cell})),"",{expr})'
 
 
 def _earned_formula(row):
@@ -405,7 +445,10 @@ def build_ice(wb, findings, log_first):
         ws.cell(row=r, column=1, value=f"='12_Findings_Log'!A{log_row}").border = BORDER
         ws.cell(row=r, column=2, value=f"='12_Findings_Log'!C{log_row}").alignment = WRAP_TOP
         ws.cell(row=r, column=3, value=f"='12_Findings_Log'!D{log_row}").alignment = CENTER
-        imp = ws.cell(row=r, column=4, value=SEVERITY_IMPACT.get(f.get("severity", ""), 5))
+        # Same default as audit_model's impact seed — a mismatch here put one finding
+        # at the bottom of the HTML's ICE list and mid-table in this one.
+        imp = ws.cell(row=r, column=4, value=SEVERITY_IMPACT.get(
+            f.get("severity", DEFAULT_SEVERITY), DEFAULT_IMPACT))
         imp.alignment = CENTER
         cc = ws.cell(row=r, column=5)
         cc.fill = FILL_HILITE
@@ -560,10 +603,10 @@ def build_health_score(wb, analysis_sheets):
     ws.cell(row=r, column=3, value=f"=SUM(C{first}:C{last})")
     total_row = r
     # Wire the top-line cells to the totals.
+    # Blank, not 0, when nothing is scoreable — mirrors the model's score=None.
     ws.cell(row=3, column=2,
-            value=f'=IF(C{total_row}=0,0,ROUND(B{total_row}/C{total_row}*100,1))')
-    ws.cell(row=4, column=2, value=(
-        '=IF(B3>=90,"A",IF(B3>=75,"B",IF(B3>=60,"C",IF(B3>=40,"D","F"))))'))
+            value=f'=IF(C{total_row}=0,"",ROUND(B{total_row}/C{total_row}*100,1))')
+    ws.cell(row=4, column=2, value=_grade_formula("B3"))
     ws.cell(row=3, column=2).font = Font(name="Calibri", size=14, bold=True)
     ws.cell(row=4, column=2).font = Font(name="Calibri", size=14, bold=True)
 
@@ -635,6 +678,9 @@ def build(findings_path: Path, output_path: Path, brand: str | None, *,
     # findings_data lets the orchestrator pass prescore-merged findings so the
     # xlsx agrees with the html/md; standalone CLI use still reads the file.
     data = findings_data if findings_data is not None else json.loads(findings_path.read_text())
+    # Canonicalize before any result reaches a cell: this tab's formulas compare with
+    # Excel's case-INSENSITIVE `=`, so "Fail" would score here but not in the model.
+    data, _ = normalize_findings(data)
     meta = dict(data.get("meta", {}))
     if brand:
         meta["client_name"] = brand
@@ -671,8 +717,43 @@ def build(findings_path: Path, output_path: Path, brand: str | None, *,
     return 0
 
 
-def check(path: Path) -> int:
-    """Structural quality gate for an existing workbook."""
+XL_ERRORS = ("#REF!", "#NAME?", "#VALUE!", "#DIV/0!", "#NUM!", "#NULL!")
+
+
+def _find_soffice() -> str | None:
+    return (shutil.which("soffice") or shutil.which("libreoffice")
+            or next((p for p in
+                     ("/Applications/LibreOffice.app/Contents/MacOS/soffice",)
+                     if Path(p).is_file()), None))
+
+
+def _recalculated(path: Path, soffice: str):
+    """LibreOffice-recalculated copy of `path`, loaded data_only. None on failure.
+
+    openpyxl writes no cached values, so a data_only load of our own output reads
+    every cell as None — the arithmetic is invisible until something recalculates
+    it. That is why the structural gate alone cannot see a #VALUE!.
+    """
+    with tempfile.TemporaryDirectory() as td:
+        proc = subprocess.run(
+            [soffice, "--headless", "--convert-to", "xlsx", "--outdir", td, str(path)],
+            capture_output=True, timeout=300)
+        out = Path(td) / path.name
+        if proc.returncode != 0 or not out.is_file():
+            return None
+        return load_workbook(out, data_only=True)
+
+
+def check(path: Path, *, recalc: bool = False, expect_score: float | None = None) -> int:
+    """Quality gate for an existing workbook.
+
+    Structural by default. `recalc=True` additionally recalculates via LibreOffice
+    and inspects the COMPUTED values — the only way to catch a formula that builds
+    fine and evaluates to an error. Pass `expect_score` to assert the recalculated
+    Health Score equals the Python model's, which closes the xlsx parity loop
+    end-to-end. Missing LibreOffice is reported and fails; it is never skipped
+    silently, because a gate that quietly does nothing is worse than no gate.
+    """
     problems = []
     wb = load_workbook(path)
     missing = [t for t in ALL_TABS if t not in wb.sheetnames]
@@ -689,12 +770,40 @@ def check(path: Path) -> int:
         for row in ws.iter_rows():
             for cell in row:
                 v = cell.value
-                if isinstance(v, str) and ("#REF!" in v or "#NAME?" in v):
+                if isinstance(v, str) and any(e in v for e in XL_ERRORS):
                     problems.append(f"{ws.title}!{cell.coordinate} contains {v!r}")
+
+    if recalc:
+        soffice = _find_soffice()
+        if not soffice:
+            problems.append("--recalc needs LibreOffice (`soffice`) on PATH; not found")
+        else:
+            rwb = _recalculated(path, soffice)
+            if rwb is None:
+                problems.append("LibreOffice failed to recalculate the workbook")
+            else:
+                for ws in rwb.worksheets:
+                    for row in ws.iter_rows():
+                        for cell in row:
+                            if isinstance(cell.value, str) and cell.value in XL_ERRORS:
+                                problems.append(
+                                    f"{ws.title}!{cell.coordinate} evaluates to {cell.value}")
+                # Only assert the value when the caller says what to expect. A model
+                # score of None is a legitimately unscored audit, where B3 is blank.
+                if expect_score is not None:
+                    b3 = (rwb["17_Health_Score"]["B3"].value
+                          if "17_Health_Score" in rwb.sheetnames else None)
+                    if not isinstance(b3, (int, float)):
+                        problems.append(f"17_Health_Score!B3 recalculates to {b3!r}, not a number")
+                    elif abs(float(b3) - expect_score) > 0.05:
+                        problems.append(f"17_Health_Score!B3 recalculates to {b3} but the "
+                                        f"model says {expect_score} — xlsx/Python parity break")
+
     if problems:
         sys.stderr.write("CHECK FAILED:\n  - " + "\n  - ".join(problems) + "\n")
         return 1
-    print(f"CHECK OK: {path.name} — {len(wb.sheetnames)} tabs, structure valid.")
+    how = "structure valid" + (", recalculated" if recalc else "")
+    print(f"CHECK OK: {path.name} — {len(wb.sheetnames)} tabs, {how}.")
     return 0
 
 
@@ -704,6 +813,9 @@ def main(argv=None) -> int:
     ap.add_argument("--output", help="output .xlsx path (build mode)")
     ap.add_argument("--brand", help="client/brand name override")
     ap.add_argument("--check", action="store_true", help="validate an existing workbook")
+    ap.add_argument("--recalc", action="store_true",
+                    help="with --check: recalculate via LibreOffice and inspect the "
+                         "computed values (needs `soffice` on PATH)")
     args = ap.parse_args(argv)
 
     in_path = Path(args.input)
@@ -712,7 +824,7 @@ def main(argv=None) -> int:
         return 1
 
     if args.check:
-        return check(in_path)
+        return check(in_path, recalc=args.recalc)
 
     if not args.output:
         sys.stderr.write("ERROR: --output is required in build mode.\n")

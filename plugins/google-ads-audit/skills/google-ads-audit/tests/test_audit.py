@@ -8,6 +8,7 @@ self-containment (GSAP sentinel + checksum), and determinism.
 """
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import re
@@ -57,6 +58,31 @@ kw = [s for s in model["sections"] if s["tab"] == "05_Keyword_Strategy"][0]
 check("all-FAIL section score 0.0 (not None)", kw["score_pct"] == 0.0, str(kw["score_pct"]))
 
 
+# --- 3b: an audit with nothing scoreable is NOT scored (never 0.0 / F) --------
+NOTHING = {"meta": {"client_name": "Empty"}, "findings": [],
+           "sections": [{"tab": "03_Account_Structure", "title": "S",
+                         "checks": [{"id": "x", "severity": "High", "result": "N/A"},
+                                    {"id": "y", "severity": "Low", "result": ""}]}]}
+none_model = audit_model.compute_model(NOTHING, generated="2026-06-24T00:00:00")
+check("all-N/A: score is None, not 0.0", none_model["health"]["score"] is None,
+      str(none_model["health"]))
+check("all-N/A: grade is None, not 'F'", none_model["health"]["grade"] is None)
+check("all-N/A: summary agrees", none_model["summary"]["score"] is None
+      and none_model["summary"]["grade"] is None)
+_md_none = audit_md.render_md(none_model)
+check("all-N/A md says Not scored", "**Not scored**" in _md_none)
+check("all-N/A md frontmatter is YAML null (never 'None')",
+      "health_score: null" in _md_none and "grade: null" in _md_none
+      and "None" not in _md_none.split("---")[1],
+      _md_none.split("---")[1].strip()[:120])
+with tempfile.TemporaryDirectory() as _td:
+    _hp = Path(_td) / "none.html"
+    audit_html.build_html(none_model, _hp, animate=False)
+    _h = _hp.read_text()
+    check("all-N/A html embeds null score", '"score": null' in _h or '"score":null' in _h)
+    check("all-N/A html has no 'Grade null' text", "Grade null" not in _h)
+
+
 # --- 4: JS <-> Python constant parity (the render kernel mirrors the model) ---
 tpl = audit_html._TEMPLATE
 
@@ -78,18 +104,161 @@ check("JS GRADES == audit_model.GRADE_CUTOFFS", js_grades == [tuple(x) for x in 
       str(js_grades))
 
 
+# --- 4b: result canonicalization ---------------------------------------------
+# Python tests `result` membership exactly; an Excel `=` comparison is case-
+# INSENSITIVE. So an un-canonicalized "Fail" scored in the workbook and was
+# excluded from the model, and a stray value emptied the xlsx helper cells and
+# cascaded #VALUE! into the client report. Canonicalizing kills both.
+for _raw, _want in [("FAIL", "FAIL"), ("Fail", "FAIL"), ("fail", "FAIL"),
+                    ("N/A", "N/A"), ("N/A ", "N/A"), ("n/a", "N/A"), ("", "")]:
+    _got, _warn = audit_model.normalize_result(_raw)
+    check(f"normalize_result({_raw!r}) -> {_want!r}", _got == _want and _warn is None,
+          f"got {_got!r} warn={_warn!r}")
+_got, _warn = audit_model.normalize_result("Pending")
+check("stray result -> N/A and warns (not silent)", _got == "N/A" and bool(_warn),
+      f"got {_got!r} warn={_warn!r}")
+
+
+for _raw, _want in [("High", "High"), ("high", "High"), ("HIGH", "High"),
+                    ("  Critical  ", "Critical"), ("low", "Low")]:
+    _got, _warn = audit_model.normalize_severity(_raw)
+    check(f"normalize_severity({_raw!r}) -> {_want!r}", _got == _want and _warn is None,
+          f"got {_got!r} warn={_warn!r}")
+_got, _warn = audit_model.normalize_severity("Urgent")
+check("unrecognized severity -> DEFAULT_SEVERITY + warns",
+      _got == audit_model.DEFAULT_SEVERITY and bool(_warn), f"got {_got!r} warn={_warn!r}")
+_got, _warn = audit_model.normalize_severity("")
+check("blank severity -> DEFAULT_SEVERITY (not left to weigh 0)",
+      _got == audit_model.DEFAULT_SEVERITY, f"got {_got!r}")
+
+
+def score_with(val):
+    f = copy.deepcopy(FINDINGS)
+    f["sections"][0]["checks"][0]["result"] = val
+    return audit_model.compute_model(f, generated="2026-06-24T00:00:00")["health"]["score"]
+
+
+def score_with_sev(val):
+    f = copy.deepcopy(FINDINGS)
+    f["sections"][0]["checks"][0]["severity"] = val
+    return audit_model.compute_model(f, generated="2026-06-24T00:00:00")["health"]["score"]
+
+
+# Excel's `=` is case-insensitive, so an un-canonicalized 'high' scored 3 in the
+# workbook while Python weighed it 0 — measured as model "not scored" vs xlsx 100/A.
+_sev0 = FINDINGS["sections"][0]["checks"][0].get("severity", "Medium")
+check("severity case variants score identically",
+      score_with_sev(_sev0.lower()) == score_with_sev(_sev0.upper()) == score_with_sev(_sev0),
+      f"{score_with_sev(_sev0.lower())} / {score_with_sev(_sev0.upper())} / {score_with_sev(_sev0)}")
+_probe_s = copy.deepcopy(FINDINGS)
+_probe_s["sections"][0]["checks"][0]["severity"] = "high"
+_probe_s["findings"][0]["severity"] = "critical"
+_norm_s, _ = audit_model.normalize_findings(_probe_s)
+check("normalize_findings canonicalizes check severity",
+      _norm_s["sections"][0]["checks"][0]["severity"] == "High")
+check("normalize_findings canonicalizes finding severity (sev_count + ICE impact)",
+      _norm_s["findings"][0]["severity"] == "Critical")
+_m_s = audit_model.compute_model(_probe_s, generated="2026-06-24T00:00:00")
+check("mis-cased finding lands in the right counter, not dropped",
+      _m_s["summary"]["crit"] + _m_s["summary"]["high"] + _m_s["summary"]["med"]
+      + _m_s["summary"]["low"] == _m_s["provenance"]["n_findings"], str(_m_s["summary"]))
+
+# An UNRECOGNIZED severity (not merely mis-cased) used to reach each consumer's own
+# fallback, and they disagreed: impact 0 in the model vs 5 in the xlsx ICE tab, and
+# the unknown key slipped past summary's fixed reads so the finding left the counts.
+_unk = copy.deepcopy(FINDINGS)
+_unk["findings"][0]["severity"] = "Urgent"
+_um = audit_model.compute_model(_unk, generated="2026-06-24T00:00:00")
+check("unrecognized finding severity is still counted, not dropped",
+      _um["summary"]["crit"] + _um["summary"]["high"] + _um["summary"]["med"]
+      + _um["summary"]["low"] == _um["provenance"]["n_findings"], str(_um["summary"]))
+check("unrecognized finding severity seeds DEFAULT_IMPACT, not 0",
+      _um["findings"][0]["impact"] == audit_model.DEFAULT_IMPACT,
+      str(_um["findings"][0]["impact"]))
+
+
+check("case variants score identically", score_with("Fail") == score_with("FAIL") == 42.0,
+      f'Fail={score_with("Fail")} FAIL={score_with("FAIL")}')
+check("trailing space scores as N/A", score_with("N/A ") == score_with("N/A"),
+      f'"N/A "={score_with("N/A ")} "N/A"={score_with("N/A")}')
+_probe = copy.deepcopy(FINDINGS)
+_probe["sections"][0]["checks"][0]["result"] = "Fail"
+audit_model.normalize_findings(_probe)
+check("normalize_findings is pure (input untouched)",
+      _probe["sections"][0]["checks"][0]["result"] == "Fail")
+
+
+# --- 4c: rounding rule is Excel's/JS's, not Python's banker's -----------------
+# round(6.25,1)==6.2 but ROUND(6.25,1)==6.3 and Math.round(62.5)/10==6.3, so a
+# score on a .x5 boundary printed 6.2 in the model and 6.3 in the workbook.
+check("round1(6.25) == 6.3 (half-up, not banker's)", audit_model.round1(6.25) == 6.3,
+      str(audit_model.round1(6.25)))
+check("round1(6.35) == 6.4", audit_model.round1(6.35) == 6.4, str(audit_model.round1(6.35)))
+check("round1 leaves non-boundaries alone", audit_model.round1(43.67816) == 43.7)
+_bnd = {"meta": {}, "findings": [], "sections": [{"tab": "03_Account_Structure", "title": "B",
+        "checks": [{"id": "a", "severity": "Medium", "result": "FAIL"},
+                   {"id": "b", "severity": "Medium", "result": "FAIL"},
+                   {"id": "c", "severity": "Low", "result": "FAIL"},
+                   {"id": "d", "severity": "Low", "result": "FLAG"}]}]}
+_bm = audit_model.compute_model(_bnd, generated="2026-06-24T00:00:00")
+check("boundary audit (0.25/4.0 = 6.25) scores 6.3, matching Excel",
+      _bm["health"]["score"] == 6.3 and _bm["sections"][0]["score_pct"] == 6.3,
+      str(_bm["health"]))
+
+
 # --- 5: Excel <-> Python parity (workbook single-sources from audit_model) ----
+def formula_map(f, cell):
+    """Read the numeric literals back out of a generated =IF(...) chain."""
+    return {k: float(v) for k, v in re.findall(rf'IF\({cell}="([^"]+)",([\d.]+)', f)}
+
+
 try:
     import generate_workbook as gw
-    check("xlsx SEVERITY_WEIGHTS is audit_model's", gw.SEVERITY_WEIGHTS == audit_model.SEVERITY_WEIGHTS)
     check("xlsx SEVERITY_IMPACT is audit_model's", gw.SEVERITY_IMPACT == audit_model.SEVERITY_IMPACT)
     check("xlsx ANALYSIS_TABS is audit_model's", gw.ANALYSIS_TABS == audit_model.ANALYSIS_TABS)
+    # Assert the EMITTED FORMULA, not the imported name — comparing gw.X to
+    # audit_model.X is an identity test that passes while the cell says otherwise.
+    check("xlsx severity formula literals == SEVERITY_WEIGHTS",
+          formula_map(gw._severity_weight_formula(10), "D10") == audit_model.SEVERITY_WEIGHTS,
+          gw._severity_weight_formula(10))
+    check("xlsx flag formula literals == FLAG_SCORES",
+          formula_map(gw._flag_formula(10), "E10") == audit_model.FLAG_SCORES,
+          gw._flag_formula(10))
+    _gf = gw._grade_formula("B3")
+    _xl_grades = [(int(n), g) for n, g in re.findall(r'B3>=(\d+),"([A-F])"', _gf)]
+    _xl_grades.append((0, re.search(r'"([A-F])"\)*$', _gf).group(1)))
+    check("xlsx grade formula cutoffs == GRADE_CUTOFFS",
+          _xl_grades == [tuple(x) for x in audit_model.GRADE_CUTOFFS], _gf)
+    # Excel ranks text above every number, so an unguarded `B3>=90` grades a blank
+    # (= not scored) Health Score as "A". Verified against a LibreOffice recalc.
+    check("xlsx grade formula guards non-numeric B3", "ISNUMBER" in _gf, _gf)
     with tempfile.TemporaryDirectory() as td:
         xlsx = Path(td) / "t.xlsx"
         rc_build = gw.build(EXAMPLE, xlsx, "Acme Corp")
         rc_check = gw.check(xlsx)
         check("xlsx build == 0", rc_build == 0)
         check("xlsx --check gate == 0", rc_check == 0)
+        # The canonical value must reach the cell: the formulas compare against it.
+        from openpyxl import load_workbook
+        cased = copy.deepcopy(FINDINGS)
+        cased["sections"][0]["checks"][0]["result"] = "Fail"
+        x2 = Path(td) / "cased.xlsx"
+        gw.build(EXAMPLE, x2, "Acme Corp", findings_data=cased)
+        _ws = load_workbook(x2)[cased["sections"][0]["tab"]]
+        _col_e = [_ws.cell(row=r, column=5).value for r in range(1, _ws.max_row + 1)]
+        check("xlsx cell gets canonical FAIL, never 'Fail'",
+              "FAIL" in _col_e and "Fail" not in _col_e,
+              str([v for v in _col_e if v]))
+        # Read the ICE tab's seeded Impact column back and compare it to the model's,
+        # rather than comparing gw.SEVERITY_IMPACT to its own source. With an
+        # unrecognized severity these used to be 5 here and 0 in the model.
+        x4 = Path(td) / "unk.xlsx"
+        gw.build(EXAMPLE, x4, "Acme Corp", findings_data=_unk)
+        _wsi = load_workbook(x4)["13_ICE_Prioritization"]
+        _xl_imp = [_wsi.cell(row=5 + i, column=4).value for i in range(len(_um["findings"]))]
+        _py_imp = [f["impact"] for f in _um["findings"]]
+        check("xlsx ICE Impact column == model impacts (incl. unrecognized severity)",
+              _xl_imp == _py_imp, f"xlsx {_xl_imp} vs model {_py_imp}")
 except SystemExit:
     check("openpyxl available for xlsx tests", False, "openpyxl not installed")
 

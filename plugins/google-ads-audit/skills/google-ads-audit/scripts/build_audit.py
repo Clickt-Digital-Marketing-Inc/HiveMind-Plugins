@@ -117,15 +117,22 @@ def main() -> int:
     ap.add_argument("--business-model", choices=["Lead Gen", "Ecommerce"],
                     help="benchmark band for --prescore-only (else findings meta wins)")
     ap.add_argument("--check", metavar="XLSX", help="structurally validate an existing xlsx and exit")
+    ap.add_argument("--recalc", action="store_true",
+                    help="recalculate the xlsx via LibreOffice and assert it agrees with "
+                         "the model (needs `soffice` on PATH); use with --check or a build")
     args = ap.parse_args()
 
     # --check delegates to the workbook's own quality gate.
     if args.check:
+        check_path = Path(args.check)
+        if not check_path.is_file():
+            sys.stderr.write(f"ERROR: --check file not found: {check_path}\n")
+            return 1
         try:
             import generate_workbook
         except SystemExit:
             return 2
-        return generate_workbook.check(Path(args.check))
+        return generate_workbook.check(check_path, recalc=args.recalc)
 
     if not args.input and not args.prescore_only:
         sys.stderr.write("ERROR: --input findings.json is required "
@@ -196,6 +203,13 @@ def main() -> int:
     for line in plog:
         sys.stderr.write(line + "\n")
 
+    # Canonicalize check results once, for every renderer. A stray value still
+    # degrades to N/A (the safe direction) but says so instead of vanishing into
+    # the n/a count.
+    findings, norm_warnings = audit_model.normalize_findings(findings)
+    for line in norm_warnings:
+        sys.stderr.write(f"WARNING: {line}\n")
+
     brand = args.brand or ""
     model = audit_model.compute_model(findings, brand=brand, concentration=conc,
                                       prescore=pres_block)
@@ -226,7 +240,12 @@ def main() -> int:
             p = outdir / f"{stem}.xlsx"
             rc = generate_workbook.build(input_path, p, brand or None, concentration=conc,
                                          findings_data=findings)
-            if rc == 0 and generate_workbook.check(p) == 0:
+            # With --recalc the gate proves the workbook's own formulas evaluate to the
+            # model's Health Score — the only check that covers the xlsx arithmetic.
+            gate = generate_workbook.check(
+                p, recalc=args.recalc,
+                expect_score=model["health"]["score"] if args.recalc else None)
+            if rc == 0 and gate == 0:
                 written["xlsx"] = str(p.resolve())
             else:
                 sys.stderr.write("ERROR: xlsx build or quality-gate failed.\n")
@@ -235,7 +254,10 @@ def main() -> int:
     # human-readable summary
     H = model["health"]
     S = model["summary"]
-    print(f"Health Score: {H['score']} / 100 — Grade {H['grade']} "
+    headline = ("Health Score: not scored — no check returned a scoreable result"
+                if H["score"] is None else
+                f"Health Score: {H['score']} / 100 — Grade {H['grade']}")
+    print(f"{headline} "
           f"({S['n_pass']} pass / {S['n_flag']} flag / {S['n_fail']} fail / {S['n_na']} n/a)")
     print(f"Findings: {model['provenance']['n_findings']} "
           f"({S['crit']} critical · {S['high']} high · {S['med']} medium · {S['low']} low)")

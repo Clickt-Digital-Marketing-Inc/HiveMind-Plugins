@@ -1,3 +1,9 @@
+# Requires Python >= 3.9 — the stock macOS interpreter, which is what `python3`
+# resolves to for most users running SKILL.md's commands. Verified: every module
+# compiles and the full 3-format bundle + test suite run green on 3.9.6. Do not
+# use PEP 701 f-strings (reusing the outer quote inside the braces) — they parse
+# only on 3.12+, and one such line silently made this plugin 3.12-only.
+#
 # The interactive HTML report and the markdown record are standard-library only.
 # openpyxl is needed ONLY for the .xlsx backup (build_audit.py --formats html,md skips it).
 openpyxl>=3.1

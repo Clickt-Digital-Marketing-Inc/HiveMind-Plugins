@@ -23,11 +23,25 @@ def _row(cells) -> str:
     return "| " + " | ".join(_c(c) for c in cells) + " |"
 
 
+def _yaml(v) -> str:
+    """YAML scalar: None -> null (never the string "None"), str -> quoted, else bare."""
+    if v is None:
+        return "null"
+    if isinstance(v, str):
+        return '"' + v.replace('"', '\\"') + '"'
+    return str(v)
+
+
 def render_md(model: dict) -> str:
     P = model["provenance"]
     H = model["health"]
     S = model["summary"]
     L: list[str] = []
+
+    # An audit where nothing was scoreable has no score — say so rather than print 0/F.
+    headline = ("**Not scored** — no check returned a scoreable result"
+                if H["score"] is None else
+                f"**{H['score']} / 100 — Grade {H['grade']}**")
 
     # --- frontmatter ---
     L += [
@@ -35,8 +49,8 @@ def render_md(model: dict) -> str:
         f'title: "Google Ads Audit — {P.get("client_name","")}"',
         f'client: "{P.get("client_name","")}"',
         f'account: "{P.get("account_id","")}"',
-        f"health_score: {H['score']}",
-        f'grade: "{H['grade']}"',
+        f"health_score: {_yaml(H['score'])}",
+        f"grade: {_yaml(H['grade'])}",
         f'business_model: "{P.get("business_model","")}"',
         f'date_range: "{P.get("date_range","")}"',
         f'generated: "{P.get("generated","")}"',
@@ -55,7 +69,7 @@ def render_md(model: dict) -> str:
     L += [
         "## Health Score",
         "",
-        f"**{H['score']} / 100 — Grade {H['grade']}**  "
+        f"{headline}  "
         f"({S['n_pass']} pass · {S['n_flag']} flag · {S['n_fail']} fail · {S['n_na']} n/a "
         f"across {P.get('n_checks',0)} checks)",
         "",

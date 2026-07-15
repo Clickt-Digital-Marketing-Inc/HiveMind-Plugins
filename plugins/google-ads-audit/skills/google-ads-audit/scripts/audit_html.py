@@ -334,7 +334,10 @@ function healthOf(checksPredicate){
     if(checksPredicate && !checksPredicate(c)) return;
     var r=scoreCheck(c); if(r){ e+=r.e; p+=r.p; }
   });});
-  var sc = p? Math.round(e/p*1000)/10 : 0;
+  /* Nothing scoreable -> not scored, mirroring compute_model. Filtering to a
+     business model with no applicable checks must not report a confident 0/F. */
+  if(!p) return {score:null, grade:null};
+  var sc = Math.round(e/p*1000)/10;
   return {score:sc, grade:gradeOf(sc)};
 }
 
@@ -363,17 +366,20 @@ el('clientName').textContent = P.client_name || 'Google Ads Audit';
    from empty/zero via proxy objects as a pure enhancement. ---- */
 (function(){
   var score = M.health.score, grade = M.health.grade;
-  var arc = el('gaugeArc'), C = 2*Math.PI*70, target = C*(1-score/100);
+  /* score is null when no check was scoreable. Say "not scored" — an empty arc
+     labelled 0/F would assert a verdict the evidence never supported. */
+  var scored = score != null;
+  var arc = el('gaugeArc'), C = 2*Math.PI*70, target = C*(1-(scored?score:0)/100);
   arc.style.strokeDasharray = C;
-  var col = css(gradeColor(grade)) || css('--teal');
+  var col = scored ? (css(gradeColor(grade)) || css('--teal')) : css('--slate');
   arc.style.stroke = col;
   var gp = el('gaugeGrade');
-  gp.textContent = 'Grade '+grade;
+  gp.textContent = scored ? 'Grade '+grade : 'Not scored';
   gp.style.background = col; gp.style.color = '#fff';
   arc.style.strokeDashoffset = target;      // robust final state
-  el('gaugeNum').textContent = score;        // robust final state
+  el('gaugeNum').textContent = scored ? score : '—';   // robust final state
   var g = gsapOn();
-  if(g){
+  if(g && scored){
     var a={o:C};
     g.to(a,{o:target,duration:1.1,ease:'power2.out',onUpdate:function(){ arc.style.strokeDashoffset = a.o; }});
     var n={v:0};
@@ -419,11 +425,18 @@ function renderBars(){
   // what-if in-scope score
   var wf = el('whatif');
   if(BM==='Both'){ wf.innerHTML=''; }
-  else { var h = healthOf(inScope); wf.innerHTML = 'what-if, '+esc(BM)+'-applicable checks only: <b>'+h.score+'</b> ('+h.grade+')'; }
+  else { var h = healthOf(inScope);
+         wf.innerHTML = 'what-if, '+esc(BM)+'-applicable checks only: '+
+           (h.score==null ? '<b>not scored</b> (no applicable check is scoreable)'
+                          : '<b>'+h.score+'</b> ('+h.grade+')'); }
 }
 function sectionPct(s){
-  var e=0,p=0; s.checks.forEach(function(c){ var r=scoreCheck(c); if(r){e+=r.e;p+=r.p;} });
-  return p? Math.round(e/p*1000)/10 : null;
+  /* Read, do not recompute: the model already carries score_pct. Re-deriving it
+     here rounds with Math.round (half-up) where Python used round() (banker's) and
+     Excel uses ROUND (half-away-from-zero) — three runtimes, three rules — so a
+     section landing on a .x5 boundary showed 6.3 here and 6.2 in the md/xlsx.
+     Same reason the gauge reads M.health.score instead of calling healthOf(). */
+  return s.score_pct;
 }
 (function(){
   var host = el('bmToggle');

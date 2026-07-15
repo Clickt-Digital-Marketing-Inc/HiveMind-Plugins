@@ -13,12 +13,18 @@ what stops the three views from disagreeing.
 JSON-serializable model: per-check earned/possible, per-section rollups, the
 weighted Health Score + grade, ICE impact seeds, and summary counts.
 
+`health.score`/`health.grade` are **None** when no check was scoreable — an audit
+that gathered no evidence is *not scored*, not a zero. Renderers must show that as
+"not scored"; the same applies to a section's `score_pct`.
+
 Stdlib only. Deterministic: a pure function of the findings, except
 `provenance.generated` (pass `generated=` to pin it in tests).
 """
 from __future__ import annotations
 
+import copy
 import datetime as _dt
+import math
 import re
 
 # --- Canonical scoring constants (mirrored verbatim by audit_html.py's JS kernel,
@@ -28,6 +34,10 @@ FLAG_SCORES = {"PASS": 1.0, "FLAG": 0.5, "FAIL": 0.0}  # N/A and blank are EXCLU
 SEVERITY_IMPACT = {"Critical": 9, "High": 7, "Medium": 5, "Low": 3}
 GRADE_CUTOFFS = [(90, "A"), (75, "B"), (60, "C"), (40, "D"), (0, "F")]
 DEFAULT_ICE = 5  # neutral Confidence/Ease default for the live ICE re-rank
+# Substituted whenever severity is absent or unrecognized, so no consumer ever
+# reaches its own fallback — those fallbacks disagreed (see normalize_severity).
+DEFAULT_SEVERITY = "Medium"
+DEFAULT_IMPACT = SEVERITY_IMPACT[DEFAULT_SEVERITY]
 
 # The nine analysis tabs that feed the Health Score (order = layout order).
 ANALYSIS_TABS = [
@@ -54,11 +64,116 @@ def slugify(s: str) -> str:
     return out or "audit"
 
 
+def round1(x: float) -> float:
+    """Percent to 1dp, rounding half UP — the rule Excel and JS both use.
+
+    Python's built-in round() is banker's: round(6.25, 1) == 6.2, while Excel's
+    ROUND(6.25,1) == 6.3 and JS Math.round(62.5)/10 == 6.3. Three runtimes, three
+    rounding rules, and a score landing on a .x5 boundary printed 6.2 in the model
+    and 6.3 in the workbook.
+
+    The xlsx cannot simply be handed Python's number — its Health Score is a LIVE
+    formula (edit a Result in Excel and the score moves), which is the workbook's
+    whole point. So the three must share the rounding RULE instead, and the kernel
+    adopts Excel's. Scores are never negative, so half-up == half-away-from-zero
+    (do not reuse this for a signed metric without revisiting that).
+
+    Same rule as the JS `Math.round(e/p*1000)/10`, though the JS reaches it by a
+    different float path (`e/p*1000` vs `x*10` here), so the two are rule-equivalent
+    rather than provably bit-identical. Nothing compares them directly: sectionPct
+    reads Python's `score_pct`, and the JS what-if has no Python counterpart.
+    """
+    return math.floor(x * 10 + 0.5) / 10
+
+
 def grade(score: float) -> str:
     for cutoff, letter in GRADE_CUTOFFS:
         if score >= cutoff:
             return letter
     return "F"
+
+
+def normalize_result(raw) -> tuple[str, str | None]:
+    """One check `result` -> (canonical, warning). Canonical is PASS/FLAG/FAIL/N/A/"".
+
+    The findings JSON is model-authored, so a stray casing ("Fail") or an invisible
+    trailing space ("N/A ") is plausible. Python tests membership exactly while an
+    Excel `=` comparison is case-INSENSITIVE, so an un-canonicalized value scores
+    differently in the workbook than in the model — and a value matching neither
+    arm leaves the xlsx helper cells empty, cascading `#VALUE!` all the way into
+    the client report. Canonicalize once, before any renderer sees the value.
+
+    Blank stays blank: "" already means the same thing to both runtimes (excluded).
+    An unrecognized value degrades to N/A — the safe direction, matching what
+    `score_check` already did — but returns a warning so it is not silent.
+    """
+    s = str(raw if raw is not None else "").strip().upper()
+    if s in FLAG_SCORES or s in ("N/A", ""):
+        return s, None
+    return "N/A", f"unrecognized result {raw!r} — scored N/A"
+
+
+_SEVERITY_CANON = {s.upper(): s for s in SEVERITY_WEIGHTS}
+
+
+def normalize_severity(raw) -> tuple[str, str | None]:
+    """One `severity` -> (canonical, warning). Same divergence as normalize_result.
+
+    Python looks SEVERITY_WEIGHTS up exactly, so "high" misses and weighs 0.0 and
+    the check leaves the score entirely. Excel's `=` is case-insensitive, so
+    D="high" matches IF(D="High",3,…) and the workbook happily scores it. Net
+    effect measured: the model reports the audit "not scored" while the client's
+    workbook prints 100 / A.
+
+    An unrecognized value becomes DEFAULT_SEVERITY — the same substitution
+    compute_model already makes when severity is absent — rather than being left
+    for each consumer's own fallback to handle. Those fallbacks do NOT agree: the
+    model seeds ICE impact 0 while the xlsx ICE tab seeds 5, so one bad string put
+    the same finding at the bottom of the HTML's priority list and mid-table in the
+    workbook's. An unknown key also slips past summary's fixed crit/high/med/low
+    reads, so the finding vanished from the counts entirely. Canonicalizing to a
+    known key here makes every one of those fallbacks unreachable.
+    """
+    s = str(raw if raw is not None else "").strip()
+    canon = _SEVERITY_CANON.get(s.upper())
+    if canon:
+        return canon, None
+    return DEFAULT_SEVERITY, f"unrecognized severity {raw!r} — treated as {DEFAULT_SEVERITY}"
+
+
+def normalize_findings(findings: dict) -> tuple[dict, list[str]]:
+    """Deep-copied `findings` with `result` and `severity` canonicalized, + warnings.
+
+    Pure and idempotent, so every entry point can call it defensively without the
+    orchestrator having to guarantee it ran first.
+    """
+    out = copy.deepcopy(findings)
+    warnings: list[str] = []
+
+    def _sev(obj, label):
+        # Absent is left alone — compute_model substitutes DEFAULT_SEVERITY itself.
+        # A present-but-BLANK value is NOT the same thing: `.get(k, DEFAULT)` returns
+        # "" for it, which would weigh 0, so it goes through the normalizer.
+        if "severity" not in obj:
+            return
+        canon, warn = normalize_severity(obj["severity"])
+        if warn:
+            warnings.append(f"{label}: {warn}")
+        obj["severity"] = canon
+
+    for sec in out.get("sections", []):
+        for c in sec.get("checks", []):
+            label = f"{sec.get('tab', '?')} {c.get('id', '?')}"
+            canon, warn = normalize_result(c.get("result", ""))
+            if warn:
+                warnings.append(f"{label}: {warn}")
+            c["result"] = canon
+            _sev(c, label)
+    # findings[] severity feeds sev_count and the ICE impact seed, and the xlsx ICE
+    # tab looks SEVERITY_IMPACT up the same way — canonicalize it on this side too.
+    for f in out.get("findings", []):
+        _sev(f, f"finding {f.get('id', '?')}")
+    return out, warnings
 
 
 def score_check(result: str, severity: str):
@@ -98,6 +213,7 @@ def compute_model(findings: dict, *, brand: str = "", generated: str | None = No
     from raw GAQL pull files, never from findings.json); stored verbatim.
     prescore — optional merge summary from prescore.merge_into_findings
     (which checks were machine-scored/corrected); stored verbatim."""
+    findings, _ = normalize_findings(findings)  # idempotent; direct callers get it too
     meta = dict(findings.get("meta", {}))
     if brand:
         meta["client_name"] = brand
@@ -115,7 +231,7 @@ def compute_model(findings: dict, *, brand: str = "", generated: str | None = No
         for c in sec.get("checks", []):
             n_checks += 1
             result = c.get("result", "")
-            severity = c.get("severity", "Medium")
+            severity = c.get("severity", DEFAULT_SEVERITY)
             earned, possible = score_check(result, severity)
             if result == "PASS":
                 n_pass += 1
@@ -142,23 +258,29 @@ def compute_model(findings: dict, *, brand: str = "", generated: str | None = No
             "checks": checks_out,
             "earned": round(sec_earned, 4),
             "possible": round(sec_possible, 4),
-            "score_pct": (round(sec_earned / sec_possible * 100, 1) if sec_possible else None),
+            "score_pct": (round1(sec_earned / sec_possible * 100) if sec_possible else None),
         })
 
-    score = round(total_earned / total_possible * 100, 1) if total_possible else 0.0
-    letter = grade(score)
+    # Nothing scoreable (every result N/A or blank) -> not scored, NOT zero. This
+    # function takes care never to score an individual N/A check as a zero; scoring
+    # an all-N/A audit 0.0/F would undo that at the top line and brand an account
+    # with an F on evidence nobody gathered.
+    score = round1(total_earned / total_possible * 100) if total_possible else None
+    letter = grade(score) if score is not None else None
 
     sev_count = {"Critical": 0, "High": 0, "Medium": 0, "Low": 0}
     by_horizon = {"30": 0, "60": 0, "90": 0}
     findings_out = []
     for f in findings.get("findings", []):
-        severity = f.get("severity", "Medium")
+        severity = f.get("severity", DEFAULT_SEVERITY)
         sev_count[severity] = sev_count.get(severity, 0) + 1
         horizon = str(f.get("horizon", ""))
         if horizon in by_horizon:
             by_horizon[horizon] += 1
         row = {k: f.get(k, "") for k in _FINDING_KEYS}
-        row["impact"] = SEVERITY_IMPACT.get(severity, 0)
+        # Unreachable fallback after normalize_severity, but it must MATCH the xlsx
+        # ICE tab's (generate_workbook build_ice) — they used to be 0 here and 5 there.
+        row["impact"] = SEVERITY_IMPACT.get(severity, DEFAULT_IMPACT)
         findings_out.append(row)
 
     provenance = {

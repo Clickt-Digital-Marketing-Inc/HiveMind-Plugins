@@ -104,8 +104,12 @@ To use the skill, work through these steps in order.
    ```
    The tool owns the filenames (`ads-audit_{slug}_{date}.{html,md,xlsx}`), runs the
    workbook's `--check` gate automatically, and prints the paths (the last stdout line is
-   a JSON object with `html`/`md`/`xlsx`/`score`/`grade`). Flags: `--formats html,md`
-   skips the xlsx; `--no-animate` builds motion-free HTML; `--raw-dir` (or the explicit
+   a JSON object with `html`/`md`/`xlsx`/`score`/`grade`; `score` and `grade` are `null`
+   when no check returned a scoreable result — report that as **not scored**, never as
+   0 or F). Flags: `--formats html,md`
+   skips the xlsx; `--no-animate` builds motion-free HTML; `--recalc` additionally
+   recalculates the xlsx in LibreOffice and fails the build unless it evaluates to the
+   same Health Score as the model (needs `soffice` on PATH); `--raw-dir` (or the explicit
    `--raw-campaigns` / `--raw-keywords` / `--raw-search-terms`) feeds the saved raw pulls
    to the **Concentration** report — omit them and the bundle still builds, just without
    the Concentration tab/section. On the manual path use `--csv-dir` (or `--csv-campaigns`
