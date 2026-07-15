@@ -89,6 +89,25 @@
         "html",
         "xlsx"
       ]
+    },
+    {
+      "name": "catch-up",
+      "source": "./plugins/catch-up",
+      "version": "0.1.0",
+      "category": "productivity",
+      "description": "Turns everything new since the last run into tracked work: reads call transcripts and email, extracts the tasks, decisions, and open questions, de-dupes them against your tracker, files issues (review-first by default, so nothing lands without your say-so), and drafts both the replies you owe and the follow-ups you need to send — drafting only, never sending. Tool-agnostic: a setup skill binds the call-transcript, email, and project-tracker categories to whatever you connect (Granola/Teams/Meet/Zoom, Gmail/Outlook, Linear/ClickUp/Asana/Jira), saving your choices to ~/.catch-up/config.json and the last-run timestamp to ~/.catch-up/state.json so no call or email is ever processed twice.",
+      "keywords": [
+        "catch-up",
+        "meetings",
+        "transcripts",
+        "email",
+        "issues",
+        "follow-up",
+        "drafts",
+        "linear",
+        "gmail",
+        "granola"
+      ]
     }
   ]
 }
