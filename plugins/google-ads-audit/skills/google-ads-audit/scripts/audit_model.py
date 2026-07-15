@@ -113,6 +113,11 @@ def normalize_result(raw) -> tuple[str, str | None]:
     return "N/A", f"unrecognized result {raw!r} — scored N/A"
 
 
+# Canonicalizing against SEVERITY_WEIGHTS is only correct while SEVERITY_IMPACT
+# shares its vocabulary — findings[] severity is canonicalized here but consumed
+# via SEVERITY_IMPACT. Pin the assumption rather than leave it implicit.
+assert set(SEVERITY_WEIGHTS) == set(SEVERITY_IMPACT), (
+    "SEVERITY_WEIGHTS and SEVERITY_IMPACT must share their severity vocabulary")
 _SEVERITY_CANON = {s.upper(): s for s in SEVERITY_WEIGHTS}
 
 
@@ -151,10 +156,14 @@ def normalize_findings(findings: dict) -> tuple[dict, list[str]]:
     warnings: list[str] = []
 
     def _sev(obj, label):
-        # Absent is left alone — compute_model substitutes DEFAULT_SEVERITY itself.
-        # A present-but-BLANK value is NOT the same thing: `.get(k, DEFAULT)` returns
-        # "" for it, which would weigh 0, so it goes through the normalizer.
+        # Absent -> the documented default, written INTO the row. compute_model
+        # already substituted it, but only for scoring: the row still carried "",
+        # so the HTML showed a blank severity, the findings log wrote a blank cell,
+        # and 15_Client_Report's COUNTIF/COUNTA then dropped the finding entirely.
+        # Substituting here is what makes every renderer agree. Silent, because an
+        # absent severity has always meant the default; a present-but-wrong one warns.
         if "severity" not in obj:
+            obj["severity"] = DEFAULT_SEVERITY
             return
         canon, warn = normalize_severity(obj["severity"])
         if warn:

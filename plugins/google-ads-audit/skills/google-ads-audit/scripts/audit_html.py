@@ -319,7 +319,8 @@ footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);color:v
 var M = JSON.parse(document.getElementById('data').textContent);
 var SEV_W = {Critical:5, High:3, Medium:1.5, Low:0.5};
 var FLAG  = {PASS:1, FLAG:0.5, FAIL:0};
-var IMPACT= {Critical:9, High:7, Medium:5, Low:3};
+/* No IMPACT mirror: Python seeds f.impact from SEVERITY_IMPACT into the blob, so
+   the sort reads it like iceVal does. One fewer copy of the kernel to drift. */
 var GRADES= [[90,'A'],[75,'B'],[60,'C'],[40,'D'],[0,'F']];
 var reduce = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion:reduce)').matches;
 function gsapOn(){ return (typeof window!=='undefined' && window.gsap && !reduce) ? window.gsap : null; }
@@ -540,7 +541,7 @@ function findingsRows(){
   rows.sort(function(a,b){
     var k=fSort.k, va,vb;
     if(k==='ice'){ va=iceVal(a); vb=iceVal(b); }
-    else if(k==='sev'){ va=IMPACT[a.f.severity]||0; vb=IMPACT[b.f.severity]||0; }
+    else if(k==='sev'){ va=a.f.impact||0; vb=b.f.impact||0; }
     else if(k==='hzn'){ va=+a.f.horizon||999; vb=+b.f.horizon||999; }
     else { va=''+a.f[k]; vb=''+b.f[k]; return fSort.dir*va.localeCompare(vb); }
     return fSort.dir*(va-vb);

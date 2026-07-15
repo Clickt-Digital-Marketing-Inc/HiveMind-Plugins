@@ -98,7 +98,11 @@ def js_map(name):
 
 check("JS SEV_W == audit_model.SEVERITY_WEIGHTS", js_map("SEV_W") == audit_model.SEVERITY_WEIGHTS)
 check("JS FLAG == audit_model.FLAG_SCORES", js_map("FLAG") == audit_model.FLAG_SCORES)
-check("JS IMPACT == audit_model.SEVERITY_IMPACT", js_map("IMPACT") == audit_model.SEVERITY_IMPACT)
+# No JS IMPACT mirror to assert any more — the sort reads Python's f.impact from the
+# blob. Pin that it stays gone, so the mirror cannot quietly return. Matches the
+# declaration and the lookup, not the bare word (which appears in prose).
+check("JS declares no IMPACT mirror", not re.search(r"\bIMPACT\s*=", tpl))
+check("JS severity sort reads Python's f.impact", "a.f.impact" in tpl)
 js_grades = [(int(n), g) for n, g in re.findall(r"\[(\d+),'([A-F])'\]", tpl)]
 check("JS GRADES == audit_model.GRADE_CUTOFFS", js_grades == [tuple(x) for x in audit_model.GRADE_CUTOFFS],
       str(js_grades))
@@ -175,6 +179,32 @@ check("unrecognized finding severity is still counted, not dropped",
 check("unrecognized finding severity seeds DEFAULT_IMPACT, not 0",
       _um["findings"][0]["impact"] == audit_model.DEFAULT_IMPACT,
       str(_um["findings"][0]["impact"]))
+
+# ABSENT severity — the case neither earlier pass covered, and the one that deleted
+# a finding from 15_Client_Report: the log wrote "" where the model said Medium, so
+# the report's COUNTIF/COUNTA counted 4 findings out of 5.
+_abs = copy.deepcopy(FINDINGS)
+del _abs["findings"][0]["severity"]
+_am = audit_model.compute_model(_abs, generated="2026-06-24T00:00:00")
+check("absent finding severity defaults to DEFAULT_SEVERITY in the model",
+      _am["findings"][0]["severity"] == audit_model.DEFAULT_SEVERITY,
+      str(_am["findings"][0]["severity"]))
+check("absent finding severity is still counted",
+      _am["summary"]["crit"] + _am["summary"]["high"] + _am["summary"]["med"]
+      + _am["summary"]["low"] == _am["provenance"]["n_findings"], str(_am["summary"]))
+check("absent severity is carried in the row, not just used for scoring",
+      _am["findings"][0]["severity"] == audit_model.DEFAULT_SEVERITY
+      and _am["findings"][0]["impact"] == audit_model.DEFAULT_IMPACT,
+      str(_am["findings"][0]))
+# The check side too: the row used to display "" while sev_w scored it as Medium.
+_abs_c = copy.deepcopy(FINDINGS)
+del _abs_c["sections"][0]["checks"][0]["severity"]
+_amc = audit_model.compute_model(_abs_c, generated="2026-06-24T00:00:00")
+_row0 = _amc["sections"][0]["checks"][0]
+check("absent check severity: displayed value matches the weight it was scored at",
+      _row0["severity"] == audit_model.DEFAULT_SEVERITY
+      and _row0["sev_w"] == audit_model.SEVERITY_WEIGHTS[audit_model.DEFAULT_SEVERITY],
+      f"severity={_row0['severity']!r} sev_w={_row0['sev_w']}")
 
 
 check("case variants score identically", score_with("Fail") == score_with("FAIL") == 42.0,
@@ -259,6 +289,17 @@ try:
         _py_imp = [f["impact"] for f in _um["findings"]]
         check("xlsx ICE Impact column == model impacts (incl. unrecognized severity)",
               _xl_imp == _py_imp, f"xlsx {_xl_imp} vs model {_py_imp}")
+        # 12_Findings_Log's severity column is what 15_Client_Report COUNTIFs and
+        # COUNTAs. A blank there deleted the finding from the client's report while
+        # the model still counted it — model 5 findings / 2 Medium vs xlsx 4 / 1.
+        x5 = Path(td) / "absent.xlsx"
+        gw.build(EXAMPLE, x5, "Acme Corp", findings_data=_abs)
+        _wsl = load_workbook(x5)["12_Findings_Log"]
+        _sev_col = [_wsl.cell(row=r, column=4).value for r in range(1, _wsl.max_row + 1)]
+        _sev_written = [v for v in _sev_col if v in audit_model.SEVERITY_WEIGHTS]
+        check("findings log writes a severity for every finding (none blank)",
+              len(_sev_written) == _am["provenance"]["n_findings"],
+              f"{len(_sev_written)} severities for {_am['provenance']['n_findings']} findings")
 except SystemExit:
     check("openpyxl available for xlsx tests", False, "openpyxl not installed")
 

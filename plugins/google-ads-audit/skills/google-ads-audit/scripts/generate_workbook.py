@@ -107,9 +107,12 @@ ALL_TABS = (
 CHK_COLS = ["Check", "What to verify", "Applies to", "Severity", "Result",
             "Observed / evidence", "Recommendation",
             "_sev_w", "_flag", "_earned", "_possible"]
-RESULTS_DV = '"PASS,FLAG,FAIL,N/A"'
-SEVERITY_DV = '"Critical,High,Medium,Low"'
-MODEL_DV = '"Lead Gen,Ecommerce"'
+# Generated from the kernel's vocabularies, not restated: a dropdown that offers a
+# different set than the (generated) formulas score is the same drift the formula
+# builders were fixed for. N/A is a valid result but carries no FLAG_SCORES weight.
+RESULTS_DV = '"' + ",".join(list(FLAG_SCORES) + ["N/A"]) + '"'
+SEVERITY_DV = '"' + ",".join(SEVERITY_WEIGHTS) + '"'
+MODEL_DV = '"Lead Gen,Ecommerce"'  # no kernel constant — business models are not scored
 HORIZON_DV = '"30,60,90"'
 
 
@@ -349,7 +352,7 @@ def build_check_tab(wb, tab_name, tab_title, section_data, kpis=None):
         ws.cell(row=r, column=1, value=name).alignment = WRAP_TOP
         ws.cell(row=r, column=2, value=chk.get("verify", "")).alignment = WRAP_TOP
         ws.cell(row=r, column=3, value=chk.get("applies_to", "Both")).alignment = CENTER
-        ws.cell(row=r, column=4, value=chk.get("severity", "Medium")).alignment = CENTER
+        ws.cell(row=r, column=4, value=chk.get("severity", DEFAULT_SEVERITY)).alignment = CENTER
         rc = ws.cell(row=r, column=5, value=chk.get("result", ""))
         rc.alignment = CENTER
         rc.fill = FILL_HILITE
@@ -407,7 +410,10 @@ def build_findings_log(wb, findings):
         ws.cell(row=r, column=1, value=f.get("id", "")).border = BORDER
         ws.cell(row=r, column=2, value=f.get("section", "")).border = BORDER
         ws.cell(row=r, column=3, value=f.get("title", "")).alignment = WRAP_TOP
-        sc = ws.cell(row=r, column=4, value=f.get("severity", ""))
+        # DEFAULT_SEVERITY, not blank: 15_Client_Report COUNTIFs this column and
+        # COUNTAs it for the total, so a blank here deletes the finding from the
+        # client's report while the model still counts it.
+        sc = ws.cell(row=r, column=4, value=f.get("severity", DEFAULT_SEVERITY))
         sc.alignment = CENTER
         ws.cell(row=r, column=5, value=f.get("recommendation", "")).alignment = WRAP_TOP
         ws.cell(row=r, column=6, value=f.get("effort", "")).alignment = CENTER
@@ -522,12 +528,17 @@ def build_client_report(wb, meta, log_first, log_last):
     r += 2
     r = section(ws, r, "Findings by severity", 2)
     rng = f"'12_Findings_Log'!$D${log_first}:$D${log_last}"
-    for sev in ["Critical", "High", "Medium", "Low"]:
+    # Rows generated from SEVERITY_WEIGHTS — a restated list would silently omit a
+    # tier the (generated) scoring formula prices, and the COUNTIFs would stop
+    # summing to the total with nothing to show for it.
+    for sev in SEVERITY_WEIGHTS:
         ws.cell(row=r, column=1, value=sev).font = FONT_BODY
         ws.cell(row=r, column=2, value=f'=COUNTIF({rng},"{sev}")')
         r += 1
     ws.cell(row=r, column=1, value="Total findings").font = FONT_SECTION
-    ws.cell(row=r, column=2, value=f'=COUNTA({rng})')
+    # Count the findings by their ID, not by a field that happens to be populated.
+    ws.cell(row=r, column=2,
+            value=f"=COUNTA('12_Findings_Log'!$A${log_first}:$A${log_last})")
     r += 2
     r = section(ws, r, "Top priorities", 2)
     ws.cell(row=r, column=1, value=("See 13_ICE_Prioritization sorted by ICE "
