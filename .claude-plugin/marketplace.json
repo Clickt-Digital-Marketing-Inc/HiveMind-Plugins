@@ -11,7 +11,7 @@
     {
       "name": "google-ads-audit",
       "source": "./plugins/google-ads-audit",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "category": "marketing",
       "description": "Full Google Ads account audit driven by the Google Ads MCP (GAQL). Scores live data against a comprehensive 9-step audit framework plus modern Google checks (PMax, Consent Mode v2, Enhanced Conversions, Demand Gen) and emits a 3-format deliverable bundle from one findings JSON: an interactive, self-contained, white-label HTML report (the primary deliverable, with a live Health-Score gauge and ICE re-ranking), an Obsidian-ready markdown record, and a formula-driven multi-tab xlsx backup. HTML + markdown are standard-library only; the xlsx backup needs openpyxl."
     },
