@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "hivemind-plugins",
   "version": "1.0.0",
-  "description": "Clickt's HiveMind plugins for Claude Code — one marketplace bundling five marketing deliverables (Google Ads, Meta, and Shopify CRO account audits + the CM3 per-product contribution-margin report + the wPPC weighted-profit-per-click report) and four workflow plugins (decision memos, project coordinator, social media manager, and daily morning briefing) — most running on Linear, Gmail, and Google Calendar.",
+  "description": "Clickt's HiveMind plugins for Claude Code — one marketplace bundling five marketing deliverables (Google Ads, Meta, and Shopify CRO account audits + the CM3 per-product contribution-margin report + the wPPC weighted-profit-per-click report) and the workflow plugins (decision memos, the project coordinator and its execution-side orchestrator, catch-up, social media manager, and the daily morning briefing) — most running on Linear, Gmail, and Google Calendar.",
   "owner": {
     "name": "Clickt Digital Marketing Inc.",
     "url": "https://clickt.ca"
@@ -56,6 +56,14 @@
       "version": "0.5.0",
       "category": "productivity",
       "description": "Project coordination pipeline for software and marketing projects (content, social calendars, events, launches): refine ideas into briefs, plan work into Linear, structure project folders, and keep Linear as the source of truth with issues executable as standalone Claude prompts. Runs on the Linear MCP."
+    },
+    {
+      "name": "orchestrator",
+      "source": "./plugins/orchestrator",
+      "version": "0.2.0",
+      "category": "productivity",
+      "description": "Multi-agent project orchestration for repos governed by a Linear team: round-based execution with tiered executors in git worktrees, a mixed-tier merge-gate workflow, reflect passes against acceptance criteria, checkpoint/halt-state discipline, and a learnings loop. Execution-side counterpart to project-coordinator. Runs on the Linear MCP; python3 optional for the checkout-guard hook.",
+      "keywords": ["orchestration", "linear", "worktrees", "merge-gate", "multi-agent"]
     },
     {
       "name": "social-media-manager",

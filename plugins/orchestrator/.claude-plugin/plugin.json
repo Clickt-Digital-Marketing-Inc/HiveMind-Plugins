@@ -1,0 +1,12 @@
+{
+  "name": "orchestrator",
+  "version": "0.2.0",
+  "description": "Multi-agent project orchestration for repos governed by a Linear team: round-based execution with tiered executors in git worktrees, a mixed-tier merge-gate workflow, reflect passes against acceptance criteria, checkpoint/halt-state discipline, and a learnings loop. Execution-side counterpart to project-coordinator.",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "homepage": "https://clickt.ca",
+  "license": "LicenseRef-Proprietary",
+  "keywords": ["orchestration", "linear", "worktrees", "merge-gate", "multi-agent"]
+}

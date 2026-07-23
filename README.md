@@ -41,6 +41,7 @@ servers.
 | --- | --- | --- |
 | **memo** | Interrogate a raw idea, scale the depth to the stakes, pressure-test it against the objections a director would actually raise, then write a decision memo: the ask first, real options, a reasoned recommendation, and an honest account of what would kill it. Every claim marked measured/estimated/assumed/derived. | Nothing — no MCP, no Python |
 | **project-coordinator** | Refine an idea into a brief, plan the work into Linear, structure the project folder, and keep every issue executable as a standalone prompt (software or marketing projects). | Linear MCP |
+| **orchestrator** | Execution-side counterpart to project-coordinator: run a Linear-governed repo as rounds of parallel, tiered executors in git worktrees, gated by a mandatory pre-merge review (finders → verifier → fix-applier), with reflect passes, checkpoint/halt-state discipline, and a learnings loop. | Linear MCP (+ git worktrees; `python3` optional for the checkout-guard hook) |
 | **social-media-manager** | Plan a batch of posts: trend scan (Reddit + news), a voice-true interview that builds a persistent voice profile, then a writing prompt + a Higgsfield media prompt per post, each filed as a scheduled Linear issue. | Linear MCP + web |
 | **morning-briefing** | Summarize Gmail and draft replies, report Linear progress + blockers, prioritize your issues, block focus time on your calendar, and flag 3-week time-off bottlenecks. | Gmail + Linear + Google Calendar MCPs |
 
@@ -71,6 +72,7 @@ servers.
    /plugin install google-ads-management@hivemind-plugins
    /plugin install memo@hivemind-plugins
    /plugin install project-coordinator@hivemind-plugins
+   /plugin install orchestrator@hivemind-plugins
    /plugin install social-media-manager@hivemind-plugins
    /plugin install morning-briefing@hivemind-plugins
    ```
