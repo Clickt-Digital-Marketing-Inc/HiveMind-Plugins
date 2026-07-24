@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "hivemind-plugins",
   "version": "1.0.0",
-  "description": "Clickt's HiveMind plugins for Claude Code — one marketplace bundling five marketing deliverables (Google Ads, Meta, and Shopify CRO account audits + the CM3 per-product contribution-margin report + the wPPC weighted-profit-per-click report) and four workflow plugins (decision memos, project coordinator, social media manager, and daily morning briefing) — most running on Linear, Gmail, and Google Calendar.",
+  "description": "Clickt's HiveMind plugins for Claude Code — one marketplace bundling the marketing deliverables (Google Ads, Meta, and Shopify CRO account audits, the CM3 per-product contribution-margin report, the wPPC weighted-profit-per-click report, and the Google Ads management suite) and the workflow plugins (decision memos, project coordinator, orchestrator, social media manager, daily morning briefing, and catch-up) — most running on Linear, Gmail, and Google Calendar.",
   "owner": {
     "name": "Clickt Digital Marketing Inc.",
     "url": "https://clickt.ca"
@@ -53,7 +53,7 @@
     {
       "name": "project-coordinator",
       "source": "./plugins/project-coordinator",
-      "version": "0.5.0",
+      "version": "0.5.1",
       "category": "productivity",
       "description": "Project coordination pipeline for software and marketing projects (content, social calendars, events, launches): refine ideas into briefs, plan work into Linear, structure project folders, and keep Linear as the source of truth with issues executable as standalone Claude prompts. Runs on the Linear MCP."
     },
@@ -107,6 +107,21 @@
         "linear",
         "gmail",
         "granola"
+      ]
+    },
+    {
+      "name": "orchestrator",
+      "source": "./plugins/orchestrator",
+      "version": "0.3.0",
+      "category": "productivity",
+      "description": "Multi-agent project orchestration for Linear-governed repos: round-based execution with tiered executors in git worktrees, a mixed-tier merge gate (8 finder angles, one batched verifier, optional fix-applier), reflect passes against acceptance criteria, checkpoint/halt discipline, interactive review-queue closeout (/orchestrator:close-issues), an interactive learnings loop (/orchestrator:lessons-review), and a checkout-guard hook that keeps the live tree on the base branch. Execution-side counterpart to project-coordinator. Runs on the Linear MCP.",
+      "keywords": [
+        "orchestration",
+        "linear",
+        "worktrees",
+        "merge-gate",
+        "multi-agent",
+        "review-queue"
       ]
     }
   ]

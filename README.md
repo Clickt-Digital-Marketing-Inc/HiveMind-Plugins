@@ -43,6 +43,8 @@ servers.
 | **project-coordinator** | Refine an idea into a brief, plan the work into Linear, structure the project folder, and keep every issue executable as a standalone prompt (software or marketing projects). | Linear MCP |
 | **social-media-manager** | Plan a batch of posts: trend scan (Reddit + news), a voice-true interview that builds a persistent voice profile, then a writing prompt + a Higgsfield media prompt per post, each filed as a scheduled Linear issue. | Linear MCP + web |
 | **morning-briefing** | Summarize Gmail and draft replies, report Linear progress + blockers, prioritize your issues, block focus time on your calendar, and flag 3-week time-off bottlenecks. | Gmail + Linear + Google Calendar MCPs |
+| **catch-up** | Turn everything new since the last run — call transcripts, email — into tracked work: extract tasks/decisions/questions, de-dupe against your tracker, file issues review-first, and draft (never send) the replies and follow-ups you owe. | Transcript + email + tracker MCPs (tool-agnostic; setup skill binds them) |
+| **orchestrator** | Run a Linear-governed project as rounds of parallel, tiered executors in git worktrees: merge gate, reflect pass, QC, checkpoint/halt discipline, interactive review-queue closeout (`/orchestrator:close-issues`) and lessons review (`/orchestrator:lessons-review`). Execution-side counterpart to project-coordinator. | Linear MCP + git (`python3` optional, for the checkout-guard hook — fails open without it) |
 
 > **Source-available.** Free to install and use within Claude Code for your own or
 > your clients' accounts. You may read and modify the source locally, but not
@@ -73,14 +75,20 @@ servers.
    /plugin install project-coordinator@hivemind-plugins
    /plugin install social-media-manager@hivemind-plugins
    /plugin install morning-briefing@hivemind-plugins
+   /plugin install wppc-report@hivemind-plugins
+   /plugin install catch-up@hivemind-plugins
+   /plugin install orchestrator@hivemind-plugins
    ```
+   > `orchestrator` is also published in the standalone `clickt-orchestrator` marketplace — install it from **one** marketplace only (two installs of the same plugin name collide).
 3. **Set up what your chosen plugins need:**
    - *Deliverable plugins & the management suite*: Python 3 with `pip install openpyxl`;
      `google-ads-management` also needs `vl-convert-python==1.7.0` for its charts, and
      `cm3-profitability` needs `pip install python-pptx vl-convert-python==1.7.0`.
-   - *Workflow plugins*: no Python. Connect the MCP servers they use: Linear
-     (project-coordinator, social-media-manager, morning-briefing), plus Gmail +
-     Google Calendar (morning-briefing) and web access (social-media-manager).
+   - *Workflow plugins*: no Python required (exception: `orchestrator`'s checkout-guard
+     hook wants `python3` on PATH, and fails open without it). Connect the MCP servers
+     they use: Linear (project-coordinator, social-media-manager, morning-briefing,
+     orchestrator), plus Gmail + Google Calendar (morning-briefing), web access
+     (social-media-manager), and your transcript/email/tracker tools (catch-up).
      `memo` needs nothing — it writes a markdown file and stops.
 
 ## Requirements

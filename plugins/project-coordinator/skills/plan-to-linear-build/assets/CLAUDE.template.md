@@ -46,6 +46,7 @@ Every unit of work is a Linear issue, and each issue is written to be executed a
 - **Update issue status** as you move: claim it (in-progress) when you start — on repo-backed projects this claim happens *before* any git action and is the lock that stops two agents taking one issue — and done only when acceptance criteria are proven (and, on software projects, reflect has run — see below; on repo-backed projects, the PR is merged — see Git workflow).
 - **Never work off-Linear.** If new work surfaces mid-project, create an issue for it rather than silently expanding scope.
 - **Assume parallel agents.** Other agents may be executing other issues of this project at the same time. Coordinate only through Linear: an In-Progress issue is owned — never start it. Pick only unclaimed, unblocked issues.
+- **When this project runs under the `orchestrator` plugin**, review-queue verdicts go through `/orchestrator:close-issues` and lessons approvals through `/orchestrator:lessons-review` — single-agent sessions are unaffected.
 
 ## Linear sync at issue boundaries
 

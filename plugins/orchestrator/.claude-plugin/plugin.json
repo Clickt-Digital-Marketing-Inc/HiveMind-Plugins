@@ -1,0 +1,9 @@
+{
+  "name": "orchestrator",
+  "description": "Multi-agent project orchestration for repos governed by a Linear team: round-based execution with tiered executors in git worktrees, a mixed-tier merge-gate workflow, reflect passes against acceptance criteria, checkpoint/halt-state discipline, interactive review-queue closeout (/close-issues), and an interactive learnings loop (/lessons-review). Execution-side counterpart to project-coordinator.",
+  "version": "0.3.0",
+  "author": { "name": "John Greenhow" },
+  "homepage": "https://github.com/performance-clickt/orchestrator",
+  "repository": "https://github.com/performance-clickt/orchestrator",
+  "keywords": ["orchestration", "linear", "worktrees", "merge-gate", "multi-agent", "review-queue"]
+}
