@@ -1,24 +1,40 @@
-HiveMind Plugins — Source-Available License
+HiveMind Plugins — Proprietary Source-Available License
 Copyright (c) 2026 Clickt Digital Marketing Inc. All rights reserved.
 
-This repository and the associated plugins, skills, scripts, references, and
-documentation (the "Software") are published by Clickt Digital Marketing Inc.
-as source-available software. The Software is licensed, not sold, and all rights
-not expressly granted below are reserved.
+This repository and everything in it — the plugins, skills, commands, agents,
+hooks, workflows, prompts, templates, scripts, configuration, references, and
+documentation (the "Software") — is proprietary to Clickt Digital Marketing
+Inc. ("Clickt"). The Software is licensed, not sold. All rights not expressly
+granted below are reserved.
 
-PERMITTED USE. You may, at no charge, install and use the Software within Claude
-Code to manage and audit advertising and ecommerce accounts that you own or that
-you manage on behalf of your own clients. You may view and study the source, and
-you may modify it locally for your own use.
+PERMITTED USE. Subject to full compliance with this license, you may, at no
+charge: (a) install and run the Software, unmodified and through Claude Code,
+for your own internal business purposes or for accounts you manage on behalf
+of your own clients; and (b) view the source solely for reference in the
+course of that use.
 
-RESTRICTIONS. You may NOT, in whole or in part: sell, resell, relicense,
-sublicense, rent, or lease the Software; redistribute, republish, mirror, or
-re-host the Software or this repository — in original or modified form — on any
-other site, marketplace, or plugin distribution channel; represent the Software,
-or any derivative of it, as your own product; or remove or alter any copyright,
-license, or attribution notice. Forking this repository on GitHub for the sole
-purpose of proposing a contribution back to it is permitted; publishing a fork or
-a derivative as a separate distribution is not.
+RESTRICTIONS. Except as expressly permitted above or as required by applicable
+law, you may NOT, in whole or in part:
+
+1. COPY OR DUPLICATE the Software — no redistribution, republishing,
+   mirroring, re-hosting, forking, or inclusion of it in any other repository,
+   marketplace, or distribution channel, in source or any other form;
+2. EDIT OR MODIFY the Software — no changes, adaptations, translations, or
+   derivative works, whether or not they are distributed;
+3. REPURPOSE the Software — no extracting, adapting, or incorporating any
+   part of it (including skills, prompts, templates, workflows, code, or
+   documentation) into any other product, service, tool, dataset, model, or
+   workflow;
+4. SELL OR COMMERCIALIZE the Software — no selling, reselling, relicensing,
+   sublicensing, renting, leasing, or offering it, access to it, or anything
+   derived from it, for any fee or other consideration;
+5. MISREPRESENT it — no removing or altering copyright, license, or
+   attribution notices, and no representing the Software or any part of it as
+   your own work or product.
+
+TERMINATION. This license terminates automatically upon any breach. Upon
+termination you must stop using the Software and delete every copy in your
+possession or control.
 
 NO WARRANTY. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

@@ -46,9 +46,11 @@ servers.
 | **catch-up** | Turn everything new since the last run — call transcripts, email — into tracked work: extract tasks/decisions/questions, de-dupe against your tracker, file issues review-first, and draft (never send) the replies and follow-ups you owe. | Transcript + email + tracker MCPs (tool-agnostic; setup skill binds them) |
 | **orchestrator** | Run a Linear-governed project as rounds of parallel, tiered executors in git worktrees: merge gate, reflect pass, QC, checkpoint/halt discipline, interactive review-queue closeout (`/orchestrator:close-issues`) and lessons review (`/orchestrator:lessons-review`). Execution-side counterpart to project-coordinator. | Linear MCP + git (`python3` optional, for the checkout-guard hook — fails open without it) |
 
-> **Source-available.** Free to install and use within Claude Code for your own or
-> your clients' accounts. You may read and modify the source locally, but not
-> resell, redistribute, mirror, or re-host it. See [`LICENSE`](LICENSE).
+> **Source-available, all rights reserved.** Free to install and use within Claude
+> Code, unmodified, for your own or your clients' accounts. The source may be viewed
+> for reference only — no duplication, no modification, no repurposing into other
+> products or workflows, no redistribution, no resale, in whole or in part. See
+> [`LICENSE`](LICENSE).
 >
 > The social-media-manager stores your voice profile at
 > `~/.claude/social-media-manager/voice-profile.md`, **on your machine, outside
@@ -144,5 +146,7 @@ Questions, bugs, or requests: [support@clickt.ca](mailto:support@clickt.ca).
 
 ## License
 
-Source-available. Copyright (c) 2026 Clickt Digital Marketing Inc. All rights
-reserved. Free to use, not to redistribute, see [`LICENSE`](LICENSE).
+Proprietary, source-available. Copyright (c) 2026 Clickt Digital Marketing Inc.
+All rights reserved. Free to install and use through Claude Code — nothing else:
+no duplication, no modification, no repurposing, no resale, in whole or in part.
+See [`LICENSE`](LICENSE).
