@@ -7,7 +7,7 @@
     "url": "https://clickt.ca"
   },
   "homepage": "https://clickt.ca",
-  "license": "LicenseRef-Proprietary",
+  "license": "PolyForm-Internal-Use-1.0.0",
   "keywords": ["wppc", "ppc", "google-ads", "meta-ads", "sabermetrics", "profit-per-click", "mar", "cm3", "html", "interactive", "report", "xlsx"],
   "skills": "./skills"
 }

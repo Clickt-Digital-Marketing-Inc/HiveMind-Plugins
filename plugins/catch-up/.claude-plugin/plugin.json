@@ -1,7 +1,7 @@
 {
   "name": "catch-up",
   "version": "0.1.0",
-  "license": "LicenseRef-Proprietary",
+  "license": "PolyForm-Internal-Use-1.0.0",
   "description": "Turn new call transcripts and emails into tracked issues and draft replies. Reads everything since the last run, pulls out tasks, decisions, and open questions, files them in your project tracker, and drafts the emails you owe.",
   "author": {
     "name": "Clickt Digital Marketing Inc.",

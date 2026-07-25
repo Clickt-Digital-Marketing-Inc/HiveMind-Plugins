@@ -2,7 +2,7 @@
   "name": "social-media-manager",
   "description": "Social Media Manager: plans a batch of social posts end-to-end — asks how many posts, at what cadence, for which platforms and formats; scans Reddit and news sites for trending content ideas; interviews the user to capture their real opinions and direct quotes (building a persistent voice profile); then authors a production-ready writing prompt and a Higgsfield media prompt per post and files each post as a scheduled Linear issue.",
   "version": "0.1.0",
-  "license": "LicenseRef-Proprietary",
+  "license": "PolyForm-Internal-Use-1.0.0",
   "author": {
     "name": "Clickt Digital Marketing Inc.",
     "url": "https://clickt.ca"

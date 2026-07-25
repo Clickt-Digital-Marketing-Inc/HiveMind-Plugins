@@ -2,7 +2,7 @@
   "name": "memo",
   "description": "Turn a raw idea into a decision memo a director can act on in one read. Interrogates the idea before writing a word, scales depth to stakes, marks every claim as measured/estimated/assumed/derived, pressure-tests it against the objections a director would actually raise, and writes a markdown memo with an explicit ask, real options, and a reasoned recommendation.",
   "version": "0.2.0",
-  "license": "LicenseRef-Proprietary",
+  "license": "PolyForm-Internal-Use-1.0.0",
   "author": {
     "name": "Clickt Digital Marketing Inc.",
     "url": "https://clickt.ca"
