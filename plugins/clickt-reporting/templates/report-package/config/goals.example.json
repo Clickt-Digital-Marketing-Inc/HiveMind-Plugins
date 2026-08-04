@@ -1,0 +1,24 @@
+{
+  "_comment": "Goals schema v2 — see template/schema/GOALS.md. Edit in the report's Goals tab and export, or edit here directly. status 'proposed' renders a badge until client-agreed.",
+  "version": 2,
+  "goal_sets": [
+    {
+      "effective_from": "2026-07-01",
+      "status": "proposed",
+      "_basis": "Proposed 2026-08-04 from July/June actuals. John to review and edit.",
+      "goals": [
+        { "id": "store_revenue", "metric": "store_revenue", "target": 85000 },
+        { "id": "store_profit", "metric": "store_profit", "target": 48000 },
+        { "id": "total_ad_spend", "metric": "total_ad_spend", "target": 7500 },
+        { "id": "mer", "metric": "mer", "target": 11 },
+        { "id": "orders", "metric": "orders", "target": 360 },
+        { "id": "new_customers", "metric": "new_customers", "target": 200 },
+        { "id": "ncac", "metric": "ncac", "target": 30 },
+        { "id": "conversion_rate", "metric": "conversion_rate", "target": 2.4 },
+        { "id": "aov", "metric": "aov", "target": 235 },
+        { "id": "google_poas", "metric": "google_poas", "target": 2.0 },
+        { "id": "meta_roas", "metric": "meta_roas", "target": 4.0 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "client": {
+    "name": "PantryLot",
+    "slug": "pantrylot",
+    "website": "www.pantrylot.com",
+    "currency": "CAD",
+    "locale": "en-CA"
+  },
+  "agency": {
+    "name": "Clickt",
+    "legal_name": "Clickt Digital Marketing Inc."
+  },
+  "branding": {
+    "_note": "Clickt division system: HiveMind teal primary; Performance volt/moss data accents; Studio plum structural accents; ember attention. Tokens live in template/partials/styles.css.",
+    "accent": "#1F7A82",
+    "accent_dark": "#0F4A52",
+    "performance_volt": "#B4E01F",
+    "performance_moss": "#6F8C13",
+    "studio_plum": "#4E4060",
+    "ember": "#F86B3C",
+    "positive": "#2E7D52",
+    "negative": "#C0492F",
+    "neutral": "#5C6470"
+  },
+  "sections": {
+    "google_ads": {
+      "enabled": true,
+      "conversion_value_is": "profit"
+    },
+    "meta": {
+      "enabled": true,
+      "conversion_value_is": "revenue"
+    },
+    "store": {
+      "enabled": true
+    },
+    "traffic": {
+      "enabled": true
+    }
+  },
+  "accounts": {
+    "google_ads": {
+      "customer_id": "544-317-0313",
+      "adapter": "google-ads-windsor",
+      "revenue_conversion_actions": [
+        "PM Revenue - Browser",
+        "PM Revenue - Conversion Booster"
+      ]
+    },
+    "meta": {
+      "ad_account_id": "1182016997374640",
+      "adapter": "meta-windsor",
+      "profit_tracking": "complete_registration_value"
+    },
+    "store": {
+      "platform": "shopify",
+      "store": "pantrylot",
+      "adapter": "shopify-mcp"
+    },
+    "traffic": {
+      "ga4_property_id": "507568174",
+      "ga4_property_name": "PantryLot | Revenue | ProfitMetrics",
+      "adapter": "ga4-windsor"
+    }
+  },
+  "notes": [
+    "Google Ads conversion Value = PROFIT (client rule). Efficiency metric renders as POAS, never ROAS.",
+    "Meta purchase value = REVENUE. Efficiency metric renders as ROAS.",
+    "POAS and ROAS are never blended; the only blended metric is MER (store revenue / total ad spend).",
+    "Meta profit = ProfitMetrics profit value carried on the complete-registration event (action_values_complete_registration in Windsor). Google revenue = PM Revenue conversion actions. Channel profit is never estimated."
+  ]
+}
