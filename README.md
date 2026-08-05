@@ -46,7 +46,7 @@ servers.
 | **catch-up** | Turn everything new since the last run — call transcripts, email — into tracked work: extract tasks/decisions/questions, de-dupe against your tracker, file issues review-first, and draft (never send) the replies and follow-ups you owe. | Transcript + email + tracker MCPs (tool-agnostic; setup skill binds them) |
 | **orchestrator** | Run a Linear-governed project as rounds of parallel, tiered executors in git worktrees: merge gate, reflect pass, QC, checkpoint/halt discipline, interactive review-queue closeout (`/orchestrator:close-issues`) and lessons review (`/orchestrator:lessons-review`). Execution-side counterpart to project-coordinator. | Linear MCP + git (`python3` optional, for the checkout-guard hook — fails open without it) |
 
-> **Source-available under the [PolyForm Internal Use License 1.0.0](https://polyformproject.org/licenses/internal-use/1.0.0).**
+> **Source-available under the [PolyForm Shield License 1.0.0](https://polyformproject.org/licenses/shield/1.0.0).**
 > Free to install and use within Claude Code for the internal business operations
 > of you and your company — including work on your own clients' accounts. No
 > redistribution, no re-hosting, no sublicensing, no resale — of the software or
@@ -146,7 +146,7 @@ Questions, bugs, or requests: [support@clickt.ca](mailto:support@clickt.ca).
 
 ## License
 
-[PolyForm Internal Use License 1.0.0](https://polyformproject.org/licenses/internal-use/1.0.0).
+[PolyForm Shield License 1.0.0](https://polyformproject.org/licenses/shield/1.0.0).
 Copyright (c) 2026 Clickt Digital Marketing Inc. Use is licensed for the internal
 business operations of you and your company; distribution, sublicensing, and sale —
 of the software or anything based on it — are not. See [`LICENSE`](LICENSE).
