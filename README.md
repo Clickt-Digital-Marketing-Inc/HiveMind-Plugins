@@ -6,8 +6,8 @@ client reports; a **management suite** runs ongoing Google Ads work as done-with
 advisors; and **workflow** plugins run your day on Linear, Gmail, and Google Calendar.
 
 Authored by **Clickt Digital Marketing Inc.** ([clickt.ca](https://clickt.ca)).
-This repo is public and every plugin in it is free to install and run. No
-signup of any kind is required.
+This repository is private. Installing these plugins requires access to
+`Clickt-Digital-Marketing-Inc/HiveMind-Plugins`.
 
 ### Deliverable plugins
 
@@ -130,8 +130,8 @@ Each plugin's full workflow lives in its `SKILL.md` under
 
 ## Community and updates
 
-This repo is public, and every plugin in it is free to install and run. No
-signup is required to install anything above.
+This repository is private. Installing anything above requires access to
+`Clickt-Digital-Marketing-Inc/HiveMind-Plugins`.
 
 If you want the HiveMind community and a heads-up when new plugins ship, one
 email at [gethivemind.co](https://gethivemind.co) gets you both. This is
