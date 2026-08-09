@@ -19,7 +19,7 @@ formula-driven xlsx workbook from a single compute pass.
 | **google-ads-audit** | Full Google Ads account audit against a 9-step framework + modern checks (PMax, Consent Mode v2, Enhanced Conversions, Demand Gen); live Health-Score gauge + ICE roadmap. | Google Ads MCP (GAQL) |
 | **meta-ads-audit** | Full Meta (Facebook/Instagram) audit against a 7-lever framework with a deterministic pre-scorer, Concentration, and Creative Signals (fatigue, reach saturation, effective frequency, ranking decomposition). | Meta Ads MCP **or** Ads Manager CSV exports |
 | **shopify-cro-audit** | 11-step Shopify conversion-rate-optimization audit; machine-computed funnel analytics, a 0–150 Funnel Health gauge, Concentration, and CVR Signals (Wilson CIs, z-tests, empirical-Bayes page CVRs). | Shopify MCP (ShopifyQL) and/or GA4 + Shopify CSV exports |
-| **cm3-profitability** | Per-product CM3 contribution-margin report; CM3 bands + rollups by campaign, category (L1–L5), product type (L1–L5), and vendor, with a live HTML explorer that re-bands every table as you tune assumptions. | Google Ads Shopping-products CSV (+ optional Shopify Gross-profit CSV) |
+| **cm3-profitability** | Protected remote per-product CM3 report from a required Google Ads Shopping CSV (+ optional Shopify Gross profit by product CSV) -> expiring Markdown, HTML, and XLSX artifacts. CSV bytes bypass prompts and MCP JSON through direct presigned uploads. | CM3 protected-compute MCP contract 1.0 + service-issued credential; outbound HTTPS |
 
 ### Management suite
 
@@ -85,7 +85,8 @@ servers.
 3. **Set up what your chosen plugins need:**
    - *Deliverable plugins & the management suite*: Python 3 with `pip install openpyxl`;
      `google-ads-management` also needs `vl-convert-python==1.7.0` for its charts, and
-     `cm3-profitability` needs `pip install python-pptx vl-convert-python==1.7.0`.
+     `cm3-profitability` needs the CM3 protected-compute MCP, a service-issued
+     credential in the MCP client's private secret store, and outbound HTTPS.
    - *Workflow plugins*: no Python required (exception: `orchestrator`'s checkout-guard
      hook wants `python3` on PATH, and fails open without it). Connect the MCP servers
      they use: Linear (project-coordinator, social-media-manager, morning-briefing,
@@ -99,10 +100,11 @@ servers.
 - **Deliverable plugins & the management suite, Python 3.** The HTML + markdown
   renderers are standard-library only; `openpyxl` (>=3.1) is needed for the xlsx
   workbooks. `google-ads-management` needs `vl-convert-python==1.7.0` for its static
-  chart SVGs; `cm3-profitability` additionally needs `python-pptx` and the same
-  `vl-convert-python==1.7.0` pin. **LibreOffice** (optional) normalizes xlsx output.
+  chart SVGs; `cm3-profitability`'s thin remote helper uses only the Python
+  standard library. **LibreOffice** (optional) normalizes xlsx output.
   Data comes from each plugin's own MCP (Google Ads / Meta Ads / Shopify) **or** from
-  CSV exports; `google-ads-management` takes either, `cm3-profitability` is CSV-only.
+  CSV exports; `google-ads-management` takes either, and `cm3-profitability`
+  uses direct presigned uploads through the CM3 protected-compute MCP.
 - **Workflow plugins, MCP servers, no Python.** `project-coordinator` and
   `social-media-manager` use the Linear MCP (social also uses web access);
   `morning-briefing` uses the Gmail, Linear, and Google Calendar MCPs. See each
