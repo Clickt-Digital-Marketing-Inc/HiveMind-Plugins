@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "wppc"
-version = "1.0.0"
+version = "1.0.1"
 description = "Weighted Profit-Per-Click (wPPC) sabermetric reporting for Google & Meta Ads segment exports."
 readme = "README.md"
 requires-python = ">=3.11"

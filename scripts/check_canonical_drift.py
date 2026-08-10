@@ -8,7 +8,7 @@ import hashlib
 import sys
 from pathlib import Path
 
-from sync_lib import ROOT, blob_bytes, load_config, resolve_ref, tracked_paths, tree_entries
+from sync_lib import ROOT, blob_bytes, is_overlay, load_config, resolve_ref, tracked_paths, tree_entries
 
 
 def parse_args() -> argparse.Namespace:
@@ -26,13 +26,12 @@ def main() -> int:
         print("REFUSE: mirror and canonical resolve to the same repository", file=sys.stderr)
         return 2
     commit = resolve_ref(canonical, args.canonical_ref)
-    overlays = set(config["overlayPaths"])
     source = {
         path: entry
         for path, entry in tree_entries(canonical, commit, config["plugins"]).items()
-        if path not in overlays
+        if not is_overlay(path, config)
     }
-    mirror_paths = tracked_paths(ROOT, config["plugins"]) - overlays
+    mirror_paths = {path for path in tracked_paths(ROOT, config["plugins"]) if not is_overlay(path, config)}
     missing = sorted(set(source) - mirror_paths)
     extra = sorted(mirror_paths - set(source))
     different = []
@@ -48,7 +47,10 @@ def main() -> int:
             for path in paths:
                 print(f"  {label}: {path}", file=sys.stderr)
         return 1
-    print(f"CANONICAL DRIFT OK: canonical={commit} synced_payload_files={len(source)} overlays={len(overlays)}")
+    print(
+        f"CANONICAL DRIFT OK: canonical={commit} synced_payload_files={len(source)} "
+        f"overlay_paths={len(config['overlayPaths'])} overlay_prefixes={len(config['overlayPrefixes'])}"
+    )
     return 0
 
 

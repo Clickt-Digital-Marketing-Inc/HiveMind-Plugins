@@ -1,0 +1,16 @@
+# ----------------------------------------
+# All Users
+# Landing page + query string
+# 20260401-20260630
+# ----------------------------------------
+Landing page + query string,Sessions,Key events,Session key event rate
+/,2400,88,0.0366
+/pages/a?variant=1,450,2,0.0044
+/Pages/A/,50,1,0.02
+/products/b,300,6,0.02
+Grand total,10000,197,0.0197
+
+# Day-by-day
+Nth day,Sessions
+0,100
+1,200

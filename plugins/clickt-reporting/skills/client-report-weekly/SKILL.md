@@ -1,6 +1,6 @@
 ---
 name: client-report-weekly
-description: Use for the weekly client report cycle — "run the weekly report", "weekly pulse for <client>", or when a scheduled Routine invokes /clickt-reporting:report-weekly. Pulls the just-completed ISO week, builds the pulse draft, requests John's commentary, and deploys ONLY after his approval.
+description: Use for the weekly client report cycle — "run the weekly report", "weekly pulse for <client>", or when a scheduled Routine invokes /clickt-reporting:report-weekly. Pulls the just-completed ISO week, builds the pulse draft, requests the designated approver's commentary, and deploys ONLY after their approval.
 ---
 
 # Weekly Report Cycle
@@ -12,9 +12,9 @@ and the client's Known-issues section (value semantics, source quirks).
 
 ## The non-negotiable gate
 
-**Nothing deploys until John approves.** The client may hold live credentials; a deploy
+**Nothing deploys until the designated approver approves.** The client may hold live credentials; a deploy
 is client-visible the moment it lands. Build the draft, request commentary, stop. Only
-John's reply (commentary, or an explicit "ship it" without commentary) unlocks
+the designated approver's reply (commentary, or an explicit "ship it" without commentary) unlocks
 `deploy.sh`.
 
 ## Cycle
@@ -33,14 +33,15 @@ John's reply (commentary, or an explicit "ship it" without commentary) unlocks
    Ads MCP vs Windsor) or, when none exists, internal triangulation (trend sums =
    totals, campaign sums ≤ totals, derived-metric recomputation). Record in
    `periods/<id>/raw/spot-check.md`. No match → no report.
-6. **Draft review**: render `report-preview.html` (headless screenshot), and give John
+6. **Draft review**: render `report-preview.html` (headless screenshot), and give the designated approver
    a plain-language summary — headline numbers, WoW moves, pace vs goals, anything a
    client would ask about.
 7. **Ask for commentary** — see below.
 8. **On approval**: write the reply into `periods/<id>/commentary.md` under `## pulse`
-   (light markdown: paragraphs, **bold**, `- ` lists; tidy John's rough notes but keep
+   (light markdown: paragraphs, **bold**, `- ` lists; tidy the designated approver's rough notes but keep
    his judgments — do not invent claims), rebuild (`build.mjs <id>`), assemble
-   (`node template/build-dist.mjs`), deploy (`./deploy/deploy.sh`), then verify live
+   (`node template/build-dist.mjs`), deploy with the explicit approved destination and
+   confirmation (`./deploy/deploy.sh --destination <target-ending-in-slug> --confirm deploy:<slug>`), then verify live
    (401 without credentials, 200 with; new pulse listed on the dashboard and in the
    monthly report's Weekly Pulses dropdown after its next rebuild). Commit the period
    folder.
@@ -53,7 +54,7 @@ John's reply (commentary, or an explicit "ship it" without commentary) unlocks
 - **Scheduled/headless Routine**: end the turn with the draft summary and the request:
   what the numbers say, what you'd flag, and "Reply with commentary (or 'ship it') and
   I'll integrate and deploy." Do not wait in a loop, do not deploy, do not
-  self-approve. John continues the Routine's session when ready; integration happens on
+  self-approve. The designated approver continues the Routine's session when ready; integration happens on
   his reply.
 
 ## Update side-effects worth remembering

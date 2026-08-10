@@ -7,7 +7,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from sync_lib import ROOT, blob_bytes, load_config, resolve_ref, set_executable, tracked_paths, tree_entries
+from sync_lib import ROOT, blob_bytes, is_overlay, load_config, resolve_ref, set_executable, tracked_paths, tree_entries
 
 
 def parse_args() -> argparse.Namespace:
@@ -27,9 +27,8 @@ def main() -> int:
     ref = args.canonical_ref or config["sourceCommit"]
     commit = resolve_ref(canonical, ref)
     expected = tree_entries(canonical, commit, config["plugins"])
-    overlays = set(config["overlayPaths"])
-    expected = {path: entry for path, entry in expected.items() if path not in overlays}
-    existing = tracked_paths(ROOT, config["plugins"]) - overlays
+    expected = {path: entry for path, entry in expected.items() if not is_overlay(path, config)}
+    existing = {path for path in tracked_paths(ROOT, config["plugins"]) if not is_overlay(path, config)}
 
     removed = 0
     for relative in sorted(existing - set(expected)):

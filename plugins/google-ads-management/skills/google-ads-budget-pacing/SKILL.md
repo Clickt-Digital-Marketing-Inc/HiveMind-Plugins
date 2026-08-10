@@ -78,7 +78,7 @@ if a real export uses a header spelling that doesn't match, add the alias there 
 test, then log the lesson.
 
 ## Diagnose
-Thresholds from [benchmarks](google-ads-foundation/references/benchmarks-2026.md) "Budget & pacing":
+Thresholds from [benchmarks](../google-ads-foundation/references/benchmarks-2026.md) "Budget & pacing":
 
 - **Pacing:** expected MTD = monthly_goal × (days_elapsed / days_in_month). Flag if actual is
   outside ±15% (over-pacing risks early exhaustion; under-pacing leaves volume on the table).

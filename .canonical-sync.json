@@ -11,6 +11,7 @@
   ],
   "overlayPaths": [
     "plugins/cm3-profitability/.claude-plugin/plugin.json",
+    "plugins/cm3-profitability/skills/cm3-by-product-report/_charts/charts.py",
     "plugins/google-ads-audit/.claude-plugin/plugin.json",
     "plugins/google-ads-management/.claude-plugin/plugin.json",
     "plugins/google-ads-management/README.md",
@@ -20,9 +21,35 @@
     "plugins/google-ads-management/skills/google-ads-quality-score/SKILL.md",
     "plugins/google-ads-management/skills/google-ads/SKILL.md",
     "plugins/google-ads-management/skills/google-ads/references/catalog.json",
+    "plugins/google-ads-management/skills/google-ads/references/save_vault_report.py",
     "plugins/google-ads-management/skills/google-ads/tests/test_catalog.py",
     "plugins/meta-ads-audit/.claude-plugin/plugin.json",
     "plugins/shopify-cro-audit/.claude-plugin/plugin.json",
-    "plugins/wppc-report/.claude-plugin/plugin.json"
-  ]
+    "plugins/wppc-report/.claude-plugin/plugin.json",
+    "plugins/wppc-report/pyproject.toml",
+    "plugins/wppc-report/wppc/__init__.py"
+  ],
+  "overlayReasons": {
+    "plugins/cm3-profitability/.claude-plugin/plugin.json": "Marketplace distribution manifest and release version.",
+    "plugins/cm3-profitability/skills/cm3-by-product-report/_charts/charts.py": "Canonical CM3 parity test requires the newer shared chart implementation already shipped in this mirror.",
+    "plugins/google-ads-audit/.claude-plugin/plugin.json": "Marketplace distribution manifest and release version.",
+    "plugins/google-ads-management/.claude-plugin/plugin.json": "Marketplace distribution manifest and release version.",
+    "plugins/google-ads-management/README.md": "Mirror hub scope excludes plugins not distributed by this marketplace.",
+    "plugins/google-ads-management/skills/google-ads-budget-pacing/SKILL.md": "Mirror-relative documentation link correction.",
+    "plugins/google-ads-management/skills/google-ads-keywords-search-terms/SKILL.md": "Mirror-relative documentation link correction.",
+    "plugins/google-ads-management/skills/google-ads-performance-reporting/SKILL.md": "Mirror-relative documentation link correction.",
+    "plugins/google-ads-management/skills/google-ads-quality-score/SKILL.md": "Mirror-relative documentation link correction.",
+    "plugins/google-ads-management/skills/google-ads/SKILL.md": "Mirror-only hub scope and non-overwriting vault-save policy.",
+    "plugins/google-ads-management/skills/google-ads/references/catalog.json": "Mirror catalog may advertise only plugins shipped by this marketplace.",
+    "plugins/google-ads-management/skills/google-ads/references/save_vault_report.py": "Mirror implementation of the non-overwriting vault-save policy.",
+    "plugins/google-ads-management/skills/google-ads/tests/test_catalog.py": "Mirror catalog groups are derived from the mirror distribution.",
+    "plugins/meta-ads-audit/.claude-plugin/plugin.json": "Marketplace distribution manifest and release version.",
+    "plugins/shopify-cro-audit/.claude-plugin/plugin.json": "Marketplace distribution manifest and release version.",
+    "plugins/wppc-report/.claude-plugin/plugin.json": "Marketplace distribution manifest and release version.",
+    "plugins/wppc-report/pyproject.toml": "Marketplace release version must match the packaged wPPC distribution.",
+    "plugins/wppc-report/wppc/__init__.py": "Marketplace release version must match the wPPC runtime version."
+  },
+  "overlayPrefixes": {
+    "plugins/shopify-cro-audit/skills/shopify-cro-audit/tests/fixtures/csv/": "Required by the shipped canonical test script but absent from the canonical tree; retained test fixtures only."
+  }
 }

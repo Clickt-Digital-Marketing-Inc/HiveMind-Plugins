@@ -1,6 +1,6 @@
 {
   "name": "wppc-report",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "wPPC — Weighted Profit-Per-Click. Sabermetric linear-weights report for Google & Meta Ads segment exports: funnel events credited at expected CM3 value, indexed to the account baseline, shrunk for sample size, and scored above replacement (Margin Above Replacement). Emits a 3-format bundle from one model — an interactive, self-contained, white-label HTML report (primary, with a Scale/Cut/Watch decision lens and four charts), an Obsidian-ready markdown record, and a formula-driven multi-tab xlsx backup (Report/Weights/Charts/Run). HTML + markdown are standard-library only; the xlsx backup needs openpyxl and static chart SVGs need vl-convert-python.",
   "author": {
     "name": "Clickt Digital Marketing Inc.",

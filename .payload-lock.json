@@ -1,0 +1,57 @@
+{
+  "plugins": {
+    "catch-up": {
+      "payloadSha256": "e62b3cba28823b175d564b927b3874629e564a56c607c0a775e5c0294762c150",
+      "version": "0.1.0"
+    },
+    "clickt-reporting": {
+      "payloadSha256": "9c6af3620b9cbcc2c176e8bbe965db879815e362002b1742a8c0bd290563d847",
+      "version": "1.0.1"
+    },
+    "cm3-profitability": {
+      "payloadSha256": "d5c7ce6da7ecce727505ee8330521bca0e297945d671ee7a76110f1b67a3d66d",
+      "version": "1.0.1"
+    },
+    "google-ads-audit": {
+      "payloadSha256": "50b83b16879bb36a33329389fa18e5201e2aa95d5afd8fd7c125e517e274f19a",
+      "version": "1.1.0"
+    },
+    "google-ads-management": {
+      "payloadSha256": "5af22ceffb4939393a004e19f664bb84623bed6fbd3a83ea6d9c7a62ac6434f8",
+      "version": "2.0.1"
+    },
+    "memo": {
+      "payloadSha256": "ce02259f8b92f01bd3bf57db5c857e184d3436fee7045baf209f3ff2a5e1c6d0",
+      "version": "0.2.0"
+    },
+    "meta-ads-audit": {
+      "payloadSha256": "58a72c716ac476ef6a418783984dbc659e7e3f38859646629ef3ba726239f684",
+      "version": "2.0.0"
+    },
+    "morning-briefing": {
+      "payloadSha256": "0e7ec802f1546529fab6fba6009b30c19b527d465074d3be170287a49406da2b",
+      "version": "0.4.0"
+    },
+    "orchestrator": {
+      "payloadSha256": "cc18be86c5d5f4806bebe7d95fd14d3ed2fe083b0bcc9e8df9e6a5e5e790fd30",
+      "version": "0.3.0"
+    },
+    "project-coordinator": {
+      "payloadSha256": "e432ac5de42e25b3342e7b9d9f7fcd353d8269720c32f012dd1bc11c05c254bc",
+      "version": "0.5.1"
+    },
+    "shopify-cro-audit": {
+      "payloadSha256": "820b6d50ea98238260ae0a401ce2a3aef9e5e8c680170b6e1d334edbbfb6441e",
+      "version": "2.0.0"
+    },
+    "social-media-manager": {
+      "payloadSha256": "c5763721f4cfb1e4a017bec6606680b988fbab943fd5cd5d5e6f079fc77a929d",
+      "version": "0.1.0"
+    },
+    "wppc-report": {
+      "payloadSha256": "d579fab73829a427ceb46069476bac5c636acb70e0b3034dc98c2099f45413fc",
+      "version": "1.0.1"
+    }
+  },
+  "schemaVersion": 1
+}

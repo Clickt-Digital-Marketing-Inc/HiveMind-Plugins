@@ -29,7 +29,7 @@ def run_git(repo: Path, *args: str, text: bool = True) -> str | bytes:
 
 def load_config(path: Path = CONFIG_PATH) -> dict:
     data = json.loads(path.read_text(encoding="utf-8"))
-    required = {"sourceRepository", "sourceCommit", "plugins", "overlayPaths"}
+    required = {"sourceRepository", "sourceCommit", "plugins", "overlayPaths", "overlayReasons", "overlayPrefixes"}
     missing = required - set(data)
     if missing:
         raise ValueError(f"{path}: missing keys: {sorted(missing)}")
@@ -37,11 +37,22 @@ def load_config(path: Path = CONFIG_PATH) -> dict:
         raise ValueError(f"{path}: plugins must be a non-empty unique list")
     if len(data["overlayPaths"]) != len(set(data["overlayPaths"])):
         raise ValueError(f"{path}: overlayPaths contains duplicates")
+    if set(data["overlayPaths"]) != set(data["overlayReasons"]):
+        raise ValueError(f"{path}: overlayPaths and overlayReasons must have identical keys")
     roots = tuple(f"plugins/{name}/" for name in data["plugins"])
     for overlay in data["overlayPaths"]:
         if not overlay.startswith(roots):
             raise ValueError(f"{path}: overlay outside synced roots: {overlay}")
+    for prefix, reason in data["overlayPrefixes"].items():
+        if not prefix.startswith(roots) or not prefix.endswith("/") or not reason:
+            raise ValueError(f"{path}: invalid overlay prefix: {prefix}")
     return data
+
+
+def is_overlay(path: str, config: dict) -> bool:
+    return path in set(config["overlayPaths"]) or any(
+        path.startswith(prefix) for prefix in config["overlayPrefixes"]
+    )
 
 
 def resolve_ref(repo: Path, ref: str) -> str:
@@ -82,13 +93,16 @@ def payload_paths(repo: Path, plugin: str) -> list[Path]:
     root = repo / "plugins" / plugin
     manifest = root / ".claude-plugin" / "plugin.json"
     return sorted(
-        path
+        (
+            path
         for path in root.rglob("*")
         if path.is_file()
         and path != manifest
         and "__pycache__" not in path.parts
         and ".pytest_cache" not in path.parts
         and path.name != ".DS_Store"
+        ),
+        key=lambda path: path.relative_to(repo).as_posix(),
     )
 
 

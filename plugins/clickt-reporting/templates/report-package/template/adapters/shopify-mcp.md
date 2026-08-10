@@ -1,6 +1,7 @@
 # Adapter: `store` block ← Shopify MCP (preferred) / GA4 fallback
 
-**Client instance:** PantryLot (`www.pantrylot.com`, CAD).
+**Configure before use:** replace `<SHOPIFY_STORE>` and `<STORE_CURRENCY>` with approved
+client values and verify the connector.
 
 ## Preferred source: Shopify MCP
 
@@ -15,7 +16,7 @@ Pull per window (current / prior / YoY):
 > the build session, so its exact tool names are undocumented. On the next cycle, list its
 > tools first and record the exact calls here. Until then the fallback below applies.
 
-## Fallback source: GA4 (property 507568174)
+## Fallback source: GA4 (`<GA4_REVENUE_PROPERTY_ID>`)
 
 Same shapes from GA4 ecommerce metrics: `sessions`, `ecommercePurchases`/`transactions`
 (orders), `purchaseRevenue` (revenue), daily by `date`; top products by `itemName` with

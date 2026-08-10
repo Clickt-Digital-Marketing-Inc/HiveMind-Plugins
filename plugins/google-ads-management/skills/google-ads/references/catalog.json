@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "groups": ["Management", "Audit", "Profitability", "MediaMetrics"],
+  "groups": ["Management", "Audit", "Profitability"],
   "windows": ["LAST_7_DAYS", "LAST_14_DAYS", "LAST_30_DAYS", "THIS_MONTH", "LAST_MONTH", "CUSTOM"],
   "routeTemplates": {
     "mcp": "Run the {skill} skill on Google Ads account \"{account}\" for {window}. Additional context from the operator: {notes}. Analyze only — compute the results but do NOT build any output files yet. Then show the Google Ads results surface per the hub SKILL.md Step 4 (the in-Claude tuner for tunable tasks, otherwise the results card); its buttons export md/xlsx/html on demand at the chosen settings.",
@@ -191,21 +191,6 @@
       "files": [
         {"key": "shopping_csv", "label": "Google Ads \"Shopping products\" CSV", "required": true},
         {"key": "shopify_csv", "label": "Shopify \"Gross profit by product\" CSV (optional, for accurate COGS)", "required": false}
-      ]
-    },
-    {
-      "id": "mediametrics-google",
-      "skill": "mediametrics-google",
-      "plugin": "mediametrics-google",
-      "group": "MediaMetrics",
-      "label": "MediaMetrics (35-metric deep-dive)",
-      "blurb": "Deterministic statistical workbook from Google Ads CSV exports: 35 metrics, each with a plain-English read. Emits md+html+xlsx.",
-      "icon": "ti-chart-dots",
-      "inputs": "csv",
-      "window": false,
-      "formats": ["md", "html", "xlsx"],
-      "files": [
-        {"key": "raw_dir", "label": "Path to your \"Google Ads Reports\" folder (auto-resolves campaigns/keywords/ad_groups exports)", "required": true}
       ]
     }
   ]

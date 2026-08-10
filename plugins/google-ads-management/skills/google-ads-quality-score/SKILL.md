@@ -45,7 +45,7 @@ every artifact.
 > firewall" section for the exact command.
 
 ## Diagnose — the 6-step audit
-Per [benchmarks](google-ads-foundation/references/benchmarks-2026.md) "Quality Score forensics":
+Per [benchmarks](../google-ads-foundation/references/benchmarks-2026.md) "Quality Score forensics":
 
 1. **Expected-CTR drag:** search terms / keywords with CTR < 2% and ≥ 50 impressions.
 2. **Device:** if mobile CTR < 1.5% and mobile dominates impressions → mobile is dragging QS.

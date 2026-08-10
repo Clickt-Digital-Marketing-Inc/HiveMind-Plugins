@@ -21,7 +21,7 @@ CATALOG = SKILL_DIR / "references" / "catalog.json"
 REPO_ROOT = HERE.parents[5]                 # repo root
 PLUGINS = REPO_ROOT / "plugins"
 
-ALLOWED_GROUPS = {"Management", "Audit", "Profitability", "MediaMetrics"}
+ALLOWED_GROUPS = {"Management", "Audit", "Profitability"}
 ALLOWED_INPUTS = {"mcp", "csv"}
 ALLOWED_FORMATS = {"md", "html", "xlsx", "pptx", "csv"}
 REQUIRED_TASK_KEYS = {"id", "skill", "plugin", "group", "label", "blurb", "inputs", "window", "formats"}
@@ -76,6 +76,8 @@ def run():
             failures.append(msg)
 
     catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    marketplace = json.loads((REPO_ROOT / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
+    marketplace_plugins = {entry["name"] for entry in marketplace["plugins"]}
     names = installed_skill_names()
     dirs = skill_dir_map()
     check(bool(names), "no installed skills discovered under plugins/*/skills/*/SKILL.md")
@@ -105,6 +107,8 @@ def run():
         ids.add(tid)
         check(t.get("skill") in names,
               f"task '{tid}' -> skill '{t.get('skill')}' not found among installed skills")
+        check(t.get("plugin") in marketplace_plugins,
+              f"task '{tid}' advertises plugin '{t.get('plugin')}' absent from this marketplace")
         check(t.get("group") in ALLOWED_GROUPS, f"task '{tid}' bad group '{t.get('group')}'")
         check(t.get("group") in catalog.get("groups", []),
               f"task '{tid}' group '{t.get('group')}' not in catalog.groups")

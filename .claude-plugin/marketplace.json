@@ -32,14 +32,14 @@
     {
       "name": "cm3-profitability",
       "source": "./plugins/cm3-profitability",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "category": "marketing",
-      "description": "Per-product CM3 contribution-margin report from a Google Ads 'Shopping products' CSV (optionally enriched with a Shopify 'Gross profit by product' CSV). One compute pass emits the locked 3-format bundle: an Obsidian-ready markdown report with static SVG charts, a self-contained interactive HTML explorer (tune cost assumptions and band cutoffs; every KPI, band, chart, rollup and product row re-computes live — it carries every workbook tab: By Campaign / Vendor / Category L1-L5 / Product Type L1-L5, plus by-band, summary KPIs and methodology, a live Pivot cross-tab of any two dimensions, and a dark mode), and a detailed multi-tab xlsx; a 7-slide executive pptx is opt-in. Segments products into 5 CM3 bands and rolls up by campaign, category, product type, and vendor. Requires openpyxl, python-pptx, and vl-convert-python."
+      "description": "Per-product CM3 contribution-margin report from a Google Ads Shopping-products CSV (optionally enriched with a Shopify gross-profit CSV). Runs through the protected remote workflow with no local compute fallback and returns reviewable report artifacts. Segments products into five CM3 bands and rolls up by campaign, category, product type, and vendor."
     },
     {
       "name": "google-ads-management",
       "source": "./plugins/google-ads-management",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "category": "marketing",
       "description": "Ongoing, cadence-based Google Ads management as done-with-you advisors — dual input (read-only Google Ads MCP or a user CSV export), fronted by an interactive in-Claude menu: invoke 'manage Google Ads' to open the google-ads hub, which lists every task and routes to it. A shared foundation (account selection, GAQL cookbook, 2026 benchmarks, dual-input + advisor output contract) plus account health & red flags, budget pacing, bidding strategy, keywords/search terms, Quality Score forensics, audience targeting, conversions & tracking, performance reporting, competitive analysis, PMax campaigns, PMax listing groups, and product performance. Diagnoses account data against thresholds behind a transcription firewall, then leads a prioritized recommendation loop and offers ready-to-apply Google Ads Editor CSVs — emitting the md + interactive-HTML + tunable-xlsx bundle (or a reduced md + xlsx bundle for account health & audience targeting), with Node<->Python kernel parity across every tunable skill. HTML + markdown are standard-library only; the xlsx backup needs openpyxl and the static chart SVGs need vl-convert-python."
     },
@@ -74,7 +74,7 @@
     {
       "name": "wppc-report",
       "source": "./plugins/wppc-report",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "category": "marketing",
       "description": "wPPC — Weighted Profit-Per-Click. Sabermetric linear-weights report for Google & Meta Ads segment exports: funnel events credited at expected CM3 value, indexed to the account baseline, shrunk for sample size, and scored above replacement (Margin Above Replacement). Emits a 3-format bundle from one model — an interactive, self-contained, white-label HTML report (primary; Scale/Cut/Watch decision lens + four charts), an Obsidian-ready markdown record, and a formula-driven multi-tab xlsx backup (Report/Weights/Charts/Run). Requires pandas, pyyaml, click, openpyxl, and vl-convert-python for the static chart SVGs.",
       "keywords": [
@@ -127,9 +127,9 @@
     {
       "name": "clickt-reporting",
       "source": "./plugins/clickt-reporting",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "category": "marketing",
-      "description": "Clickt's hosted ecomm client reporting system. Scaffolds a client-agnostic report engine (tabbed monthly reports + weekly pulses: Google Ads, Meta, store/CRO, goal attainment with flexible v2 goals incl. SKU and seasonal targets) into a client repo, hosts it behind per-client basic auth at reports.clickt.ca, and runs the report cycles: pull, validate, spot-check, draft, John's commentary, deploy only after approval. Includes the weekly-Routine workflow that requests and integrates commentary. Honors profit-vs-revenue value semantics per channel (POAS vs ROAS, never blended; MER/nCAC suppressed on incomplete spend). Node >=18; data via Windsor.ai / platform MCPs."
+      "description": "Clickt's hosted ecomm client reporting system. Scaffolds a client-agnostic report engine (tabbed monthly reports + weekly pulses: Google Ads, Meta, store/CRO, goal attainment with flexible v2 goals incl. SKU and seasonal targets) into a client repo and runs the report cycles: pull, validate, spot-check, draft, designated approval, explicit fail-closed deploy. Includes the weekly-Routine workflow that requests and integrates commentary. Honors profit-vs-revenue value semantics per channel (POAS vs ROAS, never blended; MER/nCAC suppressed on incomplete spend). Node >=18; data via Windsor.ai / platform MCPs."
     }
   ]
 }

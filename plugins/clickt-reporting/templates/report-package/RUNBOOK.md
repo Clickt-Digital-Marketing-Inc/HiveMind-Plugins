@@ -18,32 +18,31 @@ client-agnostic (see `template/schema/CONTRACT.md`); this folder is one client's
 4. **Spot-check gate** (client-facing rule from `Reporting/CLAUDE.md`): verify 3–4
    headline numbers through an independent path (e.g. Meta Ads MCP vs Windsor) and record
    the result in `periods/<id>/raw/spot-check.md`. No match → no report.
-5. **Review**: John reviews `report-preview.html` (browser-openable twin of the
+5. **Review**: the designated approver reviews `report-preview.html` (browser-openable twin of the
    artifact-ready `report.html`).
-6. **Commentary**: John writes `periods/<id>/commentary.md` — one block per `## section`
+6. **Commentary**: the designated approver writes `periods/<id>/commentary.md` — one block per `## section`
    heading: `exec`, `attainment`, `google_ads`, `meta`, `store` (monthly) or `pulse`
    (weekly). Rebuild (step 3).
-7. **Publish** (only after John approves — drafts rule): deploy to the client's folder on
-   **reports.clickt.ca** — `./deploy/deploy.sh` builds `dist/<slug>/` (index + standalone
-   report pages) and rsyncs it to the server. The folder is behind per-client basic auth,
-   so deploying a draft is safe; share credentials with the client only after sign-off.
+7. **Publish** (only after the designated approver signs off): deploy to an explicitly
+   supplied client destination. Run `./deploy/deploy.sh --destination <exact-target-ending-in-slug>
+   --confirm deploy:<slug>`. The script performs a dry run first and never deletes remote
+   files. Authentication does not make a draft safe to deploy; approval is still required.
 8. Commit the period folder.
 
-## Hosting (reports.clickt.ca)
+## Hosting
 
-- **Server:** Hetzner box `root@5.161.204.210` (`ubuntu-4gb-ash-1`), Caddy in Docker
-  (compose + Caddyfile in `/root/vaultwarden/`, timestamped `.bak-*` backups alongside).
-- **Layout:** `/root/reports/<client-slug>/` mounted read-only at `/srv/reports`, served at
-  `https://reports.clickt.ca/<client-slug>/`. Root shows a generic landing page — no
-  client enumeration. `X-Robots-Tag: noindex` + `Cache-Control: no-store` on everything.
+- **Server and destination:** supply them from the client's approved infrastructure
+  record. No host, username, IP address, or destination path is bundled in this template.
+- **Layout:** keep one directory per client slug and serve it behind client-specific
+  authentication. Do not expose a client directory index. Apply `X-Robots-Tag: noindex`
+  and `Cache-Control: no-store`.
 - **Access:** per-client HTTP basic auth (`basic_auth` block per client folder in the
   Caddyfile; bcrypt via `docker exec caddy caddy hash-password`). Credentials live in
   Vaultwarden (`vw.clickt.ca`); one username/password per client.
-- **Deploy:** `./deploy/deploy.sh` (rsync of `dist/<slug>/`). Static files only — no
-  Caddy action needed for content updates.
-- **New client hosting:** `mkdir /root/reports/<slug>`, append a matcher + `basic_auth`
-  block to the Caddyfile, `docker exec caddy caddy reload --config /etc/caddy/Caddyfile`
-  (graceful, zero-downtime — container recreation is only needed for new *mounts*).
+- **Deploy:** use the explicit fail-closed command in step 7. The destination must end in
+  the exact validated slug; there is no default.
+- **New client hosting:** follow the approved infrastructure runbook. Do not place server
+  administration commands or credentials in this generic client package.
 
 ## Cadence
 
@@ -60,8 +59,8 @@ plus month-specific seasonal targets, higher/lower directions. `status: "propose
 renders a badge until agreed; change targets by adding a new goal set with a later
 `effective_from`, never by editing history.
 
-**Update loop:** the reporting dashboard (the client index page at
-reports.clickt.ca/<slug>/) carries a **Goals** editor — John (or John with the client)
+**Update loop:** the client reporting dashboard carries a **Goals** editor — the
+approver (or approver with the client)
 adjusts targets, hits Export JSON, and hands the JSON back; it replaces
 `config/goals.json` verbatim and the next build judges against it. Rebuild the dashboard
 with `node template/build-dist.mjs` after a goals change so the editor shows the new set.
@@ -84,7 +83,7 @@ surface them — e.g. value-semantics rules, YoY validity, attribution artifacts
    (or copy only `template/` + `RUNBOOK.md` and write fresh `config/`).
 2. Edit `config/client.json`: name, currency, locale, accent palette, account ids,
    **value semantics per channel** (`conversion_value_is: "revenue"` unless the client
-   tracks profit like PantryLot), adapter per block.
+   tracks a verified profit stream), adapter per block.
 3. Write/reuse adapters for the client's sources (all-Windsor, platform MCPs, or manual
    CSV — anything that can fill the contract).
 4. Seed `config/goals.json` (status "proposed" until agreed).

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$ROOT"
+
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+CANONICAL_REPO="${CANONICAL_REPO:-}"
+CANONICAL_REF="${CANONICAL_REF:-HEAD}"
+BASE_REF="${BASE_REF:-origin/main}"
+
+if [[ -z "$CANONICAL_REPO" ]]; then
+  echo "REFUSE: set CANONICAL_REPO to a local HiveMind-Marketing-Skills checkout" >&2
+  exit 2
+fi
+
+"$PYTHON_BIN" -B scripts/check_canonical_drift.py \
+  --canonical-repo "$CANONICAL_REPO" \
+  --canonical-ref "$CANONICAL_REF"
+"$PYTHON_BIN" -B scripts/check_payload_versions.py --base-ref "$BASE_REF"
+PYTHONDONTWRITEBYTECODE=1 "$PYTHON_BIN" -B -m pytest -q tests

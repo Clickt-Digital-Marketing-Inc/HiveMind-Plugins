@@ -1,0 +1,43 @@
+name: verify
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out marketplace mirror
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check out private canonical source
+        uses: actions/checkout@v4
+        with:
+          repository: Clickt-Digital-Marketing-Inc/HiveMind-Marketing-Skills
+          ref: main
+          token: ${{ secrets.HIVEMIND_MARKETING_SKILLS_TOKEN }}
+          path: .canonical/HiveMind-Marketing-Skills
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install verification dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libreoffice-calc
+          python -m pip install -r requirements-test.txt
+
+      - name: Verify repository
+        env:
+          CANONICAL_REPO: ${{ github.workspace }}/.canonical/HiveMind-Marketing-Skills
+          PYTHON_BIN: python
+        run: ./verify

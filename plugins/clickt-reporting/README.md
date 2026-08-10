@@ -1,8 +1,8 @@
 # clickt-reporting
 
-Clickt's hosted ecomm client reporting system as a Claude Code plugin. Born from the
-PantryLot reporting build (2026-08); PantryLot's
-`Clients/PantryLot/Reporting/report-package/` is the reference instance.
+Clickt's hosted ecomm client reporting system as a Claude Code plugin. The bundled
+report package is generic: client identifiers, source fields, destinations, and
+approvers are supplied during onboarding.
 
 ## What it does
 
@@ -11,7 +11,7 @@ PantryLot reporting build (2026-08); PantryLot's
   client repo, verify data sources, host at `reports.clickt.ca/<slug>/` behind
   per-client basic auth, schedule the weekly Routine (Monday 08:00 default).
 - **`/clickt-reporting:report-weekly`** — the Routine workload: pull the just-completed
-  ISO week + MTD, validate, spot-check, build the pulse **draft**, ask John for
+  ISO week + MTD, validate, spot-check, build the pulse **draft**, ask the designated approver for
   commentary, integrate it, and deploy **only after his approval**.
 - **`/clickt-reporting:report-monthly`** — full-month tabbed report (Executive Summary /
   Attainment / Google Ads / Meta Ads / Store / Weekly Pulses), per-section commentary,
@@ -32,13 +32,13 @@ exports `goals.json`, and a client dashboard listing all reports.
 2. Value semantics are config: profit → POAS, revenue → ROAS, never blended; MER and
    nCAC suppress themselves when any channel's spend is missing.
 3. Every cycle keeps raw pulls verbatim + a spot-check record.
-4. Drafts until John approves — the deploy gate survives automation.
+4. Drafts until the designated approver approves — the deploy gate survives automation.
 
-## Install (dev)
+## Install
 
 ```
-/plugin marketplace add /Users/johngreenhow/Documents/Tools/clickt-reporting
-/plugin install clickt-reporting@clickt-reporting-dev
+/plugin marketplace add Clickt-Digital-Marketing-Inc/HiveMind-Plugins
+/plugin install clickt-reporting@hivemind-plugins
 ```
 
-Released via the `hivemind-plugins` marketplace.
+The repository is private; the installing GitHub account must have read access.
