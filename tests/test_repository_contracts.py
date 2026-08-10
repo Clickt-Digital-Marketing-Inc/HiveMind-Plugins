@@ -111,3 +111,13 @@ def test_deploy_and_vault_contracts_are_fail_closed() -> None:
     assert "exclusive-create semantics" in hub
     assert "Never replace an existing source by default" in hub
     assert "overwrite = supersede" not in hub
+
+
+def test_ci_routes_through_the_root_verification_command() -> None:
+    workflow = (ROOT / ".github/workflows/verify.yml").read_text(encoding="utf-8")
+    assert "run: ./verify" in workflow
+    assert "HIVEMIND_MARKETING_SKILLS_TOKEN" in workflow
+    verify = (ROOT / "verify").read_text(encoding="utf-8")
+    assert "scripts/check_canonical_drift.py" in verify
+    assert "scripts/check_payload_versions.py" in verify
+    assert 'pytest -q tests' in verify
