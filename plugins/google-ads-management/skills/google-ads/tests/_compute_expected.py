@@ -55,7 +55,11 @@ def _analytics_mode(vector_files: list[str]) -> int:
                lambda c: analytics.concentration(c["rows"], c["value_key"],
                                                  c.get("top_n", 3)),
            "signals": lambda c: analytics.signals(c["rows"], c["rules"]),
-           "pre_score": lambda c: analytics.pre_score(c["row"], c["weights"])}
+           "pre_score": lambda c: analytics.pre_score(c["row"], c["weights"]),
+           "segment_liveness":
+               lambda c: analytics.segment_liveness(
+                   c["rows"], status_key=c["status_key"], spend_key=c["spend_key"],
+                   prior_spend_key=c.get("prior_spend_key"))}
     cases = []
     for vf in vector_files:
         data = json.loads(Path(vf).read_text(encoding="utf-8"))

@@ -100,6 +100,7 @@ XLSX = {
     "rows_columns": [
         {"header": "Campaign", "kind": "data", "key": "campaign", "width": 32},
         {"header": "Status", "kind": "data", "key": "__status__", "width": 13},
+        {"header": "Liveness", "kind": "data", "key": "liveness", "width": 15},
         {"header": "CTR (curr)", "kind": "data", "key": "ctr_curr", "fmt": "PCT", "width": 11},
         {"header": "CTR (prior)", "kind": "data", "key": "ctr_prior", "fmt": "PCT", "width": 11},
         {"header": "CVR (curr)", "kind": "data", "key": "cvr_curr", "fmt": "PCT", "width": 11},
@@ -121,13 +122,17 @@ XLSX = {
          "formula": '=IF({C:Conv (curr)}{row}<{ctrl:min_conv_30d},TRUE,FALSE)'},
         {"header": "Below account CVR?", "kind": "formula", "width": 11,
          "formula": '=IF({C:CVR (curr)}{row}<{C:Account avg CVR}{row}*{ctrl:cvr_factor},TRUE,FALSE)'},
+        # Liveness gate (HM-603): a dormant campaign scores 0 / no tier, mirroring
+        # conv_tracking_core (the {C:Liveness} guard wraps the existing formulas).
         {"header": "Score", "kind": "formula", "width": 8,
-         "formula": '=({C:CVR drop?}{row}*4)+({C:Landing page suspect?}{row}*6)'
-                    '+({C:Thin volume?}{row}*1)+({C:Below account CVR?}{row}*2)'},
+         "formula": '=IF({C:Liveness}{row}="dormant",0,'
+                    '({C:CVR drop?}{row}*4)+({C:Landing page suspect?}{row}*6)'
+                    '+({C:Thin volume?}{row}*1)+({C:Below account CVR?}{row}*2))'},
         {"header": "Tier", "kind": "formula", "width": 10,
-         "formula": '=IF({C:Status}{row}<>"scored","",'
+         "formula": '=IF({C:Liveness}{row}="dormant","",'
+                    'IF({C:Status}{row}<>"scored","",'
                     'IF({C:Score}{row}>=6,"Critical",IF({C:Score}{row}>=3,"High",'
-                    'IF({C:Score}{row}>0,"Watch",""))))'},
+                    'IF({C:Score}{row}>0,"Watch","")))))'},
     ],
     "rows_freeze": "B2",
 

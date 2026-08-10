@@ -117,6 +117,17 @@ def test_reconcile_tolerance_and_absence():
     check("absent reconciliation is not an error at verify()", True)
 
 
+# ── the pytest binding (added by HM-791; the checks above are untouched) ────
+# check() only APPENDS to _failures, so under pytest every test_* function
+# above passes whatever it observed. Defined LAST so pytest (definition order)
+# runs it after them, and it is what actually makes a failed check red here.
+# See also ../conftest.py for the order/selection-independent guard.
+def test_no_check_failures():
+    assert not _failures, (
+        f"{len(_failures)} failed check(s): " + ", ".join(_failures)
+    )
+
+
 def main():
     for t in (test_gaql_raw_formats, test_reconcile_roundtrip,
               test_reconcile_catches_tampering, test_reconcile_tolerance_and_absence):

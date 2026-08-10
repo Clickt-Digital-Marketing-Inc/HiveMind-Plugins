@@ -25,11 +25,12 @@ Per the foundation's dual-input contract: a user-supplied CSV wins outright; oth
 Google Ads MCP. Either way the two judgment components below (value variance, tracking confidence)
 are **always** manual — see `references/bidding-strategy-maturity.md#judgment-inputs-both-paths`.
 
-- **MCP** — one `campaign` structure+performance pull (`bidding_strategy_type`,
+- **MCP** — one `campaign` structure+performance pull (`campaign.status`, `bidding_strategy_type`,
   `ai_max_setting.enable_ai_max`, `metrics.conversions`, `metrics.cost_micros`,
-  `metrics.conversions_value`) over the last 30 days.
+  `metrics.conversions_value`) over the last 30 days (authoritative constant: `CAMPAIGN_FIELDS` in
+  [scripts/assemble_findings.py](scripts/assemble_findings.py)).
 - **CSV** — ask for the Google Ads UI *Campaigns* report (Campaign, Campaign ID, Bid strategy
-  type, Conversions, Cost, optional Conv. value), same 30-day window.
+  type, Conversions, Cost, optional Conv. value and Campaign state), same 30-day window.
 
 Build the findings JSON with `scripts/assemble_findings.py` (never by hand — see the reference doc
 for the exact commands and the transcription-firewall discipline).
@@ -44,6 +45,17 @@ presented as measured). The score maps to a recommended tier (tunable band edges
 30/50/70/85); the campaign's **current** strategy maps to a tier via a fixed lookup. The gap
 between the two, plus the **≥ 30 conversions/30 days automation gate**, drives the mismatch signal:
 `Over-automated (under-data)` (Critical), `Over-automated`, `Under-automated`, or aligned.
+
+**Campaign liveness gate (HM-603).** Every campaign is tagged `live` / `recently_active` / `dormant`
+via `_shared/analytics.segment_liveness` (foundation `references/artifact-formats.md` "Campaign
+liveness"). This skill is **two-band-derivable**: the pull carries `campaign.status` and current-window
+spend (`cost`) but **no prior-window spend**, so `segment_liveness` is called with `prior_spend_key=None`.
+All three bands stay reachable — the only path that is unavailable is the "spent only in the prior
+window" flavour of `recently_active`. **Dormant** campaigns (not ENABLED, zero spend in the window)
+are tagged and kept — no-row-loss — but never scored or flagged (the mismatch is gated on liveness in
+`bidding_core`, the JS kernel, and the xlsx Mismatch formula in lockstep). **recently_active** campaigns
+(paused-mid-window or enabled-but-idle) are still scored, but each carries a `liveness_note` so the
+recommendation is hedged ("confirm the bid strategy intent before acting").
 
 ## Build the bundle, then advise (emit → report → recommend → offer-apply)
 1. `python3 scripts/build_bidding_report.py --input findings.json --outdir artifacts --formats md,html,xlsx --emit-widget widget.json`

@@ -1,0 +1,57 @@
+{
+  "_comment": [
+    "The liveness matrix fixture (HM-799). Every band budget_core branches on is",
+    "present, and both of _liveness_note's REACHABLE return paths fire exactly",
+    "once (this skill passes prior_spend_key=None, so the 'spent only in the",
+    "prior window' path is unreachable by construction: documented in",
+    "budget_core, never invented here).",
+    "Campaigns 3 and 4 are a contrast pair: identical in every field except",
+    "'campaign_status'. That single field is what separates recently_active from",
+    "dormant, so each dormant gate is decidable. Both carry daily_budget 200,",
+    "which is below min_budget_multiple x target_cpa (5 x 50 = 250). budget_core",
+    "has THREE independent dormant gates and this fixture pins each of them",
+    "SEPARATELY -- no single deletion reproduces row 3:",
+    "(1) classify_row's gate: with it, row 4 has bucket ''; delete only it and",
+    "row 4 is bucketed 'Low budget' on a REMOVED campaign, the self-contradicting",
+    "headline HM-603 exists to prevent (its pace values are unchanged).",
+    "(2) the pace-ratio gate: with it, row 4 has campaign_pace_ratio null /",
+    "pace_verdict 'n/a' and stays out of summary.under_pace (3); delete only it",
+    "and row 4 paces 0.0 / 'under' and under_pace becomes 4.",
+    "(3) the pace-flag gate: with it, row 4 has pace_flags [] / pace_score 0.0;",
+    "delete only it and row 4 gets ['zero_conv'] / 2.0 -- NOT row 3's",
+    "['under_pace','zero_conv'] / 3.0, because gate (2) still forces row 4's pace",
+    "ratio to null, so under_pace cannot fire.",
+    "Only with ALL THREE deleted does row 4 reproduce row 3 exactly."
+  ],
+  "meta": {
+    "client_name": "Liveness Fixture Co",
+    "account_id": "999-000-2222",
+    "currency": "USD",
+    "period": "last 30 days",
+    "generated": "2026-06-30",
+    "monthly_goal": 30000,
+    "days_elapsed": 15,
+    "days_in_month": 30
+  },
+  "campaigns": [
+    {"campaign_id": 1, "campaign": "Live | Brand", "channel": "SEARCH", "campaign_status": "ENABLED",
+     "daily_budget": 300.0,
+     "cost": 4000.0, "mtd_spend": 2200.0, "conversions": 100,
+     "search_budget_lost_is": 0.25, "search_rank_lost_is": 0.05},
+
+    {"campaign_id": 2, "campaign": "RA | Paused mid-window", "channel": "SEARCH", "campaign_status": "PAUSED",
+     "daily_budget": 100.0,
+     "cost": 900.0, "mtd_spend": 500.0, "conversions": 10,
+     "search_budget_lost_is": 0.0, "search_rank_lost_is": 0.0},
+
+    {"campaign_id": 3, "campaign": "RA | Enabled idle", "channel": "SEARCH", "campaign_status": "ENABLED",
+     "daily_budget": 200.0,
+     "cost": 0.0, "mtd_spend": 0.0, "conversions": 0,
+     "search_budget_lost_is": 0.0, "search_rank_lost_is": 0.0},
+
+    {"campaign_id": 4, "campaign": "Dormant | Removed", "channel": "SEARCH", "campaign_status": "REMOVED",
+     "daily_budget": 200.0,
+     "cost": 0.0, "mtd_spend": 0.0, "conversions": 0,
+     "search_budget_lost_is": 0.0, "search_rank_lost_is": 0.0}
+  ]
+}

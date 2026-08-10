@@ -88,7 +88,11 @@ def load_findings(path: str) -> dict:
     for opt in ("listing_groups", "products"):
         if opt in data and not isinstance(data[opt], list):
             raise FindingsError(f"findings JSON '{opt}' must be an array if present")
-    if not data.get("listing_groups") and not data.get("products"):
+    # Presence, not truthiness: a key present with an empty array is a valid empty
+    # universe (e.g. a feedless lead-gen account has zero retail listing groups AND
+    # zero products — both legitimately []). Only an ABSENT key means the source
+    # was never pulled/assembled.
+    if "listing_groups" not in data and "products" not in data:
         raise FindingsError(
             "findings JSON must contain at least one of 'listing_groups' or 'products'")
     if (data.get("meta") or {}).get("reconciliation"):

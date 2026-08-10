@@ -40,6 +40,26 @@ def _table(headers, rows, aligns=None) -> list:
     return out
 
 
+def _assumptions_section(model: dict) -> list:
+    """'Provenance & assumptions' callout, engine-owned so every skill gets it
+    identically the moment it stamps model["meta"]["assumptions"] (HM-604) — []
+    when there are none, so an unadopted skill renders byte-unchanged."""
+    items = M.assumptions(model)
+    if not items:
+        return []
+    L = ["## Provenance & assumptions",
+         "_Every value below is assumed, proxied, or defaulted — not a confirmed "
+         "client figure — unless its basis says otherwise._",
+         ""]
+    L.extend(_table(
+        ["Parameter", "Value", "Basis", "Note"],
+        [[a.get("param", ""), a.get("value", ""), M.basis_label(a.get("basis")), a.get("note", "")]
+         for a in items],
+        aligns=["l", "r", "l", "l"]))
+    L.append("")
+    return L
+
+
 def render_md(model: dict, spec: dict, chart_refs=None) -> str:
     M.require_model(model)
     M.require_spec(spec)
@@ -69,6 +89,8 @@ def render_md(model: dict, spec: dict, chart_refs=None) -> str:
     for label, val in (spec.get("md_kpis") or (lambda m: []))(model):
         L.append(f"- **{label}:** {val}")
     L.append("")
+
+    L.extend(_assumptions_section(model))
 
     for line in (spec.get("md_narrative") or (lambda m: []))(model):
         L.append(line)
@@ -108,8 +130,12 @@ def render_md(model: dict, spec: dict, chart_refs=None) -> str:
 
     ref = spec.get("methodology_ref")
     L.append("---")
-    foot = "Conversions use the account's primary `metrics.conversions` " \
-           "(attribution-modeled, may be fractional)."
+    # A skill may supply its own methodology footer via spec['methodology_note'];
+    # otherwise fall back to the historical default (kept verbatim so skills that
+    # don't set the key render byte-identically).
+    foot = spec.get("methodology_note") or (
+        "Conversions use the account's primary `metrics.conversions` "
+        "(attribution-modeled, may be fractional).")
     if ref:
         L.append(f"Methodology and the findings-JSON schema: see `{ref}`. " + foot)
     else:

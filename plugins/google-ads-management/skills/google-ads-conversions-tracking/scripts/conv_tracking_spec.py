@@ -41,7 +41,10 @@ def md_params(model):
 def md_kpis(model):
     s = model["summary"]
     return [
-        ("Config actions — flagged / total", f"{s['config_flagged']} / {s['config_actions']}"),
+        ("Primary conversion actions — flagged / total",
+         f"{s['config_primary_flagged']} / {s['config_primary_actions']}"),
+        ("Secondary conversion actions — flagged / total",
+         f"{s['config_secondary_flagged']} / {s['config_secondary_actions']}"),
         ("No primary conversion action",
          "YES — tracking is broken" if s["config_no_primary_action"] else "no"),
         ("Campaigns — Critical / High / Watch", f"{s['critical']} / {s['high']} / {s['watch']}"),
@@ -68,21 +71,46 @@ def md_narrative(model):
     return out
 
 
+def _config_table_rows(rows):
+    return [[r["name"], r["category"], r["counting_type"], r["attribution_model"],
+             f"{r['conversions_30d']:.2f}", r["verdict"], ", ".join(r["flags"]) or "—"]
+            for r in rows]
+
+
+_CONFIG_HEADERS = ["Action", "Category", "Counting", "Attribution",
+                   "All conv. (incl. secondary)", "Verdict", "Flags"]
+_CONFIG_ALIGNS = ["l", "l", "l", "l", "r", "l", "l"]
+
+
 def md_sections(model):
     secs = []
 
-    # Config-health checklist (secondary dataset — every conversion_action row).
+    # Config-health checklist — segmented by primary_for_goal. Primary-for-goal
+    # actions drive Smart Bidding, so they carry the health framing; secondary
+    # actions are listed separately with their own count (never dropped). Counts
+    # shown are all conversions (incl. secondary) — metrics.all_conversions.
+    primary_rows, secondary_rows = core.config_segments(model["config_rows"])
     cflags = ", ".join(f"**{fid}** — {label}" for fid, label in core.CONFIG_FLAG_LABELS)
+    s = model["summary"]
     secs.append({
-        "title": "Conversion-action config health",
-        "note": f"Every ENABLED conversion action, pass/flag verdict. Flags: {cflags}.",
-        "headers": ["Action", "Category", "Counting", "Attribution", "Primary?", "Conv (30d)",
-                    "Verdict", "Flags"],
-        "aligns": ["l", "l", "l", "l", "l", "r", "l", "l"],
-        "rows": [[r["name"], r["category"], r["counting_type"], r["attribution_model"],
-                  "yes" if r["primary_for_goal"] else "no", f"{r['conversions_30d']:.2f}",
-                  r["verdict"], ", ".join(r["flags"]) or "—"] for r in model["config_rows"]],
-        "empty": "_No conversion actions returned — tracking cannot be verified._",
+        "title": "Conversion-action config health — primary-for-goal actions",
+        "note": (f"The {s['config_primary_actions']} ENABLED primary-for-goal action(s) Smart Bidding "
+                 f"optimizes toward — {s['config_primary_flagged']} flagged. Counts are all "
+                 f"conversions (incl. secondary). Flags: {cflags}."),
+        "headers": _CONFIG_HEADERS,
+        "aligns": _CONFIG_ALIGNS,
+        "rows": _config_table_rows(primary_rows),
+        "empty": "_No ENABLED primary-for-goal conversion action — tracking is broken._",
+    })
+    secs.append({
+        "title": "Conversion-action config health — secondary actions",
+        "note": (f"The {s['config_secondary_actions']} non-primary (secondary) action(s) — "
+                 f"{s['config_secondary_flagged']} flagged. Kept for completeness; they don't drive "
+                 "the goal-level bidding signal. Counts are all conversions (incl. secondary)."),
+        "headers": _CONFIG_HEADERS,
+        "aligns": _CONFIG_ALIGNS,
+        "rows": _config_table_rows(secondary_rows),
+        "empty": "_No secondary conversion actions._",
     })
 
     # Manual EC / Consent Mode checks — never implied as an API confirmation.
@@ -127,12 +155,12 @@ def md_rows(model):
     """Every campaign in the trend universe with a status — the no-row-loss
     layer for the md."""
     cur = model["provenance"]["currency"]
-    headers = ["Campaign", "Status", "Tier", "CTR (curr)", "CTR (prior)", "CVR (curr)",
+    headers = ["Campaign", "Status", "Liveness", "Tier", "CTR (curr)", "CTR (prior)", "CVR (curr)",
                "CVR (prior)", f"Cost ({cur})" if cur else "Cost", "Conv (curr)", "Flags"]
     out = []
     for r in model["rows"]:
         out.append([
-            r["campaign"], r["status"], r["tier"] or "—",
+            r["campaign"], r["status"], r["liveness"].replace("_", " "), r["tier"] or "—",
             f"{r['ctr_curr'] * 100:.2f}%", _pct(r["ctr_prior"]),
             f"{r['cvr_curr'] * 100:.2f}%", _pct(r["cvr_prior"]),
             f"{r['cost_curr']:,.2f}", f"{r['conversions_curr']:.2f}",
@@ -140,10 +168,10 @@ def md_rows(model):
         ])
     return {
         "title": "All campaigns — CVR/CTR trend (every row, with status)",
-        "note": "No row loss: every campaign in the universe appears here, scored or held out as "
-                "no-benchmark. Sorted by current-window cost (highest first).",
+        "note": "No row loss: every campaign in the universe appears here (with its liveness band), "
+                "scored or held out as no-benchmark. Sorted by current-window cost (highest first).",
         "headers": headers,
-        "aligns": ["l", "l", "l", "r", "r", "r", "r", "r", "r", "l"],
+        "aligns": ["l", "l", "l", "l", "r", "r", "r", "r", "r", "r", "l"],
         "rows": out,
         "empty": "_No campaigns in the trend universe._",
     }
@@ -170,6 +198,7 @@ def html_embed(model):
         "drop_ladder": model["drop_ladder"],
         "rows": [{
             "campaign": r["campaign"], "status": r["status"],
+            "liveness": r["liveness"], "liveness_note": r.get("liveness_note", ""),
             "ctr_curr": r["ctr_curr"], "cvr_curr": r["cvr_curr"],
             "ctr_prior": r["ctr_prior"], "cvr_prior": r["cvr_prior"],
             "cost_curr": r["cost_curr"], "conversions_curr": r["conversions_curr"],
@@ -191,6 +220,7 @@ HTML_CONTROLS = [
 HTML_COLUMNS = [
     {"key": "campaign", "label": "Campaign"},
     {"key": "status", "label": "Status", "fmt": "status"},
+    {"key": "liveness", "label": "Liveness", "fmt": "status"},
     {"key": "ctr_curr", "label": "CTR (curr)", "num": True, "fmt": "pct"},
     {"key": "ctr_prior", "label": "CTR (prior)", "num": True, "fmt": "pct"},
     {"key": "cvr_curr", "label": "CVR (curr)", "num": True, "fmt": "pct"},
@@ -231,6 +261,11 @@ function tierOf(status,score){
   return "";
 }
 classify = function(r,P){
+  // Liveness gate (HM-603): a dormant campaign (not ENABLED, zero spend in both
+  // windows) is never flagged/scored — mirrors conv_tracking_core.classify_trend.
+  // `liveness` is a static embedded field (not tuning-dependent), so the kernel
+  // only READS it here.
+  if(r.liveness==="dormant"){ return {flags:[], score:0, tier:"", block:""}; }
   const flagsList = gxSignals([r], trendRules(P));
   let flags = flagsList[0].slice();
   if(flags.indexOf("cvr_drop")>=0 && flags.indexOf("ctr_held_or_up")>=0) flags.push("landing_page_suspect");
@@ -270,19 +305,30 @@ summarize = function(rows,P){
 JS_EXTRA = r"""
 renderExtra = function(host,H){
   const cfg = MODEL.config_rows||[], man = MODEL.manual_rows||[], S = MODEL.summary||{};
-  let h = '<div class="card"><h2>Conversion-action config health</h2>'+
-    `<div class="note">${S.config_flagged||0} flagged of ${S.config_actions||0} actions.`+
-    (S.config_no_primary_action?' <b>No ENABLED primary-for-goal action — tracking is broken.</b>':'')+'</div>';
-  if(cfg.length){
-    h += '<table><thead><tr><th>Action</th><th>Category</th><th>Counting</th><th>Attribution</th>'+
-      '<th>Verdict</th><th>Flags</th></tr></thead><tbody>';
-    cfg.forEach(r=>{h+=`<tr class="${r.verdict==='flag'?'qual':''}"><td>${H.esc(r.name)}</td>`+
+  // Config-health table, segmented by primary_for_goal (primary drives the
+  // health framing; secondary listed separately with its own count). All-
+  // conversions (incl. secondary) counts — metrics.all_conversions.
+  const configTable = function(rows){
+    if(!rows.length) return '<div class="note">None.</div>';
+    let t = '<table><thead><tr><th>Action</th><th>Category</th><th>Counting</th><th>Attribution</th>'+
+      '<th class="num">All conv. (incl. secondary)</th><th>Verdict</th><th>Flags</th></tr></thead><tbody>';
+    rows.forEach(r=>{t+=`<tr class="${r.verdict==='flag'?'qual':''}"><td>${H.esc(r.name)}</td>`+
       `<td>${H.esc(r.category)}</td><td>${H.esc(r.counting_type)}</td>`+
-      `<td>${H.esc(r.attribution_model)}</td><td>${H.esc(r.verdict)}</td>`+
+      `<td>${H.esc(r.attribution_model)}</td>`+
+      `<td class="num">${(+r.conversions_30d||0).toFixed(2)}</td><td>${H.esc(r.verdict)}</td>`+
       `<td>${H.esc((r.flags||[]).join(", "))}</td></tr>`;});
-    h += '</tbody></table>';
-  } else { h += '<div class="note">No conversion actions returned.</div>'; }
-  h += '</div>';
+    return t + '</tbody></table>';
+  };
+  const primary = cfg.filter(r=>r.primary_for_goal), secondary = cfg.filter(r=>!r.primary_for_goal);
+  let h = '<div class="card"><h2>Conversion-action config health — primary-for-goal actions</h2>'+
+    `<div class="note">${S.config_primary_flagged||0} flagged of ${S.config_primary_actions||0} `+
+    `primary-for-goal action(s) — Smart Bidding optimizes toward these.`+
+    (S.config_no_primary_action?' <b>No ENABLED primary-for-goal action — tracking is broken.</b>':'')+'</div>';
+  h += configTable(primary) + '</div>';
+  h += '<div class="card"><h2>Conversion-action config health — secondary actions</h2>'+
+    `<div class="note">${S.config_secondary_flagged||0} flagged of ${S.config_secondary_actions||0} `+
+    `secondary (non-primary) action(s) — kept for completeness, not the goal-level bidding signal.</div>`;
+  h += configTable(secondary) + '</div>';
 
   h += '<div class="card"><h2>Enhanced Conversions / Consent Mode (manual)</h2>'+
     '<div class="note">Never confirmed by the API — user_csv or not_confirmed only.</div>';
@@ -320,7 +366,15 @@ CHARTS = [
         "title": "Campaigns by cost, scored vs. no-benchmark",
         "mark": {"type": "bar"},
         "encoding": {
-            "x": {"field": "campaign", "type": "nominal", "title": None, "sort": "-y"},
+            # At ~100 campaigns a bar-per-campaign x-axis is unreadable —
+            # labelAngle/labelLimit truncate long names and labelOverlap hides
+            # any that would still collide, the standard Vega-Lite mechanism
+            # for a high-cardinality nominal axis. Pure declarative encoding
+            # (verbatim Vega-Lite, already passed through by charts.py) so it
+            # fixes both the static SVG and the live explorer chart with no
+            # change to the chart layer itself (HM-607 H2).
+            "x": {"field": "campaign", "type": "nominal", "title": None, "sort": "-y",
+                  "axis": {"labelAngle": -40, "labelLimit": 100, "labelOverlap": "greedy"}},
             "y": {"field": "cost_curr", "type": "quantitative", "title": "Cost (current window)"},
             "color": {"field": "status", "type": "nominal", "title": None,
                       "scale": {"domain": ["scored", "no_benchmark"], "range": ["#1F7A82", "#cbd5e1"]}},
@@ -374,6 +428,11 @@ SPEC = {
         ],
     },
     "methodology_ref": "references/conversion-tracking-filter.md",
+    "methodology_note": (
+        "Conversion-action counts are `metrics.all_conversions` — all conversions including "
+        "secondary actions (the only conversions metric selectable at the `conversion_action` "
+        "grain; attribution-modeled, may be fractional). The config-health checklist is segmented "
+        "into primary-for-goal actions (which drive Smart Bidding) and secondary actions."),
     "md_params": md_params,
     "md_kpis": md_kpis,
     "md_narrative": md_narrative,

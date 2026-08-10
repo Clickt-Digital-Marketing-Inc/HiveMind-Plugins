@@ -66,6 +66,7 @@ def render_html(model: dict, spec: dict) -> str:
     embed.setdefault("provenance", model["provenance"])
     embed.setdefault("params", model["params"])
     embed.setdefault("summary", model["summary"])
+    embed.setdefault("meta", {"assumptions": M.assumptions(model)})
 
     spec_js = {
         "title": spec["title"],
@@ -185,6 +186,7 @@ tr.qual{background:var(--accent-soft)}
   </div>
   <div id="right">
     <div class="card"><h2>Results (live)</h2><div class="kpis" id="kpis"></div><div id="logic"></div></div>
+    <div class="card" id="assumeCard" style="display:none"><h2>Provenance &amp; assumptions</h2><div id="assume"></div></div>
     <div class="card" id="chartsCard"><h2>Charts (live)</h2><div id="charts"></div></div>
     <div id="extra"></div>
     <div class="card"><h2>Rows</h2>
@@ -274,11 +276,34 @@ function renderControls(){
     });
   }
 }
+const BASIS_LABEL = {client_confirmed:"client-confirmed", proxy:"proxy", model_default:"default"};
+function assumptionFor(key){
+  return (MODEL.meta&&MODEL.meta.assumptions||[]).find(a=>a.param===key);
+}
+// Non-numeric inline marker text for a KPI/param whose value is assumed,
+// proxied, or defaulted (HM-604) — never touches the number itself.
+function assumeMarker(key){
+  const a=assumptionFor(key); if(!a) return "";
+  const label=BASIS_LABEL[a.basis]||a.basis||"assumed";
+  return a.note? ` (${label}: ${a.note})` : ` (${label})`;
+}
+function renderAssumptions(){
+  const items=(MODEL.meta&&MODEL.meta.assumptions)||[];
+  const card=document.getElementById("assumeCard");
+  if(!items.length){card.style.display="none"; return;}
+  card.style.display="";
+  let h='<div class="note">Every value below is assumed, proxied, or defaulted — not a confirmed client figure — unless its basis says otherwise.</div>';
+  h+='<table><thead><tr><th>Parameter</th><th class="num">Value</th><th>Basis</th><th>Note</th></tr></thead><tbody>';
+  items.forEach(a=>{h+=`<tr><td>${esc(a.param)}</td><td class="num">${esc(a.value)}</td><td>${esc(BASIS_LABEL[a.basis]||a.basis||"")}</td><td>${esc(a.note||"")}</td></tr>`;});
+  h+='</tbody></table>';
+  document.getElementById("assume").innerHTML=h;
+}
 function renderKpis(){
   const S=summarize(MODEL.rows,P);
   document.getElementById("kpis").innerHTML = (SPEC.kpis||[]).map(k=>{
     let v=S[k.key]; if(k.money) v=money(v);
-    return `<div class="kpi ${k.cls||""}"><div class="n">${v==null?"—":v}</div><div class="l">${esc(k.label)}</div></div>`;
+    const marker=assumeMarker(k.key);
+    return `<div class="kpi ${k.cls||""}"><div class="n">${v==null?"—":v}</div><div class="l">${esc(k.label)}${marker?`<br><span style="font-weight:400;text-transform:none;letter-spacing:0">${esc(marker)}</span>`:""}</div></div>`;
   }).join("");
 }
 function fmtCell(r,col,c){
@@ -328,7 +353,7 @@ function renderExtraHost(){
   const host=document.getElementById("extra"); if(!renderExtra){host.innerHTML="";return;} renderExtra(host,H);
 }
 function renderAll(){renderKpis();renderExtraHost();renderTable();}
-renderProv();renderControls();
+renderProv();renderControls();renderAssumptions();
 document.getElementById("qualonly").onchange=renderTable;
 renderAll();
 /*__CHARTS__*/

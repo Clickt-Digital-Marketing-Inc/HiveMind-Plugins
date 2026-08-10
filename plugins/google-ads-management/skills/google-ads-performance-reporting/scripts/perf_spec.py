@@ -36,7 +36,7 @@ def md_params(model):
     p = model["params"]
     return [
         ("Data source", M.source_label(model["provenance"].get("source"))),
-        ("ROAS goal", f"{p['roas_goal']:.2f}×"),
+        ("ROAS goal", f"{p['roas_goal']:.2f}×" + M.inline_marker(model, "roas_goal")),
         ("Budget-lost-IS flag", f"{p['budget_lost_is_flag'] * 100:.0f}%"),
         ("Anomaly delta flag", f"{p['delta_flag'] * 100:.0f}%"),
         ("Fix spend floor", _money(p["min_spend"], model["provenance"]["currency"])),
@@ -175,13 +175,14 @@ def md_sections(model):
 
 def md_rows(model):
     cur = model["provenance"]["currency"]
-    headers = ["Campaign", "Channel", "Status", "Impr", "Clicks", "CTR",
+    headers = ["Campaign", "Channel", "Status", "Liveness", "Impr", "Clicks", "CTR",
                f"Spend ({cur})" if cur else "Spend", "Conv", f"Revenue ({cur})" if cur else "Revenue",
                "ROAS", "Budget-lost IS", "Spend Δ", "Bucket"]
     out = []
     for r in model["rows"]:
         out.append([
             r["campaign"], r["channel"], r["status"].replace("_", " "),
+            r["liveness"].replace("_", " "),
             int(r["impressions"]) if float(r["impressions"]).is_integer() else round(r["impressions"], 2),
             int(r["clicks"]) if float(r["clicks"]).is_integer() else round(r["clicks"], 2),
             f"{r['ctr'] * 100:.2f}%", f"{r['cost']:,.2f}", f"{r['conversions']:.2f}",
@@ -190,9 +191,10 @@ def md_rows(model):
         ])
     return {
         "title": "All campaigns (every row, with status)",
-        "note": "No row loss: every campaign in the window appears here. Sorted by spend (highest first).",
+        "note": "No row loss: every campaign in the window appears here (with its liveness band). "
+                "Sorted by spend (highest first).",
         "headers": headers,
-        "aligns": ["l", "l", "l", "r", "r", "r", "r", "r", "r", "r", "r", "r", "l"],
+        "aligns": ["l", "l", "l", "l", "r", "r", "r", "r", "r", "r", "r", "r", "r", "l"],
         "rows": out,
         "empty": "_No campaigns in the window._",
     }
@@ -210,6 +212,7 @@ def html_embed(model):
         "concentration": model["concentration"],
         "rows": [{
             "campaign": r["campaign"], "channel": r["channel"], "status": r["status"],
+            "liveness": r["liveness"], "liveness_note": r.get("liveness_note", ""),
             "impr": r["impressions"], "clicks": r["clicks"], "ctr": r["ctr"],
             "cost": r["cost"], "conv": r["conversions"], "value": r["value"], "roas": r["roas"],
             "budget_lost_is": r["budget_lost_is"], "search_is": r["search_is"],
@@ -233,6 +236,7 @@ HTML_COLUMNS = [
     {"key": "campaign", "label": "Campaign"},
     {"key": "channel", "label": "Channel"},
     {"key": "status", "label": "Status", "fmt": "status"},
+    {"key": "liveness", "label": "Liveness", "fmt": "status"},
     {"key": "impr", "label": "Impr", "num": True, "fmt": "int"},
     {"key": "ctr", "label": "CTR", "num": True, "fmt": "pct"},
     {"key": "cost", "label": "Spend", "num": True, "fmt": "money"},
@@ -244,6 +248,7 @@ HTML_COLUMNS = [
 ]
 
 HTML_KPIS = [
+    {"label": "ROAS goal", "key": "roas_goal"},
     {"label": "Spend", "key": "spend", "money": True},
     {"label": "Revenue", "key": "revenue", "money": True},
     {"label": "ROAS", "key": "roas"},
@@ -268,6 +273,10 @@ function anomalyRules(P){
   ];
 }
 classify = function(r,P){
+  // Liveness gate (HM-603): a dormant campaign is never bucketed or flagged —
+  // mirrors perf_core.classify_row / annotate_anomalies. `liveness` is a static
+  // embedded field (not tuning-dependent), so the kernel only READS it.
+  if(r.liveness==="dormant"){ return {block:"", flags:[], pre_score:0}; }
   let block="";
   if(r.status==="measured" && r.roas!==null){
     if(r.roas >= P.roas_goal){
@@ -293,7 +302,7 @@ summarize = function(rows,P){
   return {campaigns:rows.length, spend:Math.round(spend*100)/100, revenue:Math.round(value*100)/100,
     conversions:Math.round(conv*100)/100, roas:spend?Math.round(value/spend*100)/100:null,
     cpa:conv?Math.round(spend/conv*100)/100:null, ctr:impr?clicks/impr:0,
-    scale, winner, fix, hold, no_value:nv, anomalies};
+    scale, winner, fix, hold, no_value:nv, anomalies, roas_goal:P.roas_goal||null};
 };
 """
 

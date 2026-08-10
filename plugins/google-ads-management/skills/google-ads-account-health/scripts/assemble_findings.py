@@ -48,7 +48,7 @@ ADGROUP_PERF_FIELDS = ("campaign.id", "campaign.name", "ad_group.id", "ad_group.
                        "metrics.clicks", "metrics.impressions")
 CAMPAIGNS_FIELDS = ("campaign.id", "campaign.name", "campaign.status",
                     "campaign.advertising_channel_type", "campaign.bidding_strategy_type",
-                    "metrics.conversions")
+                    "metrics.conversions", "metrics.cost_micros")
 NEGATIVES_FIELDS = ("campaign.id",)
 
 RECONCILE_ARRAYS = core.RECONCILE_ARRAYS
@@ -98,36 +98,70 @@ def assemble(keywords_path: str, adgroup_perf_path: str, campaigns_path: str,
     for k in all_keys:
         p = perf.get(k, {"campaign_id": k[0], "campaign": "", "ad_group_id": k[1], "ad_group": "",
                          "clicks": 0.0, "impressions": 0.0})
+        # An ad group can appear in the keywords pull but not the ad-group-perf
+        # pull (e.g. zero impressions in the window) — carry the name through
+        # with a fallback label rather than leaving the sprawl table blank.
+        campaign_name = p["campaign"] or f"(name unavailable — id {p['campaign_id']})"
+        ad_group_name = p["ad_group"] or f"(name unavailable — id {p['ad_group_id']})"
         ad_groups.append({
-            "campaign_id": p["campaign_id"], "campaign": p["campaign"],
-            "ad_group_id": p["ad_group_id"], "ad_group": p["ad_group"],
+            "campaign_id": p["campaign_id"], "campaign": campaign_name,
+            "ad_group_id": p["ad_group_id"], "ad_group": ad_group_name,
             "keyword_count": kw_count.get(k, 0),
             "clicks": round(p["clicks"], 6), "impressions": round(p["impressions"], 6),
         })
 
-    # negative_count per campaign.
+    # negative_count per campaign, from ALL raw negative rows (raw universe —
+    # this dict is the reconciliation source of truth for the negatives
+    # total, not the post-join campaigns array below).
     neg_count: dict = {}
     for r in neg_rows:
         cid = str(r.get("campaign.id"))
         neg_count[cid] = neg_count.get(cid, 0) + 1
+    negatives_raw_total = sum(neg_count.values())  # == len(neg_rows)
 
     campaigns = []
+    camp_ids = set()
     for r in camp_rows:
         cid = str(r.get("campaign.id"))
+        camp_ids.add(cid)
         campaigns.append({
             "campaign_id": cid, "campaign": r.get("campaign.name", ""),
             "status": r.get("campaign.status", ""),
             "channel_type": r.get("campaign.advertising_channel_type", ""),
             "bidding_strategy_type": r.get("campaign.bidding_strategy_type", ""),
             "conversions_30d": round(G.num(r.get("metrics.conversions")), 6),
+            # 30d window spend — drives campaign liveness (HM-603). Micros -> unit.
+            "cost": round(G.num(r.get("metrics.cost_micros")) / 1e6, 6),
             "negative_count": neg_count.get(cid, 0),
         })
 
-    findings = {"meta": meta, "params": {}, "ad_groups": ad_groups, "campaigns": campaigns}
+    # Negatives that reference a campaign id absent from the campaigns pull
+    # (e.g. REMOVED campaigns, excluded by pull 3's `status != 'REMOVED'`
+    # condition) — no-row-loss: these are never silently dropped, they are
+    # counted separately and status-tagged so the control total (below)
+    # covers the ENTIRE raw negatives universe, not just the joined subset.
+    orphan_ids = sorted((cid for cid in neg_count if cid not in camp_ids), key=lambda c: (len(c), c))
+    orphan_count = sum(neg_count[cid] for cid in orphan_ids)
+    if orphan_ids:
+        sys.stderr.write(
+            f"NOTE: {len(orphan_ids)} campaign id(s) in the negatives pull are absent from "
+            f"the campaigns pull — {orphan_count} negative(s) excluded from active-structure "
+            f"totals, counted in orphan_negatives instead "
+            f"({', '.join(orphan_ids)})\n")
+
+    orphan_negatives = {
+        "count": orphan_count,
+        "campaign_ids": orphan_ids,
+        "status": "out_of_scope",  # removed/out-of-scope campaigns — never scored
+    }
+
+    findings = {"meta": meta, "params": {}, "ad_groups": ad_groups, "campaigns": campaigns,
+                "orphan_negatives": orphan_negatives}
     findings["meta"]["reconciliation"] = R.build(
         findings, RECONCILE_ARRAYS,
         raw_stamps=[G.file_stamp(p) for p in
-                    (keywords_path, adgroup_perf_path, campaigns_path, negatives_path)])
+                    (keywords_path, adgroup_perf_path, campaigns_path, negatives_path)],
+        raw_totals={"negatives": negatives_raw_total})
     return findings
 
 
@@ -165,6 +199,10 @@ def main() -> int:
           f"impressions {ag['sums']['impressions']:,.0f}, clicks {ag['sums']['clicks']:,.0f})")
     print(f"  campaigns: {cp['rows']} (negatives {cp['sums']['negative_count']:,.0f}, "
           f"conversions(30d) {cp['sums']['conversions_30d']:,.2f})")
+    orphan = findings["orphan_negatives"]
+    print(f"  negatives (raw universe): {rec['raw_totals']['negatives']:,.0f} "
+          f"(orphan_negatives: {orphan['count']} across {len(orphan['campaign_ids'])} "
+          f"out-of-scope campaign id(s))")
     print("  reconciliation totals embedded — the builder verifies them on every run")
     return 0
 

@@ -149,8 +149,17 @@ def load_findings(path: str) -> dict:
                 "findings carry reconciliation totals but the _shared toolkit is not "
                 "on sys.path — run via build_health_report.py, or add the plugin's "
                 "_shared/ to sys.path before loading") from e
+        # negatives raw-universe total: in-scope campaigns' negative_count PLUS
+        # orphan_negatives.count (negatives on campaigns absent from the
+        # campaigns pull, e.g. REMOVED) must equal the raw negatives pull —
+        # this is what catches the post-join array silently losing rows
+        # (control totals computed FROM the same lossy array can't).
+        orphan = data.get("orphan_negatives") or {}
+        campaigns_neg_total = sum(_num(c.get("negative_count")) for c in data.get("campaigns") or [])
+        orphan_count = _num(orphan.get("count"))
         try:
-            reconcile.verify(data, RECONCILE_ARRAYS)
+            reconcile.verify(data, RECONCILE_ARRAYS,
+                             raw_totals={"negatives": campaigns_neg_total + orphan_count})
         except reconcile.ReconciliationError as e:
             raise FindingsError(str(e)) from e
     return data
@@ -186,10 +195,53 @@ def _yn(v) -> str | None:
     return "yes" if v else "no"
 
 
+def _campaign_liveness(campaigns: list) -> tuple[dict, dict]:
+    """Per-campaign liveness map (HM-603). Two-band-honest: this skill has a
+    single 30-day window, so `segment_liveness` is called with
+    prior_spend_key=None — live / recently_active / dormant are all reachable,
+    but the 'spent only in the prior window' path can't fire (no prior window).
+    Returns (liveness_by_campaign_id, note_by_campaign_id)."""
+    tagged = analytics.segment_liveness(campaigns, status_key="status",
+                                        spend_key="cost", prior_spend_key=None)
+    live_by, note_by = {}, {}
+    for c in tagged:
+        cid = str(c.get("campaign_id", ""))
+        live_by[cid] = c["liveness"]
+        note_by[cid] = _liveness_note(c)
+    return live_by, note_by
+
+
+def _liveness_note(campaign: dict) -> str:
+    """Conditional-phrasing seam for recently_active campaigns (the HM-605 hook).
+    Empty for live and dormant. Single window -> only the enabled-idle and
+    paused-mid-window reasons are derivable."""
+    if campaign.get("liveness") != "recently_active":
+        return ""
+    enabled = str(campaign.get("status") or "").strip().upper() == "ENABLED"
+    cur = _num(campaign.get("cost"))
+    if not enabled and cur > 0:
+        return (f"Paused/removed mid-window after spending {cur:,.2f} in the 30-day "
+                "window — confirm intent before acting.")
+    return "Enabled but no spend in the 30-day window — confirm it should be running before acting."
+
+
 def build_rows(ad_groups: list, campaigns: list, params: dict) -> list:
     """Every ad_group -> 1 sprawl row; every campaign -> 3 rows (no_negatives,
     automation_no_data, naming); every PMax campaign -> 1 pmax row.
-    No-row-loss: every input array element is represented (nothing dropped)."""
+    No-row-loss: every input array element is represented (nothing dropped).
+    Every row carries a `liveness` band (HM-603): campaign-grain rows use their
+    own campaign's liveness; ad-group sprawl rows inherit their parent campaign's
+    liveness (a dead campaign's ad groups are dead too). A row whose campaign is
+    absent from the campaigns pull defaults to recently_active (kept in scope,
+    never silently suppressed)."""
+    live_by, note_by = _campaign_liveness(campaigns)
+
+    def _tag(row):
+        cid = str(row.get("campaign_id", ""))
+        row["liveness"] = live_by.get(cid, "recently_active")
+        row["liveness_note"] = note_by.get(cid, "")
+        return row
+
     rows: list = []
     try:
         regex = re.compile(params["naming_regex"])
@@ -298,6 +350,8 @@ def build_rows(ad_groups: list, campaigns: list, params: dict) -> list:
                 # never confirmable via the read-only API — always None/"unconfirmed"
                 "status": CHECK_STATUS["pmax_cannibalization"],
             })
+    for r in rows:
+        _tag(r)
     return rows
 
 
@@ -324,8 +378,13 @@ def score_rows(rows: list, params: dict) -> list:
     for row, flags in zip(rows, flag_lists):
         r = dict(row)
         r["flags"] = flags
+        # Liveness gate (HM-603): a dormant campaign (not ENABLED, zero 30d spend)
+        # — and its ad groups — never trip a check (this is what stops the zombie
+        # "revert to Manual CPC" rows on long-dead campaigns). The row survives,
+        # tagged liveness="dormant", but carries no flags/severity/pre-score.
+        dormant = r.get("liveness") == "dormant"
         need = set(CHECK_FLAG_SETS[r["check"]])
-        r["is_flagged"] = need <= set(flags)
+        r["is_flagged"] = (not dormant) and need <= set(flags)
         r["pre_score"] = analytics.pre_score(r, WEIGHTS) if r["is_flagged"] else 0.0
         r["severity"] = CHECK_SEVERITY[r["check"]] if r["is_flagged"] else None
         out.append(r)
@@ -343,11 +402,18 @@ def summarize(rows: list) -> dict:
     for r in rows:
         if r["is_flagged"]:
             by_severity[r["severity"]] += 1
+    by_liveness = {"live": 0, "recently_active": 0, "dormant": 0}
+    for r in rows:
+        by_liveness[r.get("liveness", "recently_active")] = \
+            by_liveness.get(r.get("liveness", "recently_active"), 0) + 1
     return {
         "universe": len(rows),
         "total_flagged": total_flagged,
         "by_check": by_check,
         "by_severity": by_severity,
+        # Liveness split (HM-603): dormant rows are kept + tagged but excluded
+        # from the scored/severity universe (never flagged).
+        "by_liveness": by_liveness,
         "structural_score": round(sum(r["pre_score"] for r in rows), 4),
     }
 
@@ -374,6 +440,37 @@ def provenance(findings: dict, params: dict) -> dict:
     }
 
 
+def orphan_negatives_summary(findings: dict) -> dict:
+    """Negatives that reference a campaign id absent from the campaigns pull
+    (e.g. REMOVED campaigns) — never dropped, always surfaced with an honest
+    `status` (no-row-loss). Empty/zero when the findings predate this field
+    (legacy fixtures) or the CSV path (no separate negatives pull to orphan
+    against)."""
+    orphan = findings.get("orphan_negatives") or {}
+    return {
+        "count": int(_num(orphan.get("count"))),
+        "campaign_ids": list(orphan.get("campaign_ids") or []),
+        "status": orphan.get("status", "out_of_scope"),
+    }
+
+
+def _build_meta(findings: dict, params: dict) -> dict:
+    """meta pass-through + the naming_regex auto-stamp (HM-604): unless the
+    client explicitly supplied params.naming_regex in the findings JSON, every
+    campaign is being judged against DEFAULT_PARAMS['naming_regex'] — an
+    unconfirmed convention, not something the account owner agreed to — so it
+    gets an honest basis=model_default entry."""
+    meta = dict(findings.get("meta") or {})
+    supplied = (findings.get("params") or {}).get("naming_regex")
+    if supplied is None:
+        entries = [a for a in (meta.get("assumptions") or []) if a.get("param") != "naming_regex"]
+        entries.append({"param": "naming_regex", "value": params["naming_regex"], "basis": "model_default",
+                        "note": "no client-confirmed naming convention supplied — flagging campaigns "
+                                "against the tool's default regex (DEFAULT_PARAMS['naming_regex'])"})
+        meta["assumptions"] = entries
+    return meta
+
+
 def compute_model(findings: dict) -> dict:
     """Assemble the full model at the resolved params. JSON-serializable. This
     is the single source of truth; presentation (md/xlsx) lives in
@@ -391,4 +488,8 @@ def compute_model(findings: dict) -> dict:
         "check_labels": CHECK_LABELS,
         "check_severity": CHECK_SEVERITY,
         "check_max_score": CHECK_MAX_SCORE,
+        "orphan_negatives": orphan_negatives_summary(findings),
+        # Pass-through so every renderer sees the assembler's meta.assumptions
+        # (HM-604) and meta.source verbatim, plus the auto-stamped naming default.
+        "meta": _build_meta(findings, params),
     }

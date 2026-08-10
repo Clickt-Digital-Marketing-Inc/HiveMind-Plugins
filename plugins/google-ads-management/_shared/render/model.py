@@ -129,3 +129,93 @@ def source_label(source: str, csv_label: str = "User-supplied CSV export") -> st
     if source == LIVE_PULL_SOURCE:
         return LIVE_PULL_LABEL
     return source or LIVE_PULL_LABEL
+
+
+# --------------------------------------------------------------------------
+# meta.assumptions — provenance & assumptions transparency (HM-604)
+#
+# Locked design: meta.assumptions: [{param, value, basis, note}], basis in
+# client_confirmed | proxy | model_default. Stamped by an assembler (or
+# core.compute_model, for a tunable that silently defaulted) onto the
+# findings/model "meta" dict; rendered by every format as a "Provenance &
+# assumptions" callout under the Headline, plus a small inline marker helper
+# a spec can splice next to the affected number. Purely textual — never
+# touches a computed value, so it carries zero kernel-parity exposure.
+# --------------------------------------------------------------------------
+
+ASSUMPTION_BASES = ("client_confirmed", "proxy", "model_default")
+
+_BASIS_LABEL = {
+    "client_confirmed": "client-confirmed",
+    "proxy": "proxy",
+    "model_default": "default",
+}
+
+
+def add_assumption(meta: dict, param: str, value, basis: str, note: str = "") -> None:
+    """Stamp (or replace) one meta.assumptions entry in place on a findings/meta
+    dict. Called by an assembler (or a core.compute_model that resolves a
+    tunable to an unconfirmed default)."""
+    if basis not in ASSUMPTION_BASES:
+        raise ValueError(f"assumption basis must be one of {ASSUMPTION_BASES}, got {basis!r}")
+    entries = [a for a in (meta.get("assumptions") or []) if a.get("param") != param]
+    entries.append({"param": param, "value": value, "basis": basis, "note": note or ""})
+    meta["assumptions"] = entries
+
+
+def assumptions(model: dict) -> list:
+    return list((model.get("meta") or {}).get("assumptions") or [])
+
+
+def get_assumption(model: dict, param: str):
+    for a in assumptions(model):
+        if a.get("param") == param:
+            return a
+    return None
+
+
+def basis_label(basis: str) -> str:
+    return _BASIS_LABEL.get(basis, basis or "assumed")
+
+
+def inline_marker(model: dict, param: str) -> str:
+    """' (basis: note)' suffix for a number driven by an assumed/proxied/
+    defaulted parameter — '' when the param carries no meta.assumptions entry
+    (e.g. it was client-confirmed and never stamped). A spec splices this
+    directly onto the formatted number string; it never touches the value."""
+    a = get_assumption(model, param)
+    if not a:
+        return ""
+    label = basis_label(a.get("basis"))
+    note = a.get("note")
+    return f" ({label}: {note})" if note else f" ({label})"
+
+
+def require_assumptions(model: dict, tunables) -> list:
+    """UNVERIFIED warnings: for each spec-declared tunable/default parameter
+    name in `tunables`, ensure a meta.assumptions entry exists. Returns a list
+    of warning strings (empty == clean). Callers print/raise as their build
+    script's honesty gate dictates — this function never raises itself."""
+    have = {a.get("param") for a in assumptions(model)}
+    return [f"UNVERIFIED: parameter '{t}' has no meta.assumptions entry (basis unknown)"
+            for t in tunables if t not in have]
+
+
+def print_warnings(warnings) -> None:
+    """Print each warning to stderr in the same 'WARN: ...' style every build
+    script already uses for the reconciliation gate — a build script calls
+    this right after compute_model with require_assumptions/require_meta_source."""
+    import sys
+    for w in warnings:
+        sys.stderr.write(f"WARN: {w}\n")
+
+
+def require_meta_source(model: dict) -> list:
+    """UNVERIFIED warning when meta.source is absent. provenance['source'] is
+    always populated (defaults to the live-pull token), but that default masks
+    an assembler that never stamped meta.source in the first place — this
+    checks the RAW meta, not the defaulted provenance, so the gap is caught."""
+    if not (model.get("meta") or {}).get("source"):
+        return ["UNVERIFIED: meta.source is missing — data provenance (mcp vs user_csv) "
+                "was never stamped by the assembler"]
+    return []

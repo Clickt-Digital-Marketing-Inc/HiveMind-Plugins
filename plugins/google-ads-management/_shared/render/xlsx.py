@@ -143,8 +143,14 @@ def build_workbook(model: dict, spec: dict, brand: str, out_path: str) -> dict:
             put(f"A{r}", p["label"], BOLD)
             put(f"C{r}", model["params"].get(p["key"], p.get("default")), INPUTF, p.get("fmt"),
                 INPUTFILL, INBORDER, CEN)
-            if p.get("note"):
-                put(f"D{r}", p["note"])
+            note = p["note"](model) if callable(p.get("note")) else p.get("note")
+            # Inline assumption marker (HM-604): appended to the param's note so
+            # a proxied/defaulted input is never mistaken for a confirmed one.
+            marker = M.inline_marker(model, p["key"])
+            if marker:
+                note = (note or "") + marker
+            if note:
+                put(f"D{r}", note)
 
     if tog:
         put(f"A{tog['title_row']}", tog["section_title"], SECT)
@@ -254,13 +260,35 @@ def build_workbook(model: dict, spec: dict, brand: str, out_path: str) -> dict:
 
     # ===== Snapshot sheet (static sections) =====
     sect_fn = x.get("snapshot_sections") or spec.get("md_sections")
-    if sect_fn:
+    assume_items = M.assumptions(model)
+    if sect_fn or assume_items:
         ws = wb.create_sheet(x["snapshot_sheet"])
         ws["A1"] = x.get("snapshot_title", "Snapshot"); ws["A1"].font = TITLE
         if x.get("snapshot_intro"):
             ws["A2"] = x["snapshot_intro"]; ws["A2"].font = ITAL
         r = 4
-        for sec in sect_fn(model):
+        # Provenance & assumptions callout (HM-604) — engine-owned, appears the
+        # moment a skill's model carries meta.assumptions; skips cleanly for a
+        # skill with none (byte-unchanged Snapshot layout).
+        if assume_items:
+            ws.cell(row=r, column=1, value="Provenance & assumptions").font = SECT
+            r += 1
+            ws.cell(row=r, column=1, value="Every value below is assumed, proxied, or "
+                    "defaulted — not a confirmed client figure — unless its basis says "
+                    "otherwise.").font = GREY
+            r += 1
+            for j, h in enumerate(("Parameter", "Value", "Basis", "Note"), start=1):
+                c = ws.cell(row=r, column=j, value=h)
+                c.font = HDR; c.fill = HDRFILL; c.border = BORDER; c.alignment = CEN
+            r += 1
+            for a in assume_items:
+                ws.cell(row=r, column=1, value=a.get("param", ""))
+                ws.cell(row=r, column=2, value=a.get("value"))
+                ws.cell(row=r, column=3, value=M.basis_label(a.get("basis")))
+                ws.cell(row=r, column=4, value=a.get("note", ""))
+                r += 1
+            r += 1
+        for sec in (sect_fn(model) if sect_fn else []):
             ws.cell(row=r, column=1, value=sec["title"]).font = SECT
             r += 1
             if sec.get("note"):

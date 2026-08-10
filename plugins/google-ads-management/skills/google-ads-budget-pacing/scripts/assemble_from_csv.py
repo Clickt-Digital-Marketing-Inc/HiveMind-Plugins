@@ -26,7 +26,8 @@ what budget_core expects. `daily_budget` and the two lost-IS columns preserve th
 MCP path's null semantics: a blank/dash/"Shared"-style cell is missing data
 (-> no daily_budget key -> status "no_budget" in the core; lost-IS -> null), NOT
 zero — `csv_input`'s generic "num"/"pct" coercion would default absent cells to
-0.0, so those three fields are read as raw strings here and parsed by hand.
+0.0, so those three fields are read as raw strings here and re-parsed through
+`csv_input.parse_num(v, None)`: the same locale-aware parser, None default.
 
 Exit codes: 0 success, 1 usage/validation error.
 """
@@ -35,7 +36,6 @@ from __future__ import annotations
 import argparse
 import datetime
 import json
-import re
 import sys
 from pathlib import Path
 
@@ -45,6 +45,7 @@ sys.path.insert(0, str(PLUGIN_ROOT / "_shared"))
 
 import csv_input as C           # noqa: E402
 import reconcile as R           # noqa: E402
+from render import model as Rm  # noqa: E402  (meta.assumptions — HM-604)
 
 sys.path.insert(0, str(HERE))
 import budget_core as core      # noqa: E402  (owns the reconcile contract)
@@ -56,6 +57,11 @@ WINDOW_COLUMN_MAP = {
     "campaign": {"aliases": ["Campaign"], "type": "str"},
     "channel": {"aliases": ["Campaign type", "Campaign Type", "Advertising channel type"],
                 "type": "str"},
+    # campaign.status twin (HM-603 liveness): the UI export's "Campaign state"
+    # column. Optional — a column-less export omits it (-> ""), which reads as
+    # not-ENABLED; a live-spending campaign is then recently_active, still scored.
+    "campaign_status": {"aliases": ["Campaign state", "Campaign status", "Status"],
+                        "type": "str"},
     "cost": {"aliases": ["Cost"], "type": "num"},
     "conversions": {"aliases": ["Conversions"], "type": "num"},
     "daily_budget": {"aliases": ["Budget", "Daily budget", "Budget amount"], "type": "str"},
@@ -75,31 +81,19 @@ MTD_COLUMN_MAP = {
 }
 MTD_REQUIRED = ("campaign", "mtd_spend")
 
-# Cell values meaning "absent" — mirrors _shared/csv_input.py's _ABSENT set (kept
-# local: a small, stable, documented convention rather than importing a private
-# helper across the module boundary).
-_ABSENT = {"", "-", "--", "—", "–"}
-
 
 def _num_or_none(v):
     """Raw UI cell -> float, or None when absent/unparseable (missing, not zero).
 
-    Tolerates thousands commas, a trailing '%' (the lost-IS columns render as
-    percentages in the UI export), and a defensive currency prefix ('CA$300.00',
-    '$5') -- mirrors _shared/csv_input.py's "num" coercion, minus the absent-cell
-    default (this helper returns None, not 0.0, so a missing daily_budget cell
-    stays "no budget data" rather than becoming a false $0). A non-numeric cell
-    (e.g. a shared-budget campaign showing "Shared") is also None, never a crash."""
-    s = str(v or "").strip()
-    if s in _ABSENT:
-        return None
-    s = s.replace(",", "").replace(" ", " ").strip().rstrip("%").strip()
-    s = re.sub(r"^[A-Za-z]{0,3}\$", "", s)
-    try:
-        x = float(s)
-    except ValueError:
-        return None
-    return x
+    Delegates to `_shared/csv_input.parse_num` — the ONE number parser — with
+    `default=None`, so a missing daily_budget cell stays "no budget data"
+    rather than becoming a false $0 and a non-numeric cell (e.g. a
+    shared-budget campaign showing "Shared") is None, never a crash. This was
+    a local re-derivation until HM-778: the shared parser learned the locale
+    number formats and the clone did not, so within ONE findings file the
+    "num" columns of an fr/de export parsed correctly while the columns routed
+    through here (daily_budget, both lost-IS) came out 100x off or dropped."""
+    return C.parse_num(v, None)
 
 
 def _pct_or_none(v):
@@ -127,7 +121,8 @@ def assemble(window_csv: str, mtd_csv: str, meta: dict) -> dict:
         if not name or name in seen:
             continue   # a window export is one row per campaign already; guard dup headers
         seen.add(name)
-        c = {"campaign_id": name, "campaign": name, "channel": r.get("channel", "")}
+        c = {"campaign_id": name, "campaign": name, "channel": r.get("channel", ""),
+             "campaign_status": r.get("campaign_status") or ""}
         daily = _num_or_none(r.get("daily_budget"))
         if daily is not None:
             c["daily_budget"] = daily
@@ -163,6 +158,14 @@ def main() -> int:
                     help='window label, e.g. "last 30 days" — the window used in the CSV export')
     ap.add_argument("--monthly-goal", type=float, default=0.0,
                     help="account monthly spend goal (ask the user; 0/omitted => pacing reads n/a)")
+    ap.add_argument("--monthly-goal-source", choices=("client", "proxy"), default=None,
+                    help="basis for --monthly-goal: 'client' if the client stated it directly, "
+                         "'proxy' if it is derived (e.g. Sigma of daily budgets x 31) — stamps "
+                         "meta.assumptions so every report format marks the goal honestly. "
+                         "Omit only when --monthly-goal is 0 (pacing n/a, nothing to label).")
+    ap.add_argument("--monthly-goal-note", default="",
+                    help="free-text basis note, e.g. 'proxy: Sigma daily budgets x 31 days' "
+                         "(required with --monthly-goal-source=proxy)")
     ap.add_argument("--days-elapsed", type=int, required=True,
                     help="days of the month elapsed at the report date")
     ap.add_argument("--days-in-month", type=int, required=True)
@@ -176,6 +179,20 @@ def main() -> int:
             "generated": args.generated or datetime.date.today().isoformat(),
             "monthly_goal": args.monthly_goal, "days_elapsed": args.days_elapsed,
             "days_in_month": args.days_in_month}
+    if args.monthly_goal_source:
+        if args.monthly_goal_source == "proxy" and not args.monthly_goal_note:
+            sys.stderr.write("ERROR: --monthly-goal-note is required when "
+                             "--monthly-goal-source=proxy\n")
+            return 1
+        basis = "client_confirmed" if args.monthly_goal_source == "client" else "proxy"
+        note = args.monthly_goal_note or (
+            "client-confirmed monthly spend goal" if basis == "client_confirmed" else "")
+        Rm.add_assumption(meta, "monthly_goal", args.monthly_goal, basis, note)
+    elif args.monthly_goal:
+        sys.stderr.write(
+            "WARN: --monthly-goal was supplied without --monthly-goal-source — the goal's "
+            "basis (client-confirmed vs a proxy estimate) is UNVERIFIED and will not carry a "
+            "provenance marker. Pass --monthly-goal-source client|proxy.\n")
     try:
         findings = assemble(args.window, args.mtd, meta)
     except (C.CsvInputError, OSError) as e:

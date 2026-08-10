@@ -1,0 +1,50 @@
+{
+  "_comment": [
+    "The liveness matrix fixture (HM-799). Every band perf_core branches on is",
+    "present, and every one of _liveness_note's THREE return paths fires exactly",
+    "once. Deliberately separate from sample-findings.json: that fixture's",
+    "revenue/spend is 23100/5600 = 4.125 exactly, a half-up rounding BOUNDARY the",
+    "suites assert on (roas == 4.13, not round()'s 4.12), so adding spend or",
+    "revenue there would silently move the boundary and delete that check.",
+    "Campaigns 3 and 4 are a contrast pair: identical in every field except",
+    "'status'. That single field is what separates recently_active from dormant,",
+    "so the dormant gate in annotate_anomalies is decidable — with the gate row 4",
+    "has flags [] / pre_score 0.0, without it row 4 reproduces row 3's",
+    "conv_drop+value_drop / 4.5. Their prior_conversions and",
+    "prior_conversions_value are non-zero while prior_cost is 0 ON PURPOSE:",
+    "prior_cost > 0 would classify row 4 recently_active, and a dormant row with",
+    "no prior signal at all can produce no flags either way, which would make the",
+    "gate untestable."
+  ],
+  "meta": {
+    "client_name": "Liveness Fixture Co",
+    "account_id": "999-000-1111",
+    "currency": "USD",
+    "period": "2026-06-01 → 2026-06-30",
+    "prior_period": "2026-05-01 → 2026-05-31",
+    "generated": "2026-06-30"
+  },
+  "campaigns": [
+    {"campaign_id": 1, "campaign": "Live | Search", "status": "ENABLED", "channel": "SEARCH",
+     "impressions": 5000, "clicks": 250, "cost": 500.0, "conversions": 10, "conversions_value": 2500.0,
+     "search_impression_share": 0.60, "search_budget_lost_is": 0.05, "search_rank_lost_is": 0.10,
+     "prior_cost": 450.0, "prior_conversions": 8, "prior_conversions_value": 3000.0},
+
+    {"campaign_id": 2, "campaign": "RA | Paused mid-window", "status": "PAUSED", "channel": "SEARCH",
+     "impressions": 2000, "clicks": 100, "cost": 200.0, "conversions": 4, "conversions_value": 1000.0,
+     "search_impression_share": 0.40, "search_budget_lost_is": 0.20, "search_rank_lost_is": 0.05,
+     "prior_cost": 0.0},
+
+    {"campaign_id": 3, "campaign": "RA | Enabled idle", "status": "ENABLED", "channel": "SEARCH",
+     "impressions": 0, "clicks": 0, "cost": 0.0, "conversions": 0, "conversions_value": 0.0,
+     "prior_cost": 0.0, "prior_conversions": 12, "prior_conversions_value": 3600.0},
+
+    {"campaign_id": 4, "campaign": "Dormant | Removed", "status": "REMOVED", "channel": "SEARCH",
+     "impressions": 0, "clicks": 0, "cost": 0.0, "conversions": 0, "conversions_value": 0.0,
+     "prior_cost": 0.0, "prior_conversions": 12, "prior_conversions_value": 3600.0},
+
+    {"campaign_id": 5, "campaign": "RA | Prior window only", "status": "PAUSED", "channel": "SEARCH",
+     "impressions": 0, "clicks": 0, "cost": 0.0, "conversions": 0, "conversions_value": 0.0,
+     "prior_cost": 350.0, "prior_conversions": 4, "prior_conversions_value": 900.0}
+  ]
+}

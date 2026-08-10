@@ -54,6 +54,20 @@ def md_kpis(model):
 
 
 def md_narrative(model):
+    # 0 rows returned (no products at all) is a DIFFERENT honest result from
+    # "scanned N, flagged 0" — the former usually means no Merchant Center feed
+    # is linked to the account, the latter means the feed is healthy. Route
+    # this through the same provenance/honesty mechanism as meta.assumptions
+    # (HM-604), but as narrative text — a callout table would overstate a
+    # one-line root-cause note.
+    if model["summary"]["universe"] == 0:
+        return [
+            "> **0 product rows returned — no Merchant Center feed detected.** This account has no "
+            "Shopping/PMax product rows in the pull, which almost always means no Merchant Center "
+            "feed is linked (or Shopping/PMax isn't running). This is NOT the same as \"scanned N "
+            "products, flagged 0\" — verify the Merchant Center link before treating this as a clean "
+            "result.",
+        ]
     if model["summary"]["flagged"] != 0:
         return []
     return [
@@ -80,8 +94,11 @@ def md_recommendations_section(model):
         "headers": ["Severity", "Recommended action", "Why (model numbers)", "Worklist"],
         "aligns": ["l", "l", "l", "l"],
         "rows": rows,
-        "empty": "_No products flagged this run — a clean result, not an omission "
-                 "(see the sensitivity tables below for near-misses)._",
+        "empty": ("_0 product rows returned — no Merchant Center feed detected. Verify the "
+                  "Merchant Center link before treating this as a clean result._"
+                  if model["summary"]["universe"] == 0 else
+                  "_No products flagged this run — a clean result, not an omission "
+                  "(see the sensitivity tables below for near-misses)._"),
     }
 
 

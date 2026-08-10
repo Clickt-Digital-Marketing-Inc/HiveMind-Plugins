@@ -26,6 +26,15 @@ sys.path.insert(0, str(HERE.parents[2] / "_shared"))
 import perf_core as core  # noqa: E402
 
 FIXTURE = HERE / "sample-findings.json"
+#: The liveness matrix (HM-799) — kept out of sample-findings.json on purpose:
+#: that fixture's revenue/spend is 23100/5600 = 4.125 exactly, the half-up
+#: rounding boundary test_fixture_buckets asserts on (4.13, not round()'s 4.12).
+LIVENESS_FIXTURE = HERE / "sample-liveness.json"
+#: Row keys that legitimately differ between the fixture's recently_active /
+#: dormant twins (campaigns 3 and 4). Everything else must be equal, which is
+#: what makes 'status' the single distinguishing input.
+_LIVENESS_DERIVED = {"campaign_id", "campaign", "status_label", "liveness",
+                     "liveness_note", "flags", "pre_score"}
 _failures = []
 
 
@@ -343,6 +352,86 @@ def test_csv_matches_mcp_model():
           == [(r["flags"], r["pre_score"]) for r in m_csv["rows"]])
 
 
+def test_liveness_gating():
+    print("test_liveness_gating")
+    # Three-band coverage: this skill pulls status + current + prior spend, so
+    # all three bands AND all three _liveness_note return paths are reachable.
+    # The matrix lives in the SHIPPED fixture (HM-799), not in an inline dict —
+    # one definition, and the same file the port's golden is generated from.
+    m = core.compute_model(core.load_findings(str(LIVENESS_FIXTURE)))
+    rows = {r["campaign_id"]: r for r in m["rows"]}
+    check("every campaign survives (no-row-loss)", len(m["rows"]) == 5, f"got {len(m['rows'])}")
+    check("live band", rows[1]["liveness"] == "live", rows[1]["liveness"])
+    check("paused-mid-window -> recently_active", rows[2]["liveness"] == "recently_active", rows[2]["liveness"])
+    check("enabled-idle -> recently_active", rows[3]["liveness"] == "recently_active", rows[3]["liveness"])
+    check("removed + zero both windows -> dormant", rows[4]["liveness"] == "dormant", rows[4]["liveness"])
+    check("prior-window-only -> recently_active", rows[5]["liveness"] == "recently_active", rows[5]["liveness"])
+    # recently_active rows carry conditional phrasing (the HM-605 seam). All
+    # THREE note paths are asserted by their distinguishing clause, so swapping
+    # two of the branches cannot stay green.
+    check("paused+spend row has the paused-mid-window note",
+          rows[2]["liveness_note"] ==
+          "Paused/removed mid-window after spending 200.00 — confirm intent before acting.",
+          rows[2]["liveness_note"])
+    check("enabled-idle row has the enabled-but-idle note",
+          rows[3]["liveness_note"] ==
+          "Enabled but no spend in the window — confirm it should be running before acting.",
+          rows[3]["liveness_note"])
+    check("prior-window-only row has the prior-window note",
+          rows[5]["liveness_note"] ==
+          "Spent only in the prior window — confirm intent before acting.",
+          rows[5]["liveness_note"])
+    check("live row has no note", rows[1]["liveness_note"] == "")
+    # dormant row generates nothing but stays visible + tagged
+    check("dormant row not bucketed", rows[4]["bucket"] == "", rows[4]["bucket"])
+    check("dormant row has no anomaly flags", rows[4]["flags"] == [], rows[4]["flags"])
+    check("dormant row pre_score 0", rows[4]["pre_score"] == 0.0, rows[4]["pre_score"])
+    check("dormant row has empty note", rows[4]["liveness_note"] == "")
+    # The gate is load-bearing, not decoration: row 3 and row 4 differ in exactly
+    # one input field (status), and row 3 — the recently_active twin — DOES carry
+    # the flags the gate suppresses on row 4. Delete the gate and row 4 becomes
+    # row 3; widen it past dormant and row 3 loses its flags.
+    check("recently_active twin keeps its anomaly flags",
+          rows[3]["flags"] == ["conv_drop", "value_drop"], rows[3]["flags"])
+    check("recently_active twin keeps a non-zero pre_score",
+          rows[3]["pre_score"] == 4.5, rows[3]["pre_score"])
+    check("the twins' COMPUTED rows differ ONLY in the derived keys",
+          {k: v for k, v in rows[3].items() if k not in _LIVENESS_DERIVED}
+          == {k: v for k, v in rows[4].items() if k not in _LIVENESS_DERIVED},
+          "twin rows diverge in an input field, so the contrast proves nothing")
+    # ...and the same premise asserted where it actually lives: the FIXTURE INPUTS.
+    # The computed-row comparison above cannot see the twins' prior windows drift
+    # apart — prior_conversions/prior_conversions_value never reach the output row,
+    # surviving only as conv_delta/value_delta, which both saturate at -1.0 once
+    # the current window is 0. Retune one twin's prior window and the check above
+    # stays green while the one-field premise this whole contrast rests on is
+    # already broken.
+    raw = {c["campaign_id"]: c
+           for c in json.loads(LIVENESS_FIXTURE.read_text(encoding="utf-8"))["campaigns"]}
+    twin_diff = {k for k in set(raw[3]) | set(raw[4]) if raw[3].get(k) != raw[4].get(k)}
+    check("the twins' FIXTURE INPUTS differ ONLY in status (plus id/name)",
+          twin_diff == {"campaign_id", "campaign", "status"}, sorted(twin_diff))
+    check("prior-window-only row is scored (not gated)",
+          rows[5]["flags"] == ["spend_drop", "conv_drop", "value_drop"], rows[5]["flags"])
+    # live/recently_active rows still fully scored (severity universe intact)
+    check("live row still bucketed", rows[1]["bucket"] in ("Scale", "Winner", "Fix", "Hold"), rows[1]["bucket"])
+    check("recently_active row still bucketed", rows[2]["bucket"] == "Scale", rows[2]["bucket"])
+    check("summary counts only the ungated anomalies",
+          m["summary"]["anomalies"] == 2, m["summary"]["anomalies"])
+
+    # html_embed + JS-kernel parity: dormant gate is mirrored in the browser kernel,
+    # so the embedded row carries liveness and the Node gate (run_parity.py) agrees.
+    import perf_spec
+    emb = perf_spec.html_embed(m)["rows"]
+    check("html embed carries liveness + note", all("liveness" in r and "liveness_note" in r for r in emb))
+    # Key presence alone is not the seam: a fully regressed embed that tags the
+    # long-dead campaign "live" still has both keys on every row. Assert the VALUE
+    # on the dormant row (mirrors the budget-pacing sibling's embed check).
+    check("html embed dormant row tagged dormant",
+          next(r for r in emb if r["campaign"] == "Dormant | Removed")["liveness"] == "dormant",
+          next(r for r in emb if r["campaign"] == "Dormant | Removed").get("liveness"))
+
+
 def test_xlsx_recalc_matches_model():
     print("test_xlsx_recalc_matches_model")
     import perf_spec
@@ -410,11 +499,56 @@ def test_xlsx_recalc_matches_model():
               f"{cached_nv_score} vs {r_nv['pre_score']}")
 
 
+def test_assumptions_provenance():
+    print("test_assumptions_provenance")
+    from render import model as M
+
+    # sample-findings.json carries no params.roas_goal -> compute_model must
+    # auto-stamp a model_default assumption (HM-604), never silently present
+    # DEFAULT_PARAMS['roas_goal'] as a confirmed client target.
+    findings = json.loads(FIXTURE.read_text())
+    check("fixture supplies no explicit roas_goal", (findings.get("params") or {}).get("roas_goal") is None)
+    m = core.compute_model(findings)
+    a = M.get_assumption(m, "roas_goal")
+    check("roas_goal auto-stamped basis=model_default", a is not None and a["basis"] == "model_default", a)
+    check("require_assumptions is clean (auto-stamped)", M.require_assumptions(m, ["roas_goal"]) == [])
+
+    # an explicit client-supplied roas_goal must NOT be auto-stamped as a default.
+    findings2 = json.loads(FIXTURE.read_text())
+    findings2["params"] = {"roas_goal": 6.0}
+    m2 = core.compute_model(findings2)
+    check("explicit roas_goal carries no model_default assumption",
+          M.get_assumption(m2, "roas_goal") is None)
+
+    import perf_spec
+    import perf_xlsx_spec
+    from render import build_bundle
+    spec = dict(perf_spec.SPEC)
+    spec["xlsx"] = perf_xlsx_spec.XLSX
+    with tempfile.TemporaryDirectory() as td:
+        written = build_bundle(m, spec, td, formats=("md", "html", "xlsx"), charts=False,
+                               normalize=False)
+        md = next(p for p in written if p.suffix == ".md").read_text()
+        html = next(p for p in written if p.name.endswith("_explorer.html")).read_text()
+        xlsx_path = next(p for p in written if p.suffix == ".xlsx")
+        check("md has the callout", "## Provenance & assumptions" in md)
+        check("md ROAS goal line carries the inline marker", "ROAS goal" in md and "(default:" in md)
+        check("html embeds roas_goal assumption", '"roas_goal"' in html and '"model_default"' in html)
+        import openpyxl
+        wb = openpyxl.load_workbook(str(xlsx_path))
+        snap_cells = [c.value for row in wb["Snapshot"].iter_rows() for c in row if c.value is not None]
+        check("xlsx Snapshot has the callout", "Provenance & assumptions" in snap_cells)
+        ctrl_notes = [c.value for c in wb["Controls"]["D"] if c.value]
+        check("xlsx Controls note carries the inline marker",
+              any("default:" in (v or "") for v in ctrl_notes), ctrl_notes)
+
+
 def main():
     for t in (test_fixture_buckets, test_no_value_not_bucketed, test_dedupe_by_campaign_id,
               test_empty, test_goal_sensitivity_current_flag, test_assemble_findings_from_raw,
               test_bundle_md_html_parity_and_lazy, test_anomalies_and_concentration,
-              test_delta_flag_tunable, test_csv_matches_mcp_model, test_xlsx_recalc_matches_model):
+              test_delta_flag_tunable, test_csv_matches_mcp_model, test_liveness_gating,
+              test_xlsx_recalc_matches_model, test_assumptions_provenance):
         t()
     print()
     if _failures:

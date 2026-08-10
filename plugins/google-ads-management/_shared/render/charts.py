@@ -164,6 +164,6 @@ def vendor_blob() -> str:
     the self-containment test verifies any embedded blob equals this exactly."""
     parts = [VENDOR_BEGIN]
     for name in VENDOR_FILES:
-        parts.append((VENDOR_DIR / name).read_text())
+        parts.append((VENDOR_DIR / name).read_text(encoding="utf-8"))
     parts.append(VENDOR_END)
     return "\n".join(parts)

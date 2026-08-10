@@ -91,12 +91,20 @@ conditions: ["segments.date BETWEEN '<30d-start>' AND '<yesterday>'",
 resource:   "campaign"
 fields:     ["campaign.id","campaign.name","campaign.status",
              "campaign.advertising_channel_type","campaign.bidding_strategy_type",
-             "metrics.conversions"]
+             "metrics.conversions","metrics.cost_micros"]
 conditions: ["segments.date BETWEEN '<30d-start>' AND '<yesterday>'",
              "campaign.status != 'REMOVED'"]
 ```
 Use `metrics.conversions` (the account's primary, attribution-modeled,
-possibly-fractional goal) — never `metrics.all_conversions`.
+possibly-fractional goal) — never `metrics.all_conversions`. `metrics.cost_micros`
+is the 30-day window spend that drives **campaign liveness** (`_shared/analytics.segment_liveness`,
+HM-603): a campaign is `live` (ENABLED + spend > 0), `recently_active` (paused-mid-window, or
+enabled-but-idle), or `dormant` (not ENABLED + zero 30-day spend). This is a **two-band-honest**
+adoption — the skill has a single 30-day window, so there is no prior-window signal; the
+"spent only in the prior window" liveness path is not derivable here. Dormant campaigns (and
+their ad groups) are kept and tagged but **excluded from every check's scored universe** — this
+is what stops long-dead campaigns from manufacturing zombie findings (e.g. an automated-bidding
+"revert to Manual CPC" flag on a campaign that stopped spending months ago).
 
 **4 — Campaign-level negative keywords** (for `no_negatives`):
 ```
@@ -106,6 +114,14 @@ conditions: ["campaign_criterion.type = 'KEYWORD'",
              "campaign_criterion.negative = true"]
 ```
 Count rows per `campaign.id`.
+
+> **Gotcha — negatives on campaigns outside pull 3's scope.** Pull 3 filters
+> `campaign.status != 'REMOVED'`; pull 4 (negatives) has no such filter, so a
+> negative can reference a campaign id that never appears in pull 3 (most
+> often a REMOVED campaign). `assemble_findings.py` counts these separately
+> as `orphan_negatives` — see "The findings JSON" below — rather than
+> silently losing them; the reconciliation total covers the ENTIRE raw
+> negatives pull, not just the ids that joined to a pulled campaign.
 
 > **Gotcha:** `LAST_30_DAYS` **is** a valid GAQL literal (unlike `LAST_90_DAYS`),
 > but this skill uses an explicit `BETWEEN` for a stable, reproducible window
@@ -138,11 +154,25 @@ python3 scripts/assemble_findings.py \
   "ad_groups": [{"campaign_id","campaign","ad_group_id","ad_group",
                 "keyword_count","clicks","impressions"}],
   "campaigns": [{"campaign_id","campaign","status","channel_type",
-                "bidding_strategy_type","conversions_30d","negative_count"}]
+                "bidding_strategy_type","conversions_30d","negative_count"}],
+  "orphan_negatives": {"count", "campaign_ids", "status"}   // MCP path only, see below
 }
 ```
 `keyword_count` / `negative_count` are raw counts (not micros). `conversions_30d`
 uses the primary conversion metric (may be fractional).
+
+`orphan_negatives` is the no-row-loss home for negatives whose `campaign.id`
+never appears in the campaigns pull (e.g. REMOVED campaigns): `count` is the
+number of such negative rows, `campaign_ids` the distinct ids they reference,
+`status` is always `"out_of_scope"` (never scored — there is no campaign row
+to attach a check to). `health_core.load_findings` reconciles
+`sum(campaigns[].negative_count) + orphan_negatives.count` against the raw
+negatives-pull total embedded in `meta.reconciliation.raw_totals.negatives`
+at assembly time — a findings JSON that drops or edits either side without
+the other fails to load. The CSV path (below) joins `negative_count` straight
+onto each campaign row by name — there is no separate negatives pull to
+orphan against — so it never emits `orphan_negatives`; `health_core` treats
+an absent field as `{"count": 0, "campaign_ids": [], "status": "out_of_scope"}`.
 
 ## Dual input — the CSV path (`_shared/csv_input.py`)
 

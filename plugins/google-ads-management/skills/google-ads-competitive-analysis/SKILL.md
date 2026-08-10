@@ -45,6 +45,8 @@ what you can and cannot see before pulling anything.
    `metrics.search_budget_lost_impression_share`, `metrics.cost_micros`, `metrics.clicks`,
    `metrics.impressions`, `metrics.conversions`. Run for two back-to-back 7-day windows (see
    `references/competitive-pressure-filter.md` for the exact GAQL and date-window gotchas).
+   Authoritative constant: `CAMPAIGN_FIELDS` in
+   [scripts/assemble_findings.py](scripts/assemble_findings.py).
 2. Optionally the **Auction Insights** export (Campaigns → Insights → Auction insights →
    Download → .csv) for the same this-week window, if the user wants the competitor read.
 

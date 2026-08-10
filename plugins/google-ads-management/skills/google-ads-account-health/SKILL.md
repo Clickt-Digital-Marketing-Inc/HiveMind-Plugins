@@ -30,12 +30,15 @@ CSVs named below. Never guess when both are plausible — ask.
 Four GAQL pulls (exact fields/conditions in
 [references/account-health-filter.md](references/account-health-filter.md)):
 1. **Enabled keywords per ad group** (`ad_group_criterion`, type=KEYWORD, negative=false, enabled)
-   — for the sprawl count.
-2. **Ad-group performance, 30d** (`ad_group`, clicks + impressions) — for sprawl's CTR bar.
-3. **Campaign structure + bidding + conversions, 30d** (`campaign`) — status, channel type,
-   bidding strategy, conversions.
+   — for the sprawl count (constant: `KEYWORDS_FIELDS` in
+   [scripts/assemble_findings.py](scripts/assemble_findings.py)).
+2. **Ad-group performance, 30d** (`ad_group`, clicks + impressions) — for sprawl's CTR bar
+   (constant: `ADGROUP_PERF_FIELDS`).
+3. **Campaign structure + bidding + conversions + spend, 30d** (`campaign`) — status, channel type,
+   bidding strategy, conversions, **`metrics.cost_micros`** (30-day spend, drives campaign liveness)
+   (constant: `CAMPAIGNS_FIELDS`).
 4. **Campaign-level negatives** (`campaign_criterion`, type=KEYWORD, negative=true) — for the
-   `no_negatives` count.
+   `no_negatives` count (constant: `NEGATIVES_FIELDS`).
 
 Save every raw result to a file (transcription firewall), then:
 ```

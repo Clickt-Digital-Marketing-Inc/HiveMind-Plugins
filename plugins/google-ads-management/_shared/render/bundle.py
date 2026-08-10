@@ -49,15 +49,16 @@ def build_bundle(model: dict, spec: dict, outdir: str, formats=("md", "html", "x
             cdir.mkdir(exist_ok=True)
             for cid, title, svg in chartsmod.render_spec_charts(model, spec, only="md"):
                 cp = cdir / f"{cid}.svg"
-                cp.write_text(svg)
+                cp.write_text(svg, encoding="utf-8")
                 written.append(cp)
                 chart_refs.append((cid, title, f"{stem}_charts/{cid}.svg"))
         p = out / f"{stem}.md"
-        p.write_text(render_md(model, spec, chart_refs=chart_refs or None))
+        p.write_text(render_md(model, spec, chart_refs=chart_refs or None),
+                     encoding="utf-8")
         written.append(p)
     if "html" in formats:
         p = out / f"{stem}_explorer.html"
-        p.write_text(render_html(model, spec))
+        p.write_text(render_html(model, spec), encoding="utf-8")
         written.append(p)
     if "xlsx" in formats:
         if not spec.get("xlsx"):

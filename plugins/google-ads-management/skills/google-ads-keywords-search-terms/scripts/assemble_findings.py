@@ -56,6 +56,21 @@ TERMS_30D_FIELDS = ("campaign.id", "ad_group.name", "search_term_view.search_ter
 BENCH_FIELDS = ("campaign.id", "campaign.name", "metrics.ctr",
                 "metrics.cost_micros", "metrics.conversions")
 
+# SKILL.md "Pull the data" #2/#3 (basic SQR audit + monthly keyword analysis)
+# are prose-only pulls with no findings assembler of their own — these two
+# constants exist purely to bind the documented field lists to code per
+# HM-606 (skills/google-ads/tests/test_gaql_schema.py); nothing here imports
+# them.
+NEGATIVES_FIELDS = ("campaign.id", "campaign.name", "campaign_criterion.keyword.text",
+                    "campaign_criterion.keyword.match_type", "campaign_criterion.type",
+                    "campaign_criterion.negative")
+KEYWORD_QS_FIELDS = ("ad_group.id", "ad_group.name", "campaign.id", "campaign.name",
+                     "ad_group_criterion.keyword.text", "ad_group_criterion.keyword.match_type",
+                     "ad_group_criterion.quality_info.quality_score",
+                     "metrics.impressions", "metrics.clicks", "metrics.ctr",
+                     "metrics.average_cpc", "metrics.cost_micros", "metrics.conversions",
+                     "metrics.conversions_value")
+
 # Control totals verified by waste_filter_core.load_findings on every build;
 # the contract (which arrays, which fields) is owned by the core.
 RECONCILE_ARRAYS = core.RECONCILE_ARRAYS

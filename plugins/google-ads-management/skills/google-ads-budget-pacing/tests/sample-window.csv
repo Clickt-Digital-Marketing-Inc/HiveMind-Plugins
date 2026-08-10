@@ -1,8 +1,8 @@
-Campaign,Campaign type,Cost,Conversions,Budget,Search lost IS (budget),Search lost IS (rank)
-S | Brand,SEARCH,4000.00,100,300.00,25.00%,5.00%
-S | Junk,SEARCH,600.00,0,400.00,0.00%,0.00%
-S | Competitive,SEARCH,2000.00,30,500.00,2.00%,30.00%
-S | Starved,SEARCH,800.00,20,100.00,5.00%,5.00%
-S | Steady,SEARCH,1500.00,30,600.00,0.00%,0.00%
-PMax | NoBudgetData,PERFORMANCE_MAX,500.00,10,--,--,--
-Total: ,,9400.00,190,,,
+Campaign,Campaign type,Campaign state,Cost,Conversions,Budget,Search lost IS (budget),Search lost IS (rank)
+S | Brand,SEARCH,ENABLED,4000.00,100,300.00,25.00%,5.00%
+S | Junk,SEARCH,ENABLED,600.00,0,400.00,0.00%,0.00%
+S | Competitive,SEARCH,ENABLED,2000.00,30,500.00,2.00%,30.00%
+S | Starved,SEARCH,ENABLED,800.00,20,100.00,5.00%,5.00%
+S | Steady,SEARCH,ENABLED,1500.00,30,600.00,0.00%,0.00%
+PMax | NoBudgetData,PERFORMANCE_MAX,PAUSED,500.00,10,--,--,--
+Total: ,,,9400.00,190,,,

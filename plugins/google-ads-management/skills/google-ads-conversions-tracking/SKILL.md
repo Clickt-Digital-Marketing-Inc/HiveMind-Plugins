@@ -32,12 +32,18 @@ Follow `google-ads-foundation`'s dual-input Step 0 before pulling anything:
 
 ## Pull the data (MCP path)
 
-1. **Conversion actions config + 30d conversions** — `conversion_action`: status, type, category,
-   `primary_for_goal`, `counting_type`, attribution model, `metrics.conversions`.
-2. **Campaign trend, current window** — `campaign`: clicks, impressions, cost, conversions.
+1. **Conversion actions config + all conversions** — `conversion_action`: status, type, category,
+   `primary_for_goal`, `counting_type`, attribution model, `metrics.all_conversions` (all
+   conversions incl. secondary — the only conversions metric selectable at the `conversion_action`
+   grain; `metrics.conversions` is **not** valid there). The checklist is then segmented by
+   `primary_for_goal` into primary (health-framing) and secondary sections. Authoritative constant:
+   `CONFIG_FIELDS` in [scripts/assemble_findings.py](scripts/assemble_findings.py).
+2. **Campaign trend, current window** — `campaign`: status, clicks, impressions, cost, conversions.
+   (`campaign.status` drives the liveness gate below — a paused/removed campaign with zero spend in
+   both windows can't manufacture a fake CVR-drop Critical.) Constant: `CAMPAIGN_FIELDS`.
 3. **Campaign trend, prior window** — same fields, the comparable prior period (e.g. last 7 days vs
    prior 7 days; or `THIS_MONTH` vs `LAST_MONTH` — never literally "90d/30d", whatever window pair
-   the operator picks).
+   the operator picks). Same constant: `CAMPAIGN_FIELDS`.
 
 Full GAQL + the transcription-firewall assembly command:
 `references/conversion-tracking-filter.md`.
@@ -73,3 +79,26 @@ Full GAQL + the transcription-firewall assembly command:
   `manual_checks` row is honestly `user_csv` or `not_confirmed`, never presented as an API result.
 - A campaign with 0 clicks in the prior window is `no_benchmark`, not "clean" — it's excluded from
   scoring (undefined CVR/CTR baseline), not silently dropped; it still appears in the bundle.
+- A paused/dead campaign's CVR "drop" is not a finding. Every trend row is tagged with a **liveness**
+  band (see below) and dormant rows are scored to zero — don't hand the user a Critical on a
+  campaign that isn't running.
+
+## Campaign liveness gate (three-band)
+
+Every campaign_trend row is tagged by `_shared/analytics.segment_liveness` (mirrored verbatim into
+the browser kernel and the xlsx `Liveness` column) so severity is scored only on what's live:
+
+- **live** — `ENABLED` **and** spend > 0 in the current window → scored normally.
+- **recently_active** — any recent signal that isn't live: `PAUSED`/`REMOVED` but spent mid-window ·
+  `ENABLED` but idle (zero current spend) · spend only in the prior window → **still scored**, but
+  the row carries a `liveness_note` so the recommendation is hedged ("confirm intent before acting")
+  rather than presented as a hard Critical.
+- **dormant** — not `ENABLED` **and** zero spend in **both** windows → **present-but-tagged, zeroed**
+  (tier `""`, score 0, flags `[]`). Never dropped (no-row-loss); a dead campaign can no longer
+  manufacture a fake CVR-drop Critical.
+
+**Three-band fully derivable:** the campaign_trend rows carry current-window spend (`cost_curr`) AND
+prior-window spend (`cost_prior`), so `segment_liveness` is called with `prior_spend_key="cost_prior"`
+and all three bands (including the "spent only in the prior window" path) are reachable — no invented
+prior window. `liveness` is data, not a tunable: it depends on status + spend (fixed pulled facts),
+computed once in Python and read (not re-derived) by the live kernel and the xlsx formulas.

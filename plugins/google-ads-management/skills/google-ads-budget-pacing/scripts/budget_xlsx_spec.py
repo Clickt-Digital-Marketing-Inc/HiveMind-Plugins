@@ -96,6 +96,7 @@ XLSX = {
         {"header": "Campaign", "kind": "data", "key": "campaign", "width": 30},
         {"header": "Channel", "kind": "data", "key": "channel", "width": 18},
         {"header": "Status", "kind": "data", "key": "__status__", "width": 12},
+        {"header": "Liveness", "kind": "data", "key": "liveness", "width": 15},
         {"header": "Daily budget", "kind": "data", "key": "daily_budget", "fmt": "MONEY", "width": 12},
         {"header": "Spend", "kind": "data", "key": "cost", "fmt": "MONEY", "width": 11},
         {"header": "MTD", "kind": "data", "key": "mtd_spend", "fmt": "MONEY", "width": 11},
@@ -106,25 +107,33 @@ XLSX = {
         # Per-campaign pace pre-score (mirrors budget_core.add_pace / PACE_FLAG_WEIGHTS
         # verbatim). Computed for EVERY row, no_budget included — matches add_pace's
         # unconditional pass (never "scored": True, unlike Bucket).
+        # Liveness gate (HM-603): a dormant campaign gets no pace ratio/score and
+        # no bucket, mirroring budget_core (add_pace / classify_row). The
+        # {C:Liveness}="dormant" guard wraps each existing formula; Pace verdict
+        # follows the empty Pace ratio to "n/a" without its own guard.
         {"header": "Pace ratio", "kind": "formula", "fmt": "0.00", "width": 10,
-         "formula": '=IF(OR({C:Daily budget}{row}="",{C:Daily budget}{row}<=0,{ctrl:days_elapsed}=0),'
-                    '"",ROUND({C:MTD}{row}/({C:Daily budget}{row}*{ctrl:days_elapsed}),2))'},
+         "formula": '=IF({C:Liveness}{row}="dormant","",'
+                    'IF(OR({C:Daily budget}{row}="",{C:Daily budget}{row}<=0,{ctrl:days_elapsed}=0),'
+                    '"",ROUND({C:MTD}{row}/({C:Daily budget}{row}*{ctrl:days_elapsed}),2)))'},
         {"header": "Pace verdict", "kind": "formula", "width": 12,
          "formula": '=IF({C:Pace ratio}{row}="","n/a",'
                     'IF({C:Pace ratio}{row}>1+{ctrl:pacing_tolerance},"over",'
                     'IF({C:Pace ratio}{row}<1-{ctrl:pacing_tolerance},"under","on track")))'},
         {"header": "Confidence", "kind": "formula", "width": 11,
-         "formula": '=IF(AND({ctrl:days_elapsed}>=7,{C:MTD}{row}>={ctrl:target_cpa}),"high","low")'},
+         "formula": '=IF({C:Liveness}{row}="dormant","low",'
+                    'IF(AND({ctrl:days_elapsed}>=7,{C:MTD}{row}>={ctrl:target_cpa}),"high","low"))'},
         {"header": "Pace score", "kind": "formula", "fmt": "0.00", "width": 11,
-         "formula": '=IF(AND({C:Pace ratio}{row}<>"",{C:Pace ratio}{row}>1+{ctrl:pacing_tolerance}),1,0)*1'
+         "formula": '=IF({C:Liveness}{row}="dormant",0,'
+                    'IF(AND({C:Pace ratio}{row}<>"",{C:Pace ratio}{row}>1+{ctrl:pacing_tolerance}),1,0)*1'
                     '+IF(AND({C:Pace ratio}{row}<>"",{C:Pace ratio}{row}<1-{ctrl:pacing_tolerance}),1,0)*1'
                     '+IF(AND({C:Budget-lost IS}{row}<>"",{C:Budget-lost IS}{row}>{ctrl:budget_lost_is_flag}),1,0)*1.5'
-                    '+IF({C:Conv}{row}=0,1,0)*2'},
+                    '+IF({C:Conv}{row}=0,1,0)*2)'},
         {"header": "Bucket", "kind": "formula", "scored": True, "width": 12,
-         "formula": '=IF(AND({C:Conv}{row}=0,{C:Spend}{row}>={ctrl:kill_multiple}*{ctrl:target_cpa}),"Kill",'
+         "formula": '=IF({C:Liveness}{row}="dormant","",'
+                    'IF(AND({C:Conv}{row}=0,{C:Spend}{row}>={ctrl:kill_multiple}*{ctrl:target_cpa}),"Kill",'
                     'IF(AND({C:Budget-lost IS}{row}<>"",{C:Budget-lost IS}{row}>{ctrl:budget_lost_is_flag},{C:Conv}{row}>0,{C:CPA}{row}<>"",{C:CPA}{row}<={ctrl:target_cpa}),"Raise",'
                     'IF(AND({C:Rank-lost IS}{row}<>"",{C:Rank-lost IS}{row}>{ctrl:budget_lost_is_flag}),"Rank-limited",'
-                    'IF(AND({C:Daily budget}{row}<>"",{C:Daily budget}{row}<{ctrl:min_budget_multiple}*{ctrl:target_cpa}),"Low budget","OK"))))'},
+                    'IF(AND({C:Daily budget}{row}<>"",{C:Daily budget}{row}<{ctrl:min_budget_multiple}*{ctrl:target_cpa}),"Low budget","OK")))))'},
     ],
     "rows_freeze": "C2",
 

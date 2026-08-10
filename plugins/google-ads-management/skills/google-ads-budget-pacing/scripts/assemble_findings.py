@@ -43,6 +43,7 @@ sys.path.insert(0, str(PLUGIN_ROOT / "_shared"))
 
 import gaql_raw as G          # noqa: E402
 import reconcile as R         # noqa: E402
+from render import model as Rm  # noqa: E402  (meta.assumptions — HM-604)
 
 sys.path.insert(0, str(HERE))
 import budget_core as core    # noqa: E402  (owns the reconcile contract)
@@ -51,7 +52,7 @@ import budget_core as core    # noqa: E402  (owns the reconcile contract)
 # they are null for PMax/Display and may be omitted from saved rows entirely —
 # absent passes through as null (the core never IS-buckets those campaigns).
 PERF_FIELDS = ("campaign.id", "campaign.name", "campaign.advertising_channel_type",
-               "metrics.cost_micros", "metrics.conversions")
+               "campaign.status", "metrics.cost_micros", "metrics.conversions")
 BLIS_FIELD = "metrics.search_budget_lost_impression_share"
 RLIS_FIELD = "metrics.search_rank_lost_impression_share"
 # campaign_budget.explicitly_shared is in the documented pull but unused here.
@@ -102,6 +103,11 @@ def assemble(perf_path: str, budgets_path: str, mtd_path: str, meta: dict) -> di
             merged[cid] = {"campaign_id": cid,
                            "campaign": r.get("campaign.name") or "",
                            "channel": r.get("campaign.advertising_channel_type") or "",
+                           # campaign.status (ENABLED/PAUSED/REMOVED) — point-in-
+                           # time from the first occurrence, like name/channel.
+                           # Feeds liveness (HM-603); non-numeric, so it is not a
+                           # reconciled field.
+                           "campaign_status": r.get("campaign.status") or "",
                            "cost": 0.0, "conversions": 0.0,
                            "search_budget_lost_is": _frac(r.get(BLIS_FIELD)),
                            "search_rank_lost_is": _frac(r.get(RLIS_FIELD))}
@@ -114,7 +120,7 @@ def assemble(perf_path: str, budgets_path: str, mtd_path: str, meta: dict) -> di
     for cid in order:
         m = merged[cid]
         c = {"campaign_id": m["campaign_id"], "campaign": m["campaign"],
-             "channel": m["channel"]}
+             "channel": m["channel"], "campaign_status": m["campaign_status"]}
         if cid in budgets:
             c["daily_budget"] = round(budgets[cid], 6)
         c.update({"cost": round(m["cost"], 6),
@@ -154,6 +160,14 @@ def main() -> int:
                     help='window label, e.g. "last 30 days" — the window used in the GAQL condition')
     ap.add_argument("--monthly-goal", type=float, default=0.0,
                     help="account monthly spend goal (ask the user; 0/omitted => pacing reads n/a)")
+    ap.add_argument("--monthly-goal-source", choices=("client", "proxy"), default=None,
+                    help="basis for --monthly-goal: 'client' if the client stated it directly, "
+                         "'proxy' if it is derived (e.g. Sigma of daily budgets x 31) — stamps "
+                         "meta.assumptions so every report format marks the goal honestly. "
+                         "Omit only when --monthly-goal is 0 (pacing n/a, nothing to label).")
+    ap.add_argument("--monthly-goal-note", default="",
+                    help="free-text basis note, e.g. 'proxy: Sigma daily budgets x 31 days' "
+                         "(required with --monthly-goal-source=proxy)")
     ap.add_argument("--days-elapsed", type=int, required=True,
                     help="days of the month elapsed at the report date")
     ap.add_argument("--days-in-month", type=int, required=True)
@@ -168,6 +182,20 @@ def main() -> int:
             "generated": args.generated or datetime.date.today().isoformat(),
             "monthly_goal": args.monthly_goal, "days_elapsed": args.days_elapsed,
             "days_in_month": args.days_in_month}
+    if args.monthly_goal_source:
+        if args.monthly_goal_source == "proxy" and not args.monthly_goal_note:
+            sys.stderr.write("ERROR: --monthly-goal-note is required when "
+                             "--monthly-goal-source=proxy\n")
+            return 1
+        basis = "client_confirmed" if args.monthly_goal_source == "client" else "proxy"
+        note = args.monthly_goal_note or (
+            "client-confirmed monthly spend goal" if basis == "client_confirmed" else "")
+        Rm.add_assumption(meta, "monthly_goal", args.monthly_goal, basis, note)
+    elif args.monthly_goal:
+        sys.stderr.write(
+            "WARN: --monthly-goal was supplied without --monthly-goal-source — the goal's "
+            "basis (client-confirmed vs a proxy estimate) is UNVERIFIED and will not carry a "
+            "provenance marker. Pass --monthly-goal-source client|proxy.\n")
     try:
         findings = assemble(args.performance, args.budgets, args.mtd, meta)
     except (G.RawResultError, OSError) as e:

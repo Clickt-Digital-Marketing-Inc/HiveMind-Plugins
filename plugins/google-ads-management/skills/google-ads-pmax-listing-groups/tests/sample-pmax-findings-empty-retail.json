@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "client_name": "Lead Gen Co",
+    "account_id": "1234567890",
+    "currency": "USD",
+    "window_30d": "2026-06-16 to 2026-07-15",
+    "generated": "2026-07-16",
+    "source": "mcp"
+  },
+  "listing_groups": [],
+  "products": [],
+  "benchmarks": [
+    {"campaign_id": 1, "campaign": "Lead Gen - Search", "clicks": 500, "cost": 1000.0, "conversions": 50.0},
+    {"campaign_id": 2, "campaign": "Lead Gen - PMax", "clicks": 300, "cost": 600.0, "conversions": 0.0}
+  ]
+}

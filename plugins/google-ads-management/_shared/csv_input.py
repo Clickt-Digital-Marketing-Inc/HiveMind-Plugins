@@ -26,8 +26,9 @@ Column-mapping contract (per skill; the skill owns its map):
   (locale/version variance). Matching is normalized: case-insensitive,
   whitespace-collapsed, surrounding quotes/BOM stripped. A parenthesised
   suffix on the CSV header is tolerated (`Cost (CAD)` matches alias `Cost`).
-- `type` — `"str"` (default), `"num"` (float; tolerates thousands separators,
-  currency prefixes, '%', and absent markers '', '--', '—' -> 0.0), or
+- `type` — `"str"` (default), `"num"` (float; tolerates locale group/decimal
+  separators in either order including no-break-space groups, currency
+  prefixes, '%', and absent markers '', '--', '—' -> 0.0), or
   `"pct"` (percent-scale column -> fraction: '12.3%' -> 0.123).
 
 Header handling is defensive: UI exports often carry title rows above the real
@@ -35,7 +36,10 @@ header and `Total: ...` summary rows below the data — the header row is found
 by scanning for the row that resolves every required field, and total rows are
 dropped. Missing or ambiguous columns raise `CsvInputError` naming them.
 
-Stdlib only (`csv`). Deterministic: no wall clock, no locale-dependent parsing.
+Stdlib only (`csv`). Deterministic: no wall clock, no dependence on the host's
+locale environment — group/decimal separators are resolved per cell from the
+cell's own shape (`_clean_separators`), with the one undecidable case
+(single-dot '1.234') documented there and tracked in HM-785.
 """
 from __future__ import annotations
 
@@ -56,6 +60,14 @@ _ABSENT = {"", "-", "--", "—", "–"}
 
 _VALID_TYPES = ("str", "num", "pct")
 
+# Summary-row labels the Google Ads UI writes below the data, in the locales
+# whose number formatting `_num` now parses. Applied to a `_norm`-ed first
+# cell (casefolded, whitespace-collapsed); the colon is still required, and
+# fr renders it spaced ('Total : tous les termes').
+_TOTAL_ROW_RE = re.compile(
+    r"(total|totaux|totale|totali|totaal|totalt|gesamt\w*|summe|suma|"
+    r"totales|общий|合計)\s*:")
+
 
 def _norm(s: str) -> str:
     """Normalize a header cell / alias for matching: strip BOM + quotes,
@@ -68,26 +80,115 @@ def _is_absent(v) -> bool:
     return v is None or str(v).strip() in _ABSENT
 
 
-def _num(v) -> float:
-    """UI number cell -> float; absent/unparseable -> 0.0.
+def _clean_separators(s: str) -> str:
+    """Resolve group vs decimal separator: '1,234.56' / '1.234,56' -> '1234.56'.
 
-    Tolerates thousands commas ('1,234.56'), NBSP, a trailing '%', and a
-    defensive currency prefix ('CA$1,023.31', '$5')."""
+    Google Ads UI exports are locale-formatted \u2014 en groups with ',' and puts
+    the decimal at '.', fr/de do the reverse \u2014 and the cell alone is all we
+    have. Rules, in order:
+
+    - both separators present -> the LAST one is the decimal separator and the
+      other groups ('1.234,56' -> 1234.56; '1,234.56' -> 1234.56);
+    - only ',' present -> a group separator ONLY in the ONE shape a single en
+      thousands group can take: 1-3 leading digits with no leading zero, then
+      exactly 3 digits ('1,234' -> 1234; '10,500' -> 10500), or when the comma
+      occurs more than once ('1,234,567' -> 1234567). EVERY other single-comma
+      cell is decidably a decimal, and is read as one:
+        '0,125'    -> 0.125     (leading zero: no locale groups a value < 1000)
+        '1234,125' -> 1234.125  (>=4 leading digits: not a valid single group —
+                                 an fr/de '1 234,125' reaches here whitespace-
+                                 stripped by parse_num, so the space that
+                                 already grouped it is gone and the head is >=4)
+        '1,2345'   -> 1.2345    (>3 fractional digits: no en group has 4 — fr
+                                 Conv. rate / Avg. CPC cells carry 3-4 decimals)
+        '12,3' -> 12.3;  '1234,56' -> 1234.56  (<3 fractional digits);
+    - only '.' present -> a group separator when there is more than one dot
+      ('1.234.567' -> 1234567, unambiguously de/es/it grouping — before this
+      it reached float() and silently returned 0.0), otherwise the decimal
+      separator.
+
+    Two DELIBERATE choices survive, not oversights, because no cell-level rule
+    can separate them — column-level locale inference (HM-785) is the honest
+    fix; its scope note covers BOTH shapes (dot-only and comma-only):
+    - single dot: a dot-grouped de-DE integer ('1.234' meaning 1234) is byte-
+      identical to an en decimal ('1.234' meaning 1.234); the en reading (1.234)
+      is kept.
+    - single comma + the exact '1,234' shape above: an en thousands group
+      ('1,234' meaning 1234) is byte-identical to an fr/de decimal ('1,234'
+      meaning 1.234); the en reading (1234) is kept. This is SYMMETRIC with the
+      single-dot default — both keep the en interpretation, so the twin
+      spellings agree. Narrowing it here (HM-794) removed only the cases that
+      are NOT this core ('0,125', '1234,125'), which had inflated fr/de decimal
+      columns 1000x while reconcile.verify still passed on the inflated rows."""
+    has_dot, has_comma = "." in s, "," in s
+    if has_dot and has_comma:
+        if s.rfind(",") > s.rfind("."):          # ',' is the decimal mark
+            return s.replace(".", "").replace(",", ".")
+        return s.replace(",", "")
+    if has_comma:
+        # A single comma is a thousands group only in the irreducible en core:
+        # 1-3 leading digits, no leading zero, then exactly 3 digits ('1,234').
+        # Every other single-comma cell is a decidable decimal; multiple commas
+        # are unambiguously grouping.
+        if (s.count(",") == 1
+                and not re.fullmatch(r"[+-]?[1-9]\d{0,2},\d{3}", s)):
+            return s.replace(",", ".")
+        return s.replace(",", "")
+    if s.count(".") > 1:
+        return s.replace(".", "")
+    return s
+
+
+def parse_num(v, default=0.0):
+    """UI number cell -> float; absent/unparseable -> `default`.
+
+    THE number parser for this plugin \u2014 public so a skill needing different
+    absent-cell semantics reuses it instead of re-deriving one (a divergent
+    clone in google-ads-budget-pacing is exactly how HM-778's fix came to
+    apply to some columns of a findings file and not others). Pass
+    `default=None` when "absent/unparseable" must stay distinguishable from a
+    real 0.0.
+
+    Locale-tolerant, because Google Ads UI exports carry the account's locale
+    formatting. Whitespace \u2014 including the no-break space family used as a
+    thousands separator (U+00A0, and U+202F / U+2009 in current fr locales) \u2014
+    is STRIPPED, never substituted: substituting left a plain space in the
+    string, `float()` raised, and this function silently returned 0.0 for
+    every money/count cell in an fr/de export (HM-778). Also tolerates group
+    and decimal separators in either order ('1,234.56', '1.234,56' \u2014 see
+    `_clean_separators`), a trailing '%', and a currency symbol on either side
+    ('CA$1,023.31', '$5', '\u20ac1.234,56', '1 234,56 \u20ac'). An alphabetic
+    currency SUFFIX ('1234,56 EUR') is still not handled and yields `default`."""
     if _is_absent(v):
-        return 0.0
-    s = str(v).strip().replace("\u00a0", " ").replace(",", "")
-    s = s.rstrip("%").strip()
-    s = re.sub(r"^[A-Za-z]{0,3}\$", "", s)
+        return default
+    s = re.sub(r"\s+", "", str(v))
+    s = s.rstrip("%")
+    s = re.sub(r"^[A-Za-z]{0,3}[$\u20ac\u00a3\u00a5]", "", s)
+    s = re.sub(r"[$\u20ac\u00a3\u00a5]$", "", s)
     try:
-        return float(s)
+        return float(_clean_separators(s))
     except ValueError:
-        return 0.0
+        return default
+
+
+def _num(v) -> float:
+    """`parse_num` with the column-map "num" default: absent -> 0.0."""
+    return parse_num(v, 0.0)
 
 
 def _pct(v) -> float:
     """Percent-scale cell -> fraction: '12.3%' -> 0.123, '0.4' -> 0.4 (already
     a fraction), '40' -> 0.4 (percent without the sign — mirrors the audit
-    plugins' rule: divide by 100 when '%' present or value > 1)."""
+    plugins' rule: divide by 100 when '%' present or value > 1).
+
+    The unsigned branch reads the CELL, so a comma-decimal cell below 1 and
+    carrying no '%' ('0,9') is a fraction (0.9), exactly as its en twin '0.9'
+    is — before HM-778 the comma was stripped, '0,9' parsed as 9.0 and came
+    back 0.09. That is a genuine output change on such cells, and the right
+    one: the two spellings of the same number now agree. The x > 1 heuristic
+    itself stays cell-level and cannot separate '40' meaning 40% from a
+    fraction above 1; deciding that honestly needs the column-level locale /
+    scale hint tracked in HM-785."""
     if _is_absent(v):
         return 0.0
     s = str(v)
@@ -224,8 +325,12 @@ def load_csv_rows(csv_path: str, column_map: dict, required_fields=()
     for r in raw[header_idx + 1:]:
         first = next((str(c).strip() for c in r if str(c).strip()), "")
         # 'Total: ...' summary rows (colon required — a real data value may
-        # legitimately start with the word "total"; no-row-loss).
-        if _norm(first).startswith("total:"):
+        # legitimately start with the word "total"; no-row-loss). The label is
+        # localized alongside the numbers, and fr also spaces the colon
+        # ('Total : tous les termes', 'Gesamt: ...'), so match the locale
+        # spellings the UI exports — leaving them in doubled every control
+        # total once HM-778 made their cells parse to real values.
+        if _TOTAL_ROW_RE.match(_norm(first)):
             continue
         row = {}
         for field, i in resolved.items():

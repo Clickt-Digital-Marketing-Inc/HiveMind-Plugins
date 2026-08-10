@@ -53,10 +53,15 @@ _FLAGGED_VALUE = {
     "naming": 'IF({C:Name OK?}{row}="no","yes","")',
     "pmax_cannibalization": 'IF(AND({C:PMax?}{row}="yes",{C:Brand present?}{row}="yes"),"yes","")',
 }
-_FLAGGED_FORMULA = _nest_by_check(_FLAGGED_VALUE, fallback='""')
+# Liveness gate (HM-603): a dormant campaign/ad group never trips a check, so the
+# Flagged?/Pre-score formulas short-circuit to ""/0 before the per-check branch —
+# mirrors health_core.score_rows (the {C:Liveness} guard wraps the nested IF).
+_FLAGGED_FORMULA = ('=IF({C:Liveness}{row}="dormant","",'
+                    + _nest_by_check(_FLAGGED_VALUE, fallback='""')[1:] + ')')
 
 _PRE_SCORE_VALUE = {c: f'IF({{C:Flagged?}}{{row}}="yes",{_M[c]},0)' for c in core.CHECKS}
-_PRE_SCORE_FORMULA = _nest_by_check(_PRE_SCORE_VALUE, fallback="0")
+_PRE_SCORE_FORMULA = ('=IF({C:Liveness}{row}="dormant",0,'
+                      + _nest_by_check(_PRE_SCORE_VALUE, fallback="0")[1:] + ')')
 
 XLSX = {
     "sheets": ["Controls", "Live checks", "Checks snapshot"],
@@ -163,6 +168,7 @@ XLSX = {
         {"header": "Brand present?", "kind": "data", "key": "brand_present_label", "width": 13},
         {"header": "Brand excl. confirmed?", "kind": "data", "key": "has_brand_exclusion_label", "width": 18},
         {"header": "Status", "kind": "data", "key": "__status__", "width": 10},
+        {"header": "Liveness", "kind": "data", "key": "liveness", "width": 15},
         {"header": "Pre-score", "kind": "formula", "width": 10, "fmt": "0.0",
          "formula": _PRE_SCORE_FORMULA},
         {"header": "Flagged?", "kind": "formula", "width": 9,

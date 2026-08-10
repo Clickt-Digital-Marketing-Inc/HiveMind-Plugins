@@ -35,10 +35,11 @@ def _title(pr, brand):
 
 def _subtitle(pr):
     cur = pr.get("currency") or "—"
+    gran = "ad-group level" if pr.get("metrics_granularity") == "ad_group_level" else "list level"
     return (f"Currency {cur}  ·  window {pr.get('window_30d') or '—'}  ·  "
             f"generated {pr.get('generated') or '—'}  ·  applied audiences: "
             f"{M.source_label(pr.get('source'))}  ·  first-party readiness: "
-            f"{pr.get('first_party_source', 'not_supplied')}")
+            f"{pr.get('first_party_source', 'not_supplied')}  ·  metrics: {gran}")
 
 
 XLSX = {
@@ -50,7 +51,11 @@ XLSX = {
     "subtitle": _subtitle,
     "intro": ("Adjust any YELLOW cell. The flag columns, the Score, the Priority tier, and the "
               "live counts below recalculate instantly. Excluded (negative) audience criteria are "
-              "shown but never scored."),
+              "shown but never scored. When metrics are ad-group level (see the line above), Cost/"
+              "Conversions/Impressions/Clicks/CTR are shared across every USER_LIST criterion on the "
+              "same ad group — the Google Ads API cannot attribute them to one list alone. Manual "
+              "rows (no ad-group metrics for this window) show blank metric cells, never a "
+              "fabricated zero, and are never scored."),
 
     "params_title_row": 4,
     "params_title": "1 · PRIORITY SCORING PARAMETERS",
@@ -90,20 +95,22 @@ XLSX = {
              "formula": '=COUNTIFS({R:Status},"scored",{QR},"")', "fmt": "0"},
             {"row": 21, "label": "Excluded (negative — never scored)", "cell": "C21",
              "value_key": "excluded", "fmt": "0", "muted": True},
-            {"row": 22, "label": "Flagged spend", "cell": "C22",
+            {"row": 22, "label": "Manual (no ad-group metrics — never scored)", "cell": "C22",
+             "value_key": "manual", "fmt": "0", "muted": True},
+            {"row": 23, "label": "Flagged spend", "cell": "C23",
              "formula": '=SUMPRODUCT(({QR}<>"")*{COSTR})', "fmt": "MONEY"},
-            {"row": 23, "label": "Applied audiences (universe)", "cell": "C23",
+            {"row": 24, "label": "Applied audiences (universe)", "cell": "C24",
              "value_key": "total_audiences", "fmt": "0", "muted": True},
-            {"row": 24, "label": "Scored", "cell": "C24", "value_key": "scored", "fmt": "0", "muted": True},
-            {"row": 25, "label": "First-party readiness items", "cell": "C25",
+            {"row": 25, "label": "Scored", "cell": "C25", "value_key": "scored", "fmt": "0", "muted": True},
+            {"row": 26, "label": "First-party readiness items", "cell": "C26",
              "value_key": "first_party_total", "fmt": "0", "muted": True},
-            {"row": 26, "label": "First-party gaps", "cell": "C26",
+            {"row": 27, "label": "First-party gaps", "cell": "C27",
              "value_key": "first_party_gaps", "fmt": "0", "muted": True},
-            {"row": 27, "label": "First-party gaps — Critical", "cell": "C27",
+            {"row": 28, "label": "First-party gaps — Critical", "cell": "C28",
              "value_key": "first_party_critical", "fmt": "0", "muted": True},
-            {"row": 28, "label": "First-party gaps — High", "cell": "C28",
+            {"row": 29, "label": "First-party gaps — High", "cell": "C29",
              "value_key": "first_party_high", "fmt": "0", "muted": True},
-            {"row": 29, "label": "First-party gaps — Medium", "cell": "C29",
+            {"row": 30, "label": "First-party gaps — Medium", "cell": "C30",
              "value_key": "first_party_medium", "fmt": "0", "muted": True},
         ],
     },

@@ -54,5 +54,47 @@
     {"row": {}, "weights": {"high_cost": 3.0}},
     {"row": {"flags": ["b", "a", "c", "a"]}, "weights": {"a": 0.1002, "b": 0.2001, "c": 0.3003}},
     {"row": {"flags": ["a", "b"]}, "weights": {"a": 1.2345, "b": 2.3456}}
+  ],
+  "segment_liveness": [
+    {
+      "_note": "3-band with prior window: live / paused-mid-window / enabled-idle / prior-only / dormant / REMOVED-dormant / missing-status.",
+      "rows": [
+        {"campaign": "live", "status": "ENABLED", "cost": 500.0, "cost_prior": 400.0},
+        {"campaign": "paused_mid_window", "status": "PAUSED", "cost": 120.0, "cost_prior": 0.0},
+        {"campaign": "enabled_idle", "status": "ENABLED", "cost": 0.0, "cost_prior": 300.0},
+        {"campaign": "prior_only", "status": "PAUSED", "cost": 0.0, "cost_prior": 250.0},
+        {"campaign": "dormant_paused", "status": "PAUSED", "cost": 0.0, "cost_prior": 0.0},
+        {"campaign": "dormant_removed", "status": "REMOVED", "cost": 0.0, "cost_prior": 0.0},
+        {"campaign": "missing_status", "cost": 10.0, "cost_prior": 0.0}
+      ],
+      "status_key": "status", "spend_key": "cost", "prior_spend_key": "cost_prior"
+    },
+    {
+      "_note": "Two-band degradation: prior_spend_key omitted (single-window skill). prior signal cannot fire; dormant = not-enabled + zero current spend.",
+      "rows": [
+        {"status": "ENABLED", "cost": 90.0},
+        {"status": "ENABLED", "cost": 0.0},
+        {"status": "PAUSED", "cost": 45.0},
+        {"status": "PAUSED", "cost": 0.0},
+        {"status": "REMOVED", "cost": 0.0}
+      ],
+      "status_key": "status", "spend_key": "cost"
+    },
+    {
+      "_note": "Spend coercion boundaries: negative / null / non-numeric string / missing spend all count as zero; explicit null prior; lowercase + padded status normalizes to ENABLED.",
+      "rows": [
+        {"status": "ENABLED", "cost": -5.0, "cost_prior": null},
+        {"status": "enabled", "cost": 0.0001, "cost_prior": 0.0},
+        {"status": "  Enabled  ", "cost": null, "cost_prior": 0.0},
+        {"status": "PAUSED", "cost": "7", "cost_prior": "3"},
+        {"status": "PAUSED", "cost_prior": 5.0},
+        {"status": "PAUSED"}
+      ],
+      "status_key": "status", "spend_key": "cost", "prior_spend_key": "cost_prior"
+    },
+    {
+      "_note": "Empty rows.",
+      "rows": [], "status_key": "status", "spend_key": "cost", "prior_spend_key": "cost_prior"
+    }
   ]
 }

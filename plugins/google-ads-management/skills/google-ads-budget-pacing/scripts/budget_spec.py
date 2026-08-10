@@ -39,7 +39,7 @@ def md_params(model):
     cur = pr["currency"]
     return [
         ("Data source", M.source_label(pr.get("source"))),
-        ("Monthly goal", _money(p["monthly_goal"] or None, cur)),
+        ("Monthly goal", _money(p["monthly_goal"] or None, cur) + M.inline_marker(model, "monthly_goal")),
         ("Target CPA", _money(p["target_cpa"], cur)),
         ("Budget-lost-IS flag", f"{p['budget_lost_is_flag'] * 100:.0f}%"),
         ("Kill / min-budget multiples", f"{p['kill_multiple']:.0f}× / {p['min_budget_multiple']:.0f}×"),
@@ -183,22 +183,25 @@ def md_sections(model):
 
 def md_rows(model):
     cur = model["provenance"]["currency"]
-    headers = ["Campaign", "Channel", "Status", f"Daily budget ({cur})" if cur else "Daily budget",
+    headers = ["Campaign", "Channel", "Status", "Liveness",
+               f"Daily budget ({cur})" if cur else "Daily budget",
                f"Spend ({cur})" if cur else "Spend", f"MTD ({cur})" if cur else "MTD", "Conv", "CPA",
                "Budget-lost IS", "Rank-lost IS", "Bucket"]
     out = []
     for r in model["rows"]:
         out.append([
             r["campaign"], r["channel"], r["status"].replace("_", " "),
+            r["liveness"].replace("_", " "),
             _money(r["daily_budget"], ""), f"{r['cost']:,.2f}", f"{r['mtd_spend']:,.2f}",
             f"{r['conversions']:.0f}", _money(r["cpa"], ""),
             _pct(r["budget_lost_is"]), _pct(r["rank_lost_is"]), r["bucket"] or "",
         ])
     return {
         "title": "All campaigns (every row, with status)",
-        "note": "No row loss: every campaign appears here. Sorted by window spend (highest first).",
+        "note": "No row loss: every campaign appears here (with its liveness band). "
+                "Sorted by window spend (highest first).",
         "headers": headers,
-        "aligns": ["l", "l", "l", "r", "r", "r", "r", "r", "r", "r", "l"],
+        "aligns": ["l", "l", "l", "l", "r", "r", "r", "r", "r", "r", "r", "l"],
         "rows": out,
         "empty": "_No campaigns._",
     }
@@ -212,6 +215,7 @@ def html_embed(model):
         "summary": model["summary"],
         "rows": [{
             "campaign": r["campaign"], "channel": r["channel"], "status": r["status"],
+            "liveness": r["liveness"], "liveness_note": r.get("liveness_note", ""),
             "daily_budget": r["daily_budget"], "cost": r["cost"], "mtd_spend": r["mtd_spend"],
             "conv": r["conversions"], "cpa": r["cpa"],
             "budget_lost_is": r["budget_lost_is"], "rank_lost_is": r["rank_lost_is"],
@@ -234,6 +238,7 @@ HTML_COLUMNS = [
     {"key": "campaign", "label": "Campaign"},
     {"key": "channel", "label": "Channel"},
     {"key": "status", "label": "Status", "fmt": "status"},
+    {"key": "liveness", "label": "Liveness", "fmt": "status"},
     {"key": "daily_budget", "label": "Daily budget", "num": True, "fmt": "money"},
     {"key": "cost", "label": "Spend", "num": True, "fmt": "money"},
     {"key": "mtd_spend", "label": "MTD", "num": True, "fmt": "money"},
@@ -245,6 +250,7 @@ HTML_COLUMNS = [
 ]
 
 HTML_KPIS = [
+    {"label": "Monthly goal", "key": "monthly_goal", "money": True},
     {"label": "MTD spend", "key": "mtd_spend", "money": True},
     {"label": "Expected MTD", "key": "expected_mtd", "money": True},
     {"label": "Spend", "key": "spend", "money": True},
@@ -261,6 +267,10 @@ HTML_KPIS = [
 # gxRoundHalfUp, then layers the skill's own classify/pace/summarize on top.
 JS_KERNEL = analytics.JS_MIRROR + r"""
 classify = function(r,P){
+  // Liveness gate (HM-603): a dormant campaign is never bucketed — mirrors
+  // budget_core.classify_row. `liveness` is a static embedded field (not
+  // tuning-dependent), so the kernel only READS it.
+  if(r.liveness==="dormant") return {block:""};
   if(r.status!=="measured") return {block:""};
   const t=P.target_cpa;
   if(r.conv===0 && r.cost >= P.kill_multiple*t) return {block:"Kill"};
@@ -284,6 +294,10 @@ function paceRules(P){
 // Mirrors budget_core.add_pace exactly (per-row; recomputed live from r + P, same
 // as classify() — never read from a pre-computed field on the embedded row).
 pace = function(r,P){
+  // Liveness gate (HM-603): a dormant campaign contributes no pace verdict/
+  // flag/score — mirrors budget_core.add_pace's dormant suppression, keeping it
+  // out of summarize()'s over/under counts and the advisor trim list.
+  if(r.liveness==="dormant") return {ratio:null, verdict:"n/a", confidence:"low", flags:[], score:0};
   let ratio=null;
   if(r.daily_budget!==null && r.daily_budget>0 && P.days_elapsed){
     ratio=gxRoundHalfUp(r.mtd_spend/(r.daily_budget*P.days_elapsed),2);
@@ -320,6 +334,7 @@ summarize = function(rows,P){
     cpa:conv?_r2(spend/conv):null, kill, raise_, rank_limited:rank, low_budget:low, ok, no_budget:nb,
     mtd_spend:_r2(mtd), expected_mtd:expected===null?null:_r2(expected),
     pace_ratio:ratio===null?null:_r2(ratio), pace_verdict:verdict,
+    monthly_goal:P.monthly_goal||null,
     conc_top_share:conc.top_share, conc_hhi:conc.hhi, conc_effective_n:conc.effective_n,
     conc_top3_pct:gxRoundHalfUp(conc.top_share*100,1),
     over_pace:overPace, under_pace:underPace, off_pace_high_conf:offPaceHC};

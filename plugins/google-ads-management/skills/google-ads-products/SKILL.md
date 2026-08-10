@@ -40,9 +40,10 @@ Full spec, field list, date math, and the PMax-coverage caveat are in
 2. **Products, last 30 days** — `shopping_performance_view` with `segments.product_item_id`,
    `segments.product_title`, `segments.product_merchant_id`, `campaign.advertising_channel_type`,
    `metrics.conversions/cost_micros/impressions` (the zombie window + master product list).
+   Constant: `P30_FIELDS` in [scripts/assemble_findings.py](scripts/assemble_findings.py).
 3. **Products, last 14 days** and **previous 14 days** — the same resource, `product_item_id` +
    `metrics.conversions/impressions` (the surge/decline comparison; the 14-day pull also confirms
-   merchant presence).
+   merchant presence). Constants: `P14_FIELDS` / `PREV14_FIELDS`.
 
 Use `metrics.conversions` (primary, attribution-modeled, often fractional) — never
 `metrics.all_conversions`. The assembler script aggregates per `product_item_id` (sums across

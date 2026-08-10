@@ -122,6 +122,7 @@ XLSX = {
     "rows_columns": [
         {"header": "Campaign", "kind": "data", "key": "campaign", "width": 32},
         {"header": "Status", "kind": "data", "key": "__status__", "width": 13},
+        {"header": "Liveness", "kind": "data", "key": "liveness", "width": 15},
         {"header": "Bidding strategy", "kind": "data", "key": "bidding_strategy", "width": 22},
         {"header": "Current tier", "kind": "data", "key": "current_tier", "fmt": "0", "width": 8},
         {"header": "Current tier label", "kind": "data", "key": "current_label", "width": 30},
@@ -149,10 +150,15 @@ XLSX = {
          "formula": '={C:Current tier}{row}-{C:Recommended tier}{row}'},
         {"header": "Under data?", "kind": "formula", "scored": True, "width": 10,
          "formula": '=IF({C:Conv 30d}{row}<{ctrl:conv_gate},TRUE,FALSE)'},
+        # Liveness gate (HM-603): a dormant campaign yields no mismatch, mirroring
+        # bidding_core.classify_row / the JS kernel (the {C:Liveness} guard wraps
+        # the existing formula). A scored row can never be dormant, so this only
+        # ever blanks held-out rows — kept for lockstep parity with the kernels.
         {"header": "Mismatch", "kind": "formula", "scored": True, "width": 28,
-         "formula": ('=IF(AND({C:Under data?}{row},{C:Current tier}{row}>=1),"Over-automated (under-data)",'
+         "formula": ('=IF({C:Liveness}{row}="dormant","",'
+                    'IF(AND({C:Under data?}{row},{C:Current tier}{row}>=1),"Over-automated (under-data)",'
                     'IF({C:Tier gap}{row}>{ctrl:tier_gap_threshold},"Over-automated",'
-                    'IF({C:Tier gap}{row}<-{ctrl:tier_gap_threshold},"Under-automated","")))')},
+                    'IF({C:Tier gap}{row}<-{ctrl:tier_gap_threshold},"Under-automated",""))))')},
     ],
     "rows_freeze": "D2",
 

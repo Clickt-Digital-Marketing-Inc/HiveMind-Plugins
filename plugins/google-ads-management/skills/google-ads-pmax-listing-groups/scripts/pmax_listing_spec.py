@@ -71,16 +71,31 @@ def md_kpis(model):
 
 def md_narrative(model):
     s = model["summary"]
+    out = []
+    # Empty-universe root cause (HM-599): a feedless lead-gen account legitimately
+    # returns zero listing-group partitions AND zero products — that is not missing
+    # data, it is the honest shape of the account. Say so plainly instead of letting
+    # a silent 0/0 read as "nothing found" or "the pull failed". The campaign
+    # benchmark table (model['benchmarks']) still renders — it comes from campaign-
+    # level metrics, independent of any retail feed.
+    if s["universe"] == 0 and s["item"]["universe"] == 0:
+        out.append(
+            "> **No retail listing groups returned — this account has no Merchant Center feed "
+            "/ runs lead-gen PMax.** There are zero listing-group partitions and zero products to "
+            "filter, so nothing was dropped and nothing was fabricated — the campaign benchmark "
+            "table below (30-day cost/clicks/conversions per campaign) still renders for context, "
+            "since it comes from campaign-level metrics rather than a retail feed.")
+        return out
     if s["total"] != 0 or s["item"]["total"] != 0:
-        return []
+        return out
     f = model["params"]["expensiveness_factor"]
-    return [
+    out.append(
         f"> **0 / 0 is a clean result, not an error.** At the {f:.2f}× expensiveness factor, no "
         "listing group or product converts above its campaign's cost/conversion (Block 1) or burns "
         "more clicks than its campaign needs per conversion while never converting (Block 2). The "
         "sensitivity tables below show where flags would start to appear if the factor were "
-        "relaxed, and the near-miss lists show the units closest to the bar.",
-    ]
+        "relaxed, and the near-miss lists show the units closest to the bar.")
+    return out
 
 
 def _sensitivity_section(sens, title, note):

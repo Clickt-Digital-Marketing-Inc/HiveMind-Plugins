@@ -1,0 +1,28 @@
+{
+  "sourceRepository": "Clickt-Digital-Marketing-Inc/HiveMind-Marketing-Skills",
+  "sourceCommit": "a4ae33dc91d7a36a4e32e6f4792f51f9c82bd96e",
+  "plugins": [
+    "cm3-profitability",
+    "google-ads-audit",
+    "google-ads-management",
+    "meta-ads-audit",
+    "shopify-cro-audit",
+    "wppc-report"
+  ],
+  "overlayPaths": [
+    "plugins/cm3-profitability/.claude-plugin/plugin.json",
+    "plugins/google-ads-audit/.claude-plugin/plugin.json",
+    "plugins/google-ads-management/.claude-plugin/plugin.json",
+    "plugins/google-ads-management/README.md",
+    "plugins/google-ads-management/skills/google-ads-budget-pacing/SKILL.md",
+    "plugins/google-ads-management/skills/google-ads-keywords-search-terms/SKILL.md",
+    "plugins/google-ads-management/skills/google-ads-performance-reporting/SKILL.md",
+    "plugins/google-ads-management/skills/google-ads-quality-score/SKILL.md",
+    "plugins/google-ads-management/skills/google-ads/SKILL.md",
+    "plugins/google-ads-management/skills/google-ads/references/catalog.json",
+    "plugins/google-ads-management/skills/google-ads/tests/test_catalog.py",
+    "plugins/meta-ads-audit/.claude-plugin/plugin.json",
+    "plugins/shopify-cro-audit/.claude-plugin/plugin.json",
+    "plugins/wppc-report/.claude-plugin/plugin.json"
+  ]
+}

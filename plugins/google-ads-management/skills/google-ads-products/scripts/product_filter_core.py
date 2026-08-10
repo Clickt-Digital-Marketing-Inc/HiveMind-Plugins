@@ -363,6 +363,9 @@ def compute_model(findings: dict) -> dict:
         "sensitivity_decline": sensitivity(universe, params, "decline"),
         "surge_ladder": SURGE_LADDER,
         "decline_ladder": DECLINE_LADDER,
+        # Pass-through so every renderer sees the assembler's meta.assumptions
+        # (HM-604) and meta.source verbatim.
+        "meta": dict(findings.get("meta") or {}),
         "_universe": universe,  # unclassified rows for renderers that re-tune live
     }
 

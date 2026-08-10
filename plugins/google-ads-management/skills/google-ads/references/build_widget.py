@@ -23,6 +23,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 
 
+DOCTYPE_HEADER = '<!DOCTYPE html>\n<meta charset="utf-8">\n'
+
+
 def assemble(data: dict, template: str) -> str:
     payload = {"embed": data["embed"], "spec": data["spec"], "save": data["save"],
                "charts": data.get("charts", [])}
@@ -30,6 +33,12 @@ def assemble(data: dict, template: str) -> str:
     html = template.replace("/*__DATA__*/", data_json)
     html = html.replace("/*__KERNEL__*/", data.get("kernel", "") or "")
     html = html.replace("/*__EXTRA__*/", data.get("extra", "") or "")
+    # The data JSON embeds raw UTF-8 (currency symbols, non-ASCII account/campaign
+    # names — ensure_ascii=False above) with no guarantee the eventual host frame
+    # declares UTF-8 itself; without an explicit doctype+charset those bytes can
+    # render as mojibake (HM-607 H1).
+    if not html.lstrip().lower().startswith("<!doctype"):
+        html = DOCTYPE_HEADER + html
     return html
 
 

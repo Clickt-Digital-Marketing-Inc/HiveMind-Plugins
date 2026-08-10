@@ -6,7 +6,8 @@
    "campaign.status": "ENABLED",
    "campaign.advertising_channel_type": "SEARCH",
    "campaign.bidding_strategy_type": "MAXIMIZE_CONVERSIONS",
-   "metrics.conversions": "12"
+   "metrics.conversions": "12",
+   "metrics.cost_micros": "1840500000"
   },
   {
    "campaign.id": "1002",
@@ -14,7 +15,8 @@
    "campaign.status": "ENABLED",
    "campaign.advertising_channel_type": "SEARCH",
    "campaign.bidding_strategy_type": "MANUAL_CPC",
-   "metrics.conversions": "150"
+   "metrics.conversions": "150",
+   "metrics.cost_micros": "5200000000"
   },
   {
    "campaign.id": "1003",
@@ -22,7 +24,8 @@
    "campaign.status": "ENABLED",
    "campaign.advertising_channel_type": "PERFORMANCE_MAX",
    "campaign.bidding_strategy_type": "MAXIMIZE_CONVERSION_VALUE",
-   "metrics.conversions": "80"
+   "metrics.conversions": "80",
+   "metrics.cost_micros": "9310750000"
   }
  ]
 }

@@ -153,11 +153,16 @@ def test_chartless_output_unchanged():
     # day after merging the HiveMind-teal rebrand (PR #12) — the new html hash
     # was verified byte-equal to origin/main's own chart-free render_html on
     # the same model+spec, so the chart layer still adds nothing when unused.
+    # Re-baselined again for HM-604 (meta.assumptions provenance callout):
+    # the html hash moved because the engine now always emits the (hidden when
+    # empty) "Provenance & assumptions" card + its JS — the md hash is
+    # UNCHANGED because a model with no meta.assumptions renders no callout
+    # section at all (see test_assumptions_callout below for the non-empty case).
     print("test_chartless_output_unchanged")
     h = hashlib.sha256(render_html(_model(), _spec()).encode()).hexdigest()
     m = hashlib.sha256(render_md(_model(), _spec()).encode()).hexdigest()
     check("chartless html byte-identical to chart-free toolkit",
-          h == "e395edcb6f089d819dd7fb2e0771ad4016838202d1843ebcd8b808a4b8d532a6", h)
+          h == "f2741821874bdf9c08bc9650eac2eadcf28d2d85ae54c9872d495e7cdc6e2a3e", h)
     check("chartless md byte-identical to chart-free toolkit",
           m == "4e47638548d05b362b05f75f3be0f12fe4608188e7b0ebd2e9f44303c0b9fe59", m)
 
@@ -321,6 +326,87 @@ def test_lazy_openpyxl():
     check("importing render does not import openpyxl", out.stdout.strip() == "False", out.stdout.strip())
 
 
+def _model_with_assumptions():
+    m = _model()
+    m["meta"] = {"source": "mcp"}
+    M.add_assumption(m["meta"], "thr", 1, "model_default", "no client value supplied — using default")
+    return m
+
+
+def test_assumption_helpers():
+    print("test_assumption_helpers")
+    meta = {}
+    M.add_assumption(meta, "goal", 100, "proxy", "sum of daily budgets x 31")
+    check("add_assumption stores one entry", meta["assumptions"] == [
+        {"param": "goal", "value": 100, "basis": "proxy", "note": "sum of daily budgets x 31"}], meta)
+    M.add_assumption(meta, "goal", 200, "client_confirmed", "")
+    check("add_assumption replaces same param", len(meta["assumptions"]) == 1 and
+          meta["assumptions"][0]["value"] == 200, meta)
+    try:
+        M.add_assumption(meta, "x", 1, "bogus")
+        ok = False
+    except ValueError:
+        ok = True
+    check("add_assumption rejects unknown basis", ok)
+
+    model = {"meta": meta}
+    check("get_assumption finds by param", M.get_assumption(model, "goal")["basis"] == "client_confirmed")
+    check("inline_marker renders basis+note",
+          M.inline_marker({"meta": {"assumptions": [{"param": "g", "value": 1, "basis": "proxy",
+                                                      "note": "n"}]}}, "g") == " (proxy: n)")
+    check("inline_marker empty when no entry", M.inline_marker({"meta": {}}, "missing") == "")
+    check("require_assumptions flags an unstamped tunable",
+          M.require_assumptions({"meta": {}}, ["roas_goal"]) != [])
+    check("require_assumptions clean when stamped",
+          M.require_assumptions(model, ["goal"]) == [])
+    check("require_meta_source flags a missing source", M.require_meta_source({"meta": {}}) != [])
+    check("require_meta_source clean when present", M.require_meta_source({"meta": {"source": "mcp"}}) == [])
+
+
+def test_assumptions_callout():
+    print("test_assumptions_callout")
+    model = _model_with_assumptions()
+    spec = _spec()
+
+    md = render_md(model, spec)
+    check("md has the Provenance & assumptions heading", "## Provenance & assumptions" in md)
+    check("md callout carries the param/basis/note", "thr" in md and "default" in md
+          and "no client value supplied" in md)
+    plain_md = render_md(_model(), spec)  # no meta.assumptions -> no section at all
+    check("md omits the section when there are no assumptions",
+          "Provenance & assumptions" not in plain_md)
+
+    html = render_html(model, spec)
+    check("html embeds meta.assumptions", '"assumptions":[{' in html.replace(" ", ""))
+    check("html carries the renderAssumptions callout function", "function renderAssumptions()" in html)
+    check("html carries the assumeCard mount point", 'id="assumeCard"' in html and 'id="assume"' in html)
+
+    import render.xlsx as X
+    xspec = dict(spec)
+    xspec["xlsx"] = {
+        "sheets": ["Controls", "Things", "Snapshot"],
+        "controls_sheet": "Controls", "rows_sheet": "Things", "snapshot_sheet": "Snapshot",
+        "params_title_row": 4, "params": [{"row": 5, "label": "Threshold", "key": "thr", "fmt": "0"}],
+        "rows_columns": [{"header": "Name", "kind": "data", "key": "name"},
+                         {"header": "Status", "kind": "data", "key": "__status__"},
+                         {"header": "Block", "kind": "data", "key": "block"}],
+        "check": {"param_cells": ["C5"], "status_header": "Status", "qualifies_header": "Block"},
+    }
+    with tempfile.TemporaryDirectory() as td:
+        out = str(Path(td) / "t.xlsx")
+        X.build_xlsx(model, xspec, out, normalize=False)
+        wb = __import__("openpyxl").load_workbook(out)
+        ws = wb["Snapshot"]
+        cells = [c.value for row in ws.iter_rows() for c in row if c.value is not None]
+        check("xlsx Snapshot carries the callout title", "Provenance & assumptions" in cells)
+        check("xlsx Snapshot carries the param row", "thr" in cells and "default" in cells)
+        # the Controls-sheet param note picks up the inline marker for a matching key
+        note_cells = [ws2.value for ws2 in wb["Controls"]["D"] if ws2.value]
+        control_notes = [c.value for c in wb["Controls"]["D"] if c.value]
+        check("xlsx Controls param note carries the inline marker",
+              any("default:" in (v or "") for v in control_notes), control_notes)
+
+
 def main():
     for t in (test_require_model_guards_row_loss, test_stem, test_md_chrome_and_escaping,
               test_html_self_contained, test_chartless_output_unchanged,
@@ -328,7 +414,8 @@ def main():
               test_chart_svg_deterministic, test_bundle_writes_chart_svgs,
               test_widget_charts,
               test_bundle_md_html, test_xlsx_without_layout_rejected,
-              test_lazy_openpyxl, test_lazy_vl_convert):
+              test_lazy_openpyxl, test_lazy_vl_convert,
+              test_assumption_helpers, test_assumptions_callout):
         t()
     print()
     if _failures:

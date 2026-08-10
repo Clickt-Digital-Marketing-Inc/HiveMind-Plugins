@@ -89,6 +89,9 @@ def main() -> int:
             "UNVERIFIED. Assemble findings from the saved raw pulls with "
             "scripts/assemble_findings.py instead of writing the JSON by hand.\n")
     model = core.compute_model(findings)
+    rmodel.print_warnings(rmodel.require_meta_source(model))
+    if model["params"].get("monthly_goal"):
+        rmodel.print_warnings(rmodel.require_assumptions(model, ["monthly_goal"]))
 
     spec = dict(spec_mod.SPEC)
     if not args.charts:

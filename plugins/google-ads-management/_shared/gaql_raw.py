@@ -35,7 +35,7 @@ def load_rows(path: str, *, require_fields=None) -> list:
     as the search-terms file)."""
     p = Path(path)
     try:
-        text = p.read_text()
+        text = p.read_text(encoding="utf-8-sig")   # writers emit utf-8; tolerate a BOM
     except FileNotFoundError as e:
         raise RawResultError(f"raw results file not found: {path}") from e
     rows = _parse(text, path)

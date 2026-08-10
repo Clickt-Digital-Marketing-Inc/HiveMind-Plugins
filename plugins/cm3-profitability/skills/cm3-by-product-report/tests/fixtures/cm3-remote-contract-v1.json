@@ -1,0 +1,65 @@
+{
+  "prepare_response": {
+    "contract_version": "1.0",
+    "request_id": "req_abcdefghijklmnopqrstuv",
+    "job_id": "job_abcdefghijklmnopqrstuv",
+    "upload_expires_at": "2026-08-09T17:15:00Z",
+    "upload_expiry_seconds": 900,
+    "uploads": {
+      "google_ads_shopping": {
+        "filename": "google-ads-shopping.csv",
+        "put_url": "https://upload.invalid/cm3/synthetic-google?signature=fixture",
+        "required_headers": {
+          "content-type": "text/csv",
+          "x-checksum-sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "expires_at": "2026-08-09T17:15:00Z"
+      }
+    }
+  },
+  "generate_response": {
+    "contract_version": "1.0",
+    "request_id": "req_bcdefghijklmnopqrstuvw",
+    "job_id": "job_abcdefghijklmnopqrstuv",
+    "headline_metrics": {
+      "currency": "USD",
+      "product_count": 42,
+      "revenue": 125000.5,
+      "ad_spend": 22000.25,
+      "cm3": 15125.75,
+      "cm3_pct": 0.1210055,
+      "roas": 5.681776,
+      "excellent_count": 11,
+      "poor_count": 4
+    },
+    "artifacts": [
+      {
+        "filename": "cm3-report.md",
+        "mime_type": "text/markdown",
+        "byte_size": 48192,
+        "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "download_url": "https://download.invalid/cm3/report.md?signature=fixture",
+        "expires_at": "2026-08-09T18:00:00Z",
+        "expiry_seconds": 3600
+      },
+      {
+        "filename": "cm3-report.html",
+        "mime_type": "text/html",
+        "byte_size": 192451,
+        "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "download_url": "https://download.invalid/cm3/report.html?signature=fixture",
+        "expires_at": "2026-08-09T18:00:00Z",
+        "expiry_seconds": 3600
+      },
+      {
+        "filename": "cm3-report.xlsx",
+        "mime_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "byte_size": 90418,
+        "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "download_url": "https://download.invalid/cm3/report.xlsx?signature=fixture",
+        "expires_at": "2026-08-09T18:00:00Z",
+        "expiry_seconds": 3600
+      }
+    ]
+  }
+}

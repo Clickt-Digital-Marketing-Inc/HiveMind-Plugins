@@ -182,6 +182,21 @@ def _pop_delta(curr, prior):
     return (curr - prior) / prior
 
 
+def _liveness_note(row: dict) -> str:
+    """Conditional-phrasing seam for recently_active rows (HM-603) — the note
+    HM-605's recommendation layer surfaces so a paused/idle campaign's advice is
+    hedged. Empty for live (nothing to caveat) and dormant (generates nothing)."""
+    if row.get("liveness") != "recently_active":
+        return ""
+    enabled = str(row.get("status_label") or "").strip().upper() == "ENABLED"
+    cur, prior = _num(row.get("cost")), _num(row.get("prior_cost"))
+    if not enabled and cur > 0:
+        return f"Paused/removed mid-window after spending {cur:,.2f} — confirm intent before acting."
+    if enabled and cur <= 0:
+        return "Enabled but no spend in the window — confirm it should be running before acting."
+    return "Spent only in the prior window — confirm intent before acting."
+
+
 def build_rows(campaigns: list) -> list:
     rows = []
     for c in dedupe_campaigns(campaigns):
@@ -198,6 +213,7 @@ def build_rows(campaigns: list) -> list:
             "status_label": c.get("status", ""),
             "channel": c.get("channel", ""),
             "impressions": impr, "clicks": clicks, "cost": cost,
+            "prior_cost": _num(c.get("prior_cost")),
             "conversions": conv, "value": value,
             "ctr": (clicks / impr) if impr else 0.0,
             "cvr": (conv / clicks) if clicks else 0.0,
@@ -211,13 +227,22 @@ def build_rows(campaigns: list) -> list:
             "value_delta": _pop_delta(value, _num(c.get("prior_conversions_value"))) if value is not None else None,
             "status": "measured" if value is not None else "no_value",
         })
+    # Campaign liveness (HM-603): three-band — this skill pulls campaign.status
+    # (status_label), current-window spend (cost) AND prior-window spend
+    # (prior_cost), so all three bands are fully derivable. Severity/bucketing is
+    # gated on live+recently_active; dormant rows stay present-but-tagged.
+    rows = analytics.segment_liveness(rows, status_key="status_label",
+                                      spend_key="cost", prior_spend_key="prior_cost")
+    for r in rows:
+        r["liveness_note"] = _liveness_note(r)
     rows.sort(key=lambda r: r["cost"], reverse=True)
     return rows
 
 
 def classify_row(row: dict, params: dict) -> dict:
-    """Bucket one row by ROAS vs goal. no_value rows are never bucketed."""
-    if row["status"] != "measured" or row["roas"] is None:
+    """Bucket one row by ROAS vs goal. no_value and dormant rows are never
+    bucketed (dormant = long-dead campaign — never a recommendation source)."""
+    if row.get("liveness") == "dormant" or row["status"] != "measured" or row["roas"] is None:
         return {"bucket": ""}
     goal = params["roas_goal"]
     blis = row["budget_lost_is"]
@@ -297,7 +322,10 @@ def annotate_anomalies(rows: list, params: dict) -> list:
     out = []
     for r, f in zip(rows, flags):
         rr = dict(r)
-        rr["flags"] = f
+        # Liveness gate (HM-603): a dormant campaign (not ENABLED, zero spend in
+        # both windows) never manufactures an anomaly finding — flags cleared,
+        # pre_score 0 — but the row survives, tagged liveness="dormant".
+        rr["flags"] = [] if rr.get("liveness") == "dormant" else f
         rr["pre_score"] = analytics.pre_score(rr, ANOMALY_WEIGHTS)
         out.append(rr)
     return out
@@ -317,6 +345,10 @@ def compute_model(findings: dict) -> dict:
     classified = annotate_anomalies(classify(rows, params), params)
     summary = summarize(classified)
     summary["anomalies"] = sum(1 for r in classified if r["flags"])
+    # Passthrough of the tunable (not derived) — mirrors JS_KERNEL's summarize
+    # returning P.roas_goal||null — lets the html KPI row show the goal
+    # alongside its inline assumption marker (HM-604).
+    summary["roas_goal"] = params.get("roas_goal") or None
     return {
         "provenance": provenance(findings, params),
         "params": params,
@@ -325,5 +357,25 @@ def compute_model(findings: dict) -> dict:
         "concentration": compute_concentration(classified),
         "goal_sensitivity": goal_sensitivity(rows, params),
         "roas_ladder": ROAS_LADDER,
+        # Pass-through so every renderer sees the assembler's meta.assumptions
+        # (HM-604) and meta.source verbatim.
+        "meta": _build_meta(findings, params),
         "_rows": rows,
     }
+
+
+def _build_meta(findings: dict, params: dict) -> dict:
+    """meta pass-through + the roas_goal assumption auto-stamp: unless the
+    client explicitly supplied params.roas_goal in the findings JSON, the
+    resolved value is DEFAULT_PARAMS['roas_goal'] and gets an honest
+    basis=model_default entry (HM-604) — never silently presented as a
+    confirmed client target."""
+    meta = dict(findings.get("meta") or {})
+    supplied = (findings.get("params") or {}).get("roas_goal")
+    if supplied is None:
+        entries = [a for a in (meta.get("assumptions") or []) if a.get("param") != "roas_goal"]
+        entries.append({"param": "roas_goal", "value": params["roas_goal"], "basis": "model_default",
+                        "note": f"no client-stated ROAS goal — using the {params['roas_goal']:.1f}x "
+                                "model default (DEFAULT_PARAMS['roas_goal'])"})
+        meta["assumptions"] = entries
+    return meta

@@ -93,6 +93,40 @@ def test_empty_products():
           len(model["sensitivity_decline"]) == len(core.DECLINE_LADDER))
 
 
+def test_zero_rows_root_cause_narrative():
+    print("test_zero_rows_root_cause_narrative")
+    import product_filter_spec as spec_mod
+
+    model = core.compute_model({"meta": {}, "products": []})
+    narrative = spec_mod.md_narrative(model)
+    check("0-row narrative names the Merchant Center feed root cause",
+          any("no Merchant Center feed detected" in ln for ln in narrative), narrative)
+    check("0-row narrative is distinct from the clean-scan message",
+          not any("clean result, not an error" in ln for ln in narrative), narrative)
+    rec_empty = spec_mod.md_recommendations_section(model)["empty"]
+    check("recommendations empty-state also names the root cause",
+          "no Merchant Center feed detected" in rec_empty, rec_empty)
+
+    # a real "scanned N, flagged 0" clean result must NOT get the 0-row message.
+    clean = {
+        "meta": {}, "params": {"surge_multiple": 3.0, "decline_multiple": 0.3},
+        "products": [{"product_id": "p1", "product_title": "T", "channel": "SHOPPING",
+                     "status": "active", "cost_30d": 5, "conversions_30d": 1,
+                     "cost_14d": 2, "conversions_14d": 1, "cost_prev14d": 2,
+                     "conversions_prev14d": 1, "merchant_id": "m1"}],
+    }
+    clean_model = core.compute_model(clean)
+    clean_narrative = spec_mod.md_narrative(clean_model)
+    check("a real clean scan keeps the original clean-result message",
+          any("clean result, not an error" in ln for ln in clean_narrative), clean_narrative)
+
+    from render import render_md
+    import product_filter_spec
+    md = render_md(model, product_filter_spec.SPEC)
+    check("the rendered md carries the 0-row root-cause line",
+          "no Merchant Center feed detected" in md)
+
+
 def test_fractional_neither_then_flips():
     print("test_fractional_neither_then_flips")
     # prev14d=2.0, cur14d=2.75 -> not surging (2.75 < 1.5*2=3.0), not declining (2.75 > 0.5*2=1.0)
@@ -379,7 +413,8 @@ def test_bundle_md_html_parity_and_lazy():
 
 def main():
     for t in (test_fixture_counts, test_merchant_empty_not_zombie, test_inactive_row_present,
-              test_dedupe_by_product, test_empty_products, test_fractional_neither_then_flips,
+              test_dedupe_by_product, test_empty_products, test_zero_rows_root_cause_narrative,
+              test_fractional_neither_then_flips,
               test_sensitivity_shapes, test_assemble_findings_from_raw,
               test_csv_matches_mcp_model, test_csv_robustness,
               test_recommendations_cite_model_numbers,

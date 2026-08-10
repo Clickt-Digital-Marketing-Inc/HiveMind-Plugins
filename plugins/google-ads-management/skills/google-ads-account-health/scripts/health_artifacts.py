@@ -48,6 +48,12 @@ def action_plan_md(model: dict) -> str:
          "Ordered by severity — Critical first, then High, then Medium. Each item names the "
          "artifact that applies it, or **manual** when no Editor CSV can.",
          ""]
+    orphan = model.get("orphan_negatives") or {}
+    if orphan.get("count"):
+        L.append(f"{orphan['count']} negatives belong to removed/out-of-scope campaigns "
+                 f"({len(orphan['campaign_ids'])} campaign id(s)) — not counted against "
+                 "active structure.")
+        L.append("")
     order = ["Critical", "High", "Medium"]
     tf = model["top_fixes"]
     by_sev = {s: [r for r in tf if r["severity"] == s] for s in order}

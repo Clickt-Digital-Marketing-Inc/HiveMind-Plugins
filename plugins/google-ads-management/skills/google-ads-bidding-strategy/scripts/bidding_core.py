@@ -227,6 +227,7 @@ def dedupe_campaigns(campaigns: list) -> list:
                 "campaign_id": k, "campaign": c.get("campaign", str(k)),
                 "bidding_strategy_type": c.get("bidding_strategy_type", ""),
                 "ai_max_enabled": bool(c.get("ai_max_enabled")),
+                "campaign_status": c.get("status", ""),
                 "value_score": _optnum(c.get("value_score")),
                 "tracking_score": _optnum(c.get("tracking_score")),
                 "cost": 0.0, "conv30": 0.0, "value": 0.0,
@@ -240,6 +241,8 @@ def dedupe_campaigns(campaigns: list) -> list:
             m["campaign"] = c["campaign"]
         if not m["bidding_strategy_type"] and c.get("bidding_strategy_type"):
             m["bidding_strategy_type"] = c["bidding_strategy_type"]
+        if not m["campaign_status"] and c.get("status"):
+            m["campaign_status"] = c["status"]
         if c.get("ai_max_enabled"):
             m["ai_max_enabled"] = True
         if m["value_score"] is None:
@@ -252,6 +255,25 @@ def dedupe_campaigns(campaigns: list) -> list:
 def _confidence(value_score, tracking_score) -> str:
     have = (value_score is not None) + (tracking_score is not None)
     return "measured" if have == 2 else ("partial" if have == 1 else "assumed")
+
+
+def _liveness_note(row: dict) -> str:
+    """Conditional-phrasing seam for recently_active rows (HM-603) — the note
+    the recommendation layer surfaces so a paused/idle campaign's bid-strategy
+    advice is hedged. Empty for live (nothing to caveat) and dormant (generates
+    no finding). This skill pulls current-window spend but NO prior-window spend
+    (two-band-derivable — see build_universe), so the only recently_active paths
+    are paused-mid-window (not ENABLED, spent) and enabled-but-idle."""
+    if row.get("liveness") != "recently_active":
+        return ""
+    enabled = str(row.get("campaign_status") or "").strip().upper() == "ENABLED"
+    cost = _num(row.get("cost"))
+    if not enabled and cost > 0:
+        return (f"Paused/removed mid-window after spending {cost:,.2f} — confirm the "
+                "bid strategy intent before acting.")
+    if enabled and cost <= 0:
+        return "Enabled but no spend in the window — confirm it should be running before retuning bids."
+    return ""
 
 
 def build_universe(campaigns: list) -> list:
@@ -275,6 +297,7 @@ def build_universe(campaigns: list) -> list:
             "bidding_strategy": c["bidding_strategy_type"],
             "bidding_strategy_norm": strategy_norm,
             "ai_max_enabled": c["ai_max_enabled"],
+            "campaign_status": c["campaign_status"],
             "current_tier": tier,
             "current_label": TIER_LABELS[tier] if tier is not None else "",
             "conv30": c["conv30"], "cost": c["cost"], "value": c["value"],
@@ -282,14 +305,31 @@ def build_universe(campaigns: list) -> list:
             "confidence": _confidence(c["value_score"], c["tracking_score"]),
             "status": status,
         })
+    # Campaign liveness (HM-603): TWO-BAND-DERIVABLE — this skill pulls
+    # campaign.status (campaign_status) and current-window spend (cost) but NO
+    # prior-window spend, so prior_spend_key=None. All three bands stay reachable
+    # (the "spent only in the prior window" recently_active path is the one that
+    # is unavailable). Severity is gated on live+recently_active in classify_row;
+    # dormant rows stay present-but-tagged (no-row-loss). NOTE the row's `status`
+    # is the PIPELINE status (scored/no_spend/unsupported_strategy) — the raw
+    # campaign.status lives under `campaign_status` to avoid the collision.
+    universe = analytics.segment_liveness(universe, status_key="campaign_status",
+                                          spend_key="cost", prior_spend_key=None)
+    for r in universe:
+        r["liveness_note"] = _liveness_note(r)
     universe.sort(key=lambda r: r["cost"], reverse=True)
     return universe
 
 
 def classify_row(row: dict, params: dict) -> dict:
     """Return the maturity score + mismatch signal for one row at the given
-    params. Rows not status='scored' are never classified."""
-    if row["status"] != "scored":
+    params. Rows not status='scored' — and dormant rows (HM-603: not ENABLED,
+    zero spend in the window — a long-dead campaign that can never be a
+    recommendation source) — are never classified. The dormant guard mirrors the
+    JS kernel and the xlsx Mismatch formula; a scored row can never be dormant
+    (spend>0 ⇒ at least recently_active), so this only ever fires on held-out
+    rows, but it is asserted explicitly for correctness + the tag."""
+    if row.get("liveness") == "dormant" or row["status"] != "scored":
         return {"volume_score": None, "value_score_used": None, "tracking_score_used": None,
                 "maturity_score": None, "recommended_tier": None, "recommended_label": "",
                 "tier_gap": None, "under_data": None, "mismatch": "", "flags": [], "severity": 0.0}
@@ -406,6 +446,34 @@ def provenance(findings: dict, params: dict) -> dict:
     }
 
 
+def _build_meta(findings: dict, universe: list, params: dict) -> dict:
+    """meta pass-through + the assumed-judgment-score auto-stamp (HM-604): when
+    ANY row's value_score/tracking_score fell back to the tunable neutral
+    default (confidence "partial"/"assumed" — see _confidence), the resolved
+    default(s) get an honest basis=model_default entry, never silently
+    presented as a measured judgment call."""
+    meta = dict(findings.get("meta") or {})
+    entries = [a for a in (meta.get("assumptions") or [])
+              if a["param"] not in ("assumed_value_score", "assumed_tracking_score")]
+    used_value = any(r["value_score"] is None for r in universe)
+    used_tracking = any(r["tracking_score"] is None for r in universe)
+    if used_value:
+        entries.append({"param": "assumed_value_score", "value": params["assumed_value_score"],
+                        "basis": "model_default",
+                        "note": "one or more campaigns had no ValueVarianceScore judgment input — "
+                                f"used the neutral default {params['assumed_value_score']:.0f}. Supply "
+                                "a real score via --judgment to replace it."})
+    if used_tracking:
+        entries.append({"param": "assumed_tracking_score", "value": params["assumed_tracking_score"],
+                        "basis": "model_default",
+                        "note": "one or more campaigns had no TrackingConfidenceScore judgment input "
+                                f"— used the neutral default {params['assumed_tracking_score']:.0f}. "
+                                "Supply a real score via --judgment to replace it."})
+    if entries:
+        meta["assumptions"] = entries
+    return meta
+
+
 def compute_model(findings: dict) -> dict:
     """Assemble the full model at the resolved params. JSON-serializable —
     safe to embed in the HTML explorer for live recompute. This is the single
@@ -422,6 +490,9 @@ def compute_model(findings: dict) -> dict:
         "gate_sensitivity": gate_sensitivity(universe, params),
         "borderline": borderline(classified, params),
         "tier_labels": TIER_LABELS,
+        # Pass-through so every renderer sees the assembler's meta.assumptions
+        # and meta.source verbatim, plus the auto-stamped judgment fallback.
+        "meta": _build_meta(findings, universe, params),
         "gate_ladder": GATE_LADDER,
         "_universe": universe,   # unclassified rows for renderers that re-tune live
     }

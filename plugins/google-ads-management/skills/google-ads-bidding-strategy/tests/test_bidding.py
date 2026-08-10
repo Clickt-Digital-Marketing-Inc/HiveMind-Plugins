@@ -257,6 +257,58 @@ def test_assemble_findings_from_raw_and_judgment():
         check("hand-edited findings rejected by core", ok)
 
 
+def test_liveness_gating():
+    print("test_liveness_gating")
+    # Two-band-derivable coverage: this skill pulls campaign.status + current-
+    # window spend but NO prior-window spend. live / recently_active / dormant
+    # are all still reachable (only the "prior-window-only" recently_active path
+    # is unavailable).
+    f = {"meta": {"currency": "CAD"}, "campaigns": [
+        {"campaign_id": "L", "campaign": "Live", "bidding_strategy_type": "TARGET_ROAS",
+         "status": "ENABLED", "conv30": 60, "cost": 800.0, "value": 3200.0,
+         "value_score": 70, "tracking_score": 60},
+        {"campaign_id": "PA", "campaign": "Paused-mid-window", "bidding_strategy_type": "ENHANCED_CPC",
+         "status": "PAUSED", "conv30": 8, "cost": 200.0, "value": 400.0},
+        {"campaign_id": "EI", "campaign": "Enabled-idle", "bidding_strategy_type": "TARGET_CPA",
+         "status": "ENABLED", "conv30": 0, "cost": 0.0, "value": 0.0},
+        {"campaign_id": "D", "campaign": "Dead", "bidding_strategy_type": "MAXIMIZE_CONVERSIONS",
+         "status": "REMOVED", "conv30": 0, "cost": 0.0, "value": 0.0},
+    ]}
+    m = core.compute_model(f)
+    rows = {r["campaign_id"]: r for r in m["rows"]}
+    check("every campaign survives (no-row-loss)", len(m["rows"]) == 4, f"got {len(m['rows'])}")
+    check("live band", rows["L"]["liveness"] == "live", rows["L"]["liveness"])
+    check("paused-mid-window -> recently_active", rows["PA"]["liveness"] == "recently_active", rows["PA"]["liveness"])
+    check("enabled-idle -> recently_active", rows["EI"]["liveness"] == "recently_active", rows["EI"]["liveness"])
+    check("removed + zero spend -> dormant", rows["D"]["liveness"] == "dormant", rows["D"]["liveness"])
+    # (b) a PAUSED campaign that still spent in-window is recently_active with a note
+    check("paused+spend row has conditional liveness_note",
+          "confirm the bid strategy intent" in rows["PA"]["liveness_note"]
+          and "spending" in rows["PA"]["liveness_note"], rows["PA"]["liveness_note"])
+    check("enabled-idle row has conditional liveness_note",
+          rows["EI"]["liveness_note"] and "confirm" in rows["EI"]["liveness_note"], rows["EI"]["liveness_note"])
+    check("live row has no note", rows["L"]["liveness_note"] == "")
+    # (a) a dormant campaign (status not ENABLED, cost 0) produces zero severity /
+    # flags / mismatch and empty tier fields — but stays present + tagged.
+    check("dormant row not classified (empty mismatch)", rows["D"]["mismatch"] == "", rows["D"]["mismatch"])
+    check("dormant row no flags", rows["D"]["flags"] == [], rows["D"]["flags"])
+    check("dormant row zero severity", rows["D"]["severity"] == 0.0, rows["D"]["severity"])
+    check("dormant row empty tier fields",
+          rows["D"]["maturity_score"] is None and rows["D"]["recommended_tier"] is None
+          and rows["D"]["tier_gap"] is None, rows["D"])
+    check("dormant row has empty note", rows["D"]["liveness_note"] == "")
+    # live/recently_active rows still fully scored (severity universe intact)
+    check("live row still scored", rows["L"]["status"] == "scored" and rows["L"]["maturity_score"] is not None)
+    check("paused-but-spent row still scored (recently_active is NOT gated)",
+          rows["PA"]["status"] == "scored" and rows["PA"]["maturity_score"] is not None)
+    # (c) html_embed rows carry liveness + liveness_note (the Node parity gate feeds these)
+    import bidding_spec as spec_mod
+    emb = spec_mod.html_embed(m)["rows"]
+    check("html embed carries liveness + note on every row",
+          all("liveness" in r and "liveness_note" in r for r in emb))
+    check("html embed dormant row tagged", any(r["liveness"] == "dormant" for r in emb))
+
+
 def test_bundle_md_html_parity_and_lazy():
     print("test_bundle_md_html_parity_and_lazy")
     import re
@@ -292,13 +344,59 @@ def test_bundle_md_html_parity_and_lazy():
     check("building md/html did not import openpyxl", "openpyxl" not in sys.modules)
 
 
+def test_assumptions_provenance():
+    print("test_assumptions_provenance")
+    from render import model as M
+
+    findings = json.loads(FIXTURE.read_text())
+    m = core.compute_model(findings)
+    check("fixture has some None value_score rows", any(r["value_score"] is None for r in m["_universe"]))
+    va = M.get_assumption(m, "assumed_value_score")
+    ta = M.get_assumption(m, "assumed_tracking_score")
+    check("assumed_value_score auto-stamped basis=model_default", va is not None and va["basis"] == "model_default", va)
+    check("assumed_tracking_score auto-stamped basis=model_default", ta is not None and ta["basis"] == "model_default", ta)
+    check("note mentions --judgment", "--judgment" in va["note"] and "--judgment" in ta["note"])
+
+    # a fixture where every row supplies both scores gets no assumption entry.
+    findings2 = json.loads(FIXTURE.read_text())
+    for c in findings2["campaigns"]:
+        c["value_score"], c["tracking_score"] = 75, 75
+    m2 = core.compute_model(findings2)
+    check("fully-measured findings carry no judgment assumptions",
+          M.get_assumption(m2, "assumed_value_score") is None
+          and M.get_assumption(m2, "assumed_tracking_score") is None)
+
+    import bidding_spec
+    import bidding_xlsx_spec
+    from render import build_bundle
+    spec = dict(bidding_spec.SPEC)
+    spec["xlsx"] = bidding_xlsx_spec.XLSX
+    with tempfile.TemporaryDirectory() as td:
+        written = build_bundle(m, spec, td, formats=("md", "html", "xlsx"), charts=False,
+                               normalize=False)
+        md = next(p for p in written if p.suffix == ".md").read_text()
+        html = next(p for p in written if p.name.endswith("_explorer.html")).read_text()
+        xlsx_path = next(p for p in written if p.suffix == ".xlsx")
+        check("md has the callout", "## Provenance & assumptions" in md)
+        check("md value/tracking line carries a marker", "(default:" in md)
+        check("html embeds the judgment assumptions", '"assumed_value_score"' in html)
+        import openpyxl
+        wb = openpyxl.load_workbook(str(xlsx_path))
+        snap_cells = [c.value for row in wb["Snapshot"].iter_rows() for c in row if c.value is not None]
+        check("xlsx Snapshot has the callout", "Provenance & assumptions" in snap_cells)
+        ctrl_notes = [c.value for c in wb["Controls"]["D"] if c.value]
+        check("xlsx Controls notes carry the inline markers",
+              sum("default:" in (v or "") for v in ctrl_notes) >= 2, ctrl_notes)
+
+
 def main():
     for t in (test_fixture_counts, test_specific_rows, test_empty_universe,
               test_dedupe_by_campaign_id, test_automation_gate_priority,
               test_strategy_normalization_mcp_and_ui_labels,
               test_gate_sensitivity_and_borderline_shapes,
               test_mcp_vs_csv_identical_model, test_assemble_findings_from_raw_and_judgment,
-              test_bundle_md_html_parity_and_lazy):
+              test_liveness_gating, test_bundle_md_html_parity_and_lazy,
+              test_assumptions_provenance):
         t()
     print()
     if _failures:

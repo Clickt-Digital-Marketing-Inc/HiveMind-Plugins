@@ -9,7 +9,7 @@
   "generated": "2026-07-12",
   "reconciliation": {
    "conversion_actions": {"rows": 6, "sums": {"conversions_30d": 683.0}},
-   "campaign_trend": {"rows": 6, "sums": {
+   "campaign_trend": {"rows": 7, "sums": {
      "clicks_curr": 4270.0, "impressions_curr": 90400.0, "cost_curr": 2240.0, "conversions_curr": 197.0,
      "clicks_prior": 2900.0, "impressions_prior": 58000.0, "cost_prior": 2050.0, "conversions_prior": 203.0
    }},
@@ -43,23 +43,33 @@
   {"check": "Consent Mode v2", "value": "Advanced", "data_source": "user_csv", "note": ""}
  ],
  "campaign_trend": [
-  {"campaign_id": 101, "campaign": "Critical - LP suspect", "clicks_curr": 1000, "impressions_curr": 20000,
+  {"campaign_id": 101, "campaign": "Critical - LP suspect", "campaign_status": "ENABLED",
+   "clicks_curr": 1000, "impressions_curr": 20000,
    "cost_curr": 500.0, "conversions_curr": 20, "clicks_prior": 1000, "impressions_prior": 20000,
    "cost_prior": 480.0, "conversions_prior": 50},
-  {"campaign_id": 102, "campaign": "High - CVR drop only", "clicks_curr": 500, "impressions_curr": 15000,
+  {"campaign_id": 102, "campaign": "High - CVR drop only", "campaign_status": "ENABLED",
+   "clicks_curr": 500, "impressions_curr": 15000,
    "cost_curr": 300.0, "conversions_curr": 25, "clicks_prior": 500, "impressions_prior": 10000,
    "cost_prior": 290.0, "conversions_prior": 40},
-  {"campaign_id": 103, "campaign": "Watch - thin volume", "clicks_curr": 220, "impressions_curr": 4400,
+  {"campaign_id": 103, "campaign": "Watch - thin volume", "campaign_status": "ENABLED",
+   "clicks_curr": 220, "impressions_curr": 4400,
    "cost_curr": 150.0, "conversions_curr": 25, "clicks_prior": 200, "impressions_prior": 4000,
    "cost_prior": 140.0, "conversions_prior": 25},
-  {"campaign_id": 104, "campaign": "Clean", "clicks_curr": 800, "impressions_curr": 16000,
+  {"campaign_id": 104, "campaign": "Clean", "campaign_status": "ENABLED",
+   "clicks_curr": 800, "impressions_curr": 16000,
    "cost_curr": 800.0, "conversions_curr": 85, "clicks_prior": 800, "impressions_prior": 16000,
    "cost_prior": 760.0, "conversions_prior": 80},
-  {"campaign_id": 105, "campaign": "No benchmark - new campaign", "clicks_curr": 150, "impressions_curr": 3000,
+  {"campaign_id": 105, "campaign": "No benchmark - new campaign", "campaign_status": "ENABLED",
+   "clicks_curr": 150, "impressions_curr": 3000,
    "cost_curr": 90.0, "conversions_curr": 10, "clicks_prior": 0, "impressions_prior": 0,
    "cost_prior": 0.0, "conversions_prior": 0},
-  {"campaign_id": 106, "campaign": "Watch - below account CVR", "clicks_curr": 1600, "impressions_curr": 32000,
+  {"campaign_id": 106, "campaign": "Watch - below account CVR", "campaign_status": "ENABLED",
+   "clicks_curr": 1600, "impressions_curr": 32000,
    "cost_curr": 400.0, "conversions_curr": 32, "clicks_prior": 400, "impressions_prior": 8000,
-   "cost_prior": 380.0, "conversions_prior": 8}
+   "cost_prior": 380.0, "conversions_prior": 8},
+  {"campaign_id": 107, "campaign": "Dormant - long dead", "campaign_status": "REMOVED",
+   "clicks_curr": 0, "impressions_curr": 0,
+   "cost_curr": 0.0, "conversions_curr": 0, "clicks_prior": 0, "impressions_prior": 0,
+   "cost_prior": 0.0, "conversions_prior": 0}
  ]
 }

@@ -118,6 +118,38 @@ check("boundary: gt not ge", A.signals([{"x": 4}], [
 check("empty rows / rules", A.signals([], RULES) == [] and A.signals(srows, [])
       == [[], [], [], []])
 
+# HM-779 — `mult` is meaningful only in the relative form. It must actually
+# scale the relative threshold, and must be REJECTED (not ignored) on an
+# absolute rule, where it previously passed validation and silently compared
+# against the unscaled `value`.
+mrow = [{"x": 150.0, "y": 100.0}]
+# The default is pinned AT THE BOUNDARY: with x == y, 'ge' fires and 'gt' does
+# not only when the threshold is exactly y * 1.0. Any other default (0.0, 2.0,
+# 0.5 ...) flips one of the two. A 150-vs-100 probe would pass for every
+# default in [0, 1.5) and pin nothing — HM-779's docstring makes this default
+# normative, and no vector in analytics_vectors*.json omits `mult`.
+eqrow = [{"x": 100.0, "y": 100.0}]
+check("relative mult defaults to exactly 1.0 (ge fires at the boundary)",
+      A.signals(eqrow, [{"id": "m", "key": "x", "op": "ge",
+                         "value_key": "y"}])[0] == ["m"])
+check("relative mult defaults to exactly 1.0 (gt does not fire at it)",
+      A.signals(eqrow, [{"id": "m", "key": "x", "op": "gt",
+                         "value_key": "y"}])[0] == [])
+check("relative mult default (no key) matches an explicit mult: 1.0",
+      A.signals(mrow, [{"id": "m", "key": "x", "op": "gt",
+                        "value_key": "y"}])[0]
+      == A.signals(mrow, [{"id": "m", "key": "x", "op": "gt",
+                           "value_key": "y", "mult": 1.0}])[0] == ["m"])
+check("relative mult scales the threshold (150 > 100*2.0 is false)",
+      A.signals(mrow, [{"id": "m", "key": "x", "op": "gt", "value_key": "y",
+                        "mult": 2.0}])[0] == [])
+check("relative mult < 1 scales down (150 > 100*0.5 is true)",
+      A.signals(mrow, [{"id": "m", "key": "x", "op": "gt", "value_key": "y",
+                        "mult": 0.5}])[0] == ["m"])
+check("absolute rule without mult still fires normally",
+      A.signals([{"cost": 150.0}], [{"id": "a", "key": "cost", "op": "gt",
+                                     "value": 100.0}])[0] == ["a"])
+
 for bad, why in [
     ({"key": "x", "op": "gt", "value": 1}, "missing id"),
     ({"id": "r", "op": "gt", "value": 1}, "missing key"),
@@ -127,6 +159,9 @@ for bad, why in [
     ({"id": "r", "key": "x", "op": "gt", "value": float("nan")}, "nan value"),
     ({"id": "r", "key": "x", "op": "gt", "value": "5"}, "string value"),
     ({"id": "r", "key": "x", "op": "gt", "value_key": "y", "mult": "2"}, "string mult"),
+    # HM-779: was silently accepted, then ignored — threshold stayed unscaled.
+    ({"id": "r", "key": "x", "op": "gt", "value": 100, "mult": 2}, "mult without value_key"),
+    ({"id": "r", "key": "x", "op": "gt", "value": 100, "mult": 1.0}, "mult=1.0 without value_key"),
 ]:
     try:
         A.signals([{"x": 1}], [bad])
@@ -152,6 +187,73 @@ for badw, why in [({"a": -1}, "negative"), ({"a": float("inf")}, "inf"),
     except ValueError:
         check(f"bad weight raises ({why})", True)
 
+# ── segment_liveness ─────────────────────────────────────────────────────────
+print("segment_liveness")
+
+
+def _live(rows, prior="cost_prior"):
+    return [r["liveness"] for r in
+            A.segment_liveness(rows, status_key="status", spend_key="cost",
+                               prior_spend_key=prior)]
+
+
+# 3-band with a prior window
+three = _live([
+    {"status": "ENABLED", "cost": 500.0, "cost_prior": 400.0},   # live
+    {"status": "PAUSED", "cost": 120.0, "cost_prior": 0.0},       # recently_active (paused mid-window)
+    {"status": "ENABLED", "cost": 0.0, "cost_prior": 300.0},      # recently_active (enabled-but-idle)
+    {"status": "PAUSED", "cost": 0.0, "cost_prior": 250.0},       # recently_active (prior only)
+    {"status": "PAUSED", "cost": 0.0, "cost_prior": 0.0},         # dormant
+    {"status": "REMOVED", "cost": 0.0, "cost_prior": 0.0},        # dormant
+])
+check("live: enabled + spend", three[0] == "live", str(three))
+check("recently_active: paused mid-window", three[1] == "recently_active")
+check("recently_active: enabled-but-idle", three[2] == "recently_active")
+check("recently_active: prior window only", three[3] == "recently_active")
+check("dormant: paused + zero both windows", three[4] == "dormant")
+check("dormant: REMOVED + zero both windows", three[5] == "dormant")
+
+# two-band degradation (no prior window): prior signal can't fire
+two = _live([
+    {"status": "ENABLED", "cost": 90.0},    # live
+    {"status": "ENABLED", "cost": 0.0},     # recently_active (enabled-but-idle)
+    {"status": "PAUSED", "cost": 45.0},     # recently_active (spent mid-window)
+    {"status": "PAUSED", "cost": 0.0},      # dormant
+], prior=None)
+check("two-band: live", two[0] == "live")
+check("two-band: enabled-idle -> recently_active", two[1] == "recently_active")
+check("two-band: paused+spend -> recently_active", two[2] == "recently_active")
+check("two-band: paused+zero -> dormant (no prior data)", two[3] == "dormant")
+
+# coercion + boundaries
+edge = _live([
+    {"status": "ENABLED", "cost": -5.0, "cost_prior": None},   # neg spend -> 0, enabled -> recently_active
+    {"status": "enabled", "cost": 0.0001, "cost_prior": 0.0},  # lowercase status normalizes, tiny spend -> live
+    {"status": "  Enabled  ", "cost": None, "cost_prior": 0.0},  # padded status, missing spend -> recently_active
+    {"status": "PAUSED", "cost": "7", "cost_prior": "3"},       # string spend -> 0 both -> dormant
+    {"status": "PAUSED"},                                        # everything missing -> dormant
+])
+check("negative spend coerces to zero", edge[0] == "recently_active", str(edge))
+check("lowercase status + tiny spend -> live", edge[1] == "live")
+check("padded status + missing spend -> recently_active", edge[2] == "recently_active")
+check("string spend counts as zero (both windows) -> dormant", edge[3] == "dormant")
+check("all-missing -> dormant", edge[4] == "dormant")
+
+# non-mutation + full-row passthrough + no-row-loss
+src = [{"status": "PAUSED", "cost": 0.0, "cost_prior": 0.0, "campaign": "Z", "extra": 1}]
+res = A.segment_liveness(src, status_key="status", spend_key="cost", prior_spend_key="cost_prior")
+check("input row not mutated", "liveness" not in src[0])
+check("every input row survives (no-row-loss)", len(res) == 1)
+check("other fields pass through unchanged",
+      res[0]["campaign"] == "Z" and res[0]["extra"] == 1 and res[0]["liveness"] == "dormant")
+check("empty rows -> empty list",
+      A.segment_liveness([], status_key="status", spend_key="cost") == [])
+# order-independence: each row's band depends only on its own fields
+mix = [{"status": "ENABLED", "cost": 5.0, "cost_prior": 0.0},
+       {"status": "REMOVED", "cost": 0.0, "cost_prior": 0.0}]
+check("row band independent of position",
+      _live(mix) == ["live", "dormant"] and _live(list(reversed(mix))) == ["dormant", "live"])
+
 # ── determinism: input order never changes a result ─────────────────────────
 print("determinism")
 rng = random.Random(42)
@@ -176,13 +278,34 @@ check("pre_score invariant under flag shuffle",
 
 # ── JS mirror sanity (full parity lives in the Node gate) ───────────────────
 print("js mirror")
-check("JS_MIRROR defines all three kernels",
+check("JS_MIRROR defines all kernels",
       all(f"function gx{n}" in A.JS_MIRROR
-          for n in ("Concentration", "Signals", "PreScore", "RoundHalfUp")))
+          for n in ("Concentration", "Signals", "PreScore", "RoundHalfUp",
+                    "SegmentLiveness", "StatusEnabled")))
 check("JS_MIRROR is self-contained ASCII", A.JS_MIRROR.isascii())
 
 print()
-if _failures:
-    print(f"{len(_failures)} FAILURE(S): " + ", ".join(_failures))
-    sys.exit(1)
-print("all analytics tests passed")
+
+
+# ── the pytest binding (added by HM-791; the checks above are untouched) ────
+# Every check() in this file runs at import and only APPENDS to _failures. In
+# the plugin that was enough: the file is run as a script and exits 1. Under
+# bare pytest a file shaped like this — no test_* function anywhere — collects
+# 0 tests, so a failed check was reported green. This is the only test pytest
+# collects from this file; see also ../conftest.py's order-independent guard.
+def test_no_check_failures():
+    assert not _failures, (
+        f"{len(_failures)} failed check(s): " + ", ".join(_failures)
+    )
+
+
+if __name__ == "__main__":
+    # Guarded like test_csv_input.py / test_data_guards.py: the checks above run
+    # at import (module scope), but this exit must NOT fire under pytest — an
+    # unguarded sys.exit(1) during collection raises SystemExit -> INTERNALERROR,
+    # aborting the whole session and masking the sibling files. Under pytest the
+    # appended test_no_check_failures + ../conftest.py assert `_failures` instead.
+    if _failures:
+        print(f"{len(_failures)} FAILURE(S): " + ", ".join(_failures))
+        sys.exit(1)
+    print("all analytics tests passed")

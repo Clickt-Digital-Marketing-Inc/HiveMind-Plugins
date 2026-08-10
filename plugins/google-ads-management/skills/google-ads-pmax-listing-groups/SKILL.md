@@ -36,13 +36,15 @@ reports/columns to request. Both paths yield an identical model (`meta.source` s
 ## Pull the data (last 30 days) — full GAQL in [references/pmax-listing-waste-filter.md](references/pmax-listing-waste-filter.md)
 1. **Listing-group metrics** — `asset_group_product_group_view` (PMax-only by construction): campaign,
    asset group, the listing-group-filter resource name, impressions, clicks, conversions,
-   conversions_value, cost_micros. Window `segments.date DURING LAST_30_DAYS`.
+   conversions_value, cost_micros. Window `segments.date DURING LAST_30_DAYS`. Constant: `LG_FIELDS`
+   in [scripts/assemble_findings.py](scripts/assemble_findings.py).
 2. **Listing-group labels** — `asset_group_listing_group_filter` (`case_value.*` + `type`), joined by
-   resource name → a readable `Brand: … / Item ID: … / Type: …` label per partition.
+   resource name → a readable `Brand: … / Item ID: … / Type: …` label per partition. Constant:
+   `LABEL_FIELDS`.
 3. **Campaign benchmarks** — `campaign` (PMax): clicks, conversions, cost_micros → campaign cost/conv
-   and clicks/conv. Serves both universes.
+   and clicks/conv. Serves both universes. Constant: `BENCH_FIELDS`.
 4. **Per-product metrics** — `shopping_performance_view` segmented by `product_item_id` /
-   `product_title`, filtered to the PMax campaign ids from step 3.
+   `product_title`, filtered to the PMax campaign ids from step 3. Constant: `PRODUCT_FIELDS`.
 
 The assembler converts `cost_micros/1e6`, derives each label, joins, and writes the findings JSON;
 then run the builder. Use `metrics.conversions` (primary, attribution-modeled, fractional) for both

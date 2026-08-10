@@ -94,6 +94,7 @@ XLSX = {
         {"header": "Campaign", "kind": "data", "key": "campaign", "width": 32},
         {"header": "Channel", "kind": "data", "key": "channel", "width": 18},
         {"header": "Status", "kind": "data", "key": "__status__", "width": 12},
+        {"header": "Liveness", "kind": "data", "key": "liveness", "width": 15},
         {"header": "Impr", "kind": "data", "key": "impressions", "width": 9},
         {"header": "Clicks", "kind": "data", "key": "clicks", "width": 8},
         {"header": "CTR", "kind": "data", "key": "ctr", "fmt": "PCT", "width": 8},
@@ -109,16 +110,20 @@ XLSX = {
         # contract). ISNUMBER-guarded per delta — a blank cell (no prior period)
         # never fires, matching the analytics.signals() "missing = no signal" rule.
         # Applies to EVERY row (no `scored` gate): anomalies aren't ROAS-gated.
+        # Liveness gate (HM-603): a dormant campaign scores 0 anomaly / no bucket,
+        # mirroring perf_core (the {C:Liveness} guard wraps the existing formulas).
         {"header": "Anomaly score", "kind": "formula", "width": 12,
-         "formula": '=IF(ISNUMBER({C:Spend Δ}{row}),IF({C:Spend Δ}{row}>{ctrl:delta_flag},2,0)+'
+         "formula": '=IF({C:Liveness}{row}="dormant",0,'
+                    'IF(ISNUMBER({C:Spend Δ}{row}),IF({C:Spend Δ}{row}>{ctrl:delta_flag},2,0)+'
                     'IF({C:Spend Δ}{row}<-{ctrl:delta_flag},1.5,0),0)'
                     '+IF(ISNUMBER({C:Conv Δ}{row}),IF({C:Conv Δ}{row}<-{ctrl:delta_flag},2.5,0),0)'
-                    '+IF(ISNUMBER({C:Value Δ}{row}),IF({C:Value Δ}{row}<-{ctrl:delta_flag},2,0),0)',
+                    '+IF(ISNUMBER({C:Value Δ}{row}),IF({C:Value Δ}{row}<-{ctrl:delta_flag},2,0),0))',
          "fmt": "0.00"},
         {"header": "Bucket", "kind": "formula", "scored": True, "width": 10,
-         "formula": '=IF({C:ROAS}{row}="","",IF({C:ROAS}{row}>={ctrl:roas_goal},'
+         "formula": '=IF({C:Liveness}{row}="dormant","",'
+                    'IF({C:ROAS}{row}="","",IF({C:ROAS}{row}>={ctrl:roas_goal},'
                     'IF(AND({C:Budget-lost IS}{row}<>"",{C:Budget-lost IS}{row}>{ctrl:budget_lost_is_flag}),"Scale","Winner"),'
-                    'IF({C:Spend}{row}>={ctrl:min_spend},"Fix","Hold")))'},
+                    'IF({C:Spend}{row}>={ctrl:min_spend},"Fix","Hold"))))'},
     ],
     "rows_freeze": "C2",
 

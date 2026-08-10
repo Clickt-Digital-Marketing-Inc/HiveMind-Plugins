@@ -33,6 +33,12 @@ Four deterministic pass/flag rules, each independent (a row can carry several):
 Plus one **account-level** check surfaced in `summary.config_no_primary_action`: **no** row is an
 ENABLED primary-for-goal action at all — tracking is broken, fix this before touching bids.
 
+The checklist is **segmented by `primary_for_goal`** into two sections: primary-for-goal actions
+(what Smart Bidding optimizes toward — they carry the health framing) and secondary actions (listed
+separately with their own flagged/total count, never dropped). Per-action conversion counts come
+from `metrics.all_conversions` (all conversions, incl. secondary — the only conversions metric the
+API exposes at the `conversion_action` grain), stored as `conversions_30d`.
+
 ### 2 — Per-campaign CVR/CTR trend (`status="scored"`/`"no_benchmark"`)
 
 Two comparable windows (operator-chosen — 7d-vs-prior-7d, `THIS_MONTH`-vs-`LAST_MONTH`, etc., never
@@ -80,22 +86,26 @@ is not a native UI report either. Every row carries `data_source`:
 > **Gotcha:** `LAST_90_DAYS` is **not** a valid GAQL date literal. Use an explicit `BETWEEN`. Keep
 > the two windows the same length and end both no later than yesterday.
 
-**1 — Conversion-action config + 30-day conversions:**
+**1 — Conversion-action config + all conversions:**
 ```
 resource:   "conversion_action"
 fields:     ["conversion_action.id","conversion_action.name","conversion_action.status",
              "conversion_action.type","conversion_action.category",
              "conversion_action.primary_for_goal","conversion_action.counting_type",
              "conversion_action.attribution_model_settings.attribution_model",
-             "metrics.conversions"]
+             "metrics.all_conversions"]
 conditions: ["conversion_action.status = 'ENABLED'",
              "segments.date BETWEEN '<curr-window-start>' AND '<yesterday>'"]
 ```
+> **Field gotcha:** at the `conversion_action` grain the live API only allows
+> `metrics.all_conversions` (all conversions, incl. secondary actions) — `metrics.conversions`
+> is **not** selectable there and the query fails. The per-campaign pulls below stay on
+> `metrics.conversions` (valid at the `campaign` grain).
 
 **2 — Per-campaign metrics, current window:**
 ```
 resource:   "campaign"
-fields:     ["campaign.id","campaign.name","metrics.clicks","metrics.impressions",
+fields:     ["campaign.id","campaign.name","campaign.status","metrics.clicks","metrics.impressions",
              "metrics.cost_micros","metrics.conversions"]
 conditions: ["segments.date BETWEEN '<curr-window-start>' AND '<yesterday>'"]
 ```
@@ -103,7 +113,7 @@ conditions: ["segments.date BETWEEN '<curr-window-start>' AND '<yesterday>'"]
 **3 — Per-campaign metrics, prior window** (same fields, the comparable prior period):
 ```
 resource:   "campaign"
-fields:     ["campaign.id","campaign.name","metrics.clicks","metrics.impressions",
+fields:     ["campaign.id","campaign.name","campaign.status","metrics.clicks","metrics.impressions",
              "metrics.cost_micros","metrics.conversions"]
 conditions: ["segments.date BETWEEN '<prior-window-start>' AND '<prior-window-end>'"]
 ```

@@ -84,6 +84,7 @@
    "channel_type": "SEARCH",
    "bidding_strategy_type": "MAXIMIZE_CONVERSIONS",
    "conversions_30d": 12.0,
+   "cost": 1840.5,
    "negative_count": 0
   },
   {
@@ -93,6 +94,7 @@
    "channel_type": "SEARCH",
    "bidding_strategy_type": "MANUAL_CPC",
    "conversions_30d": 150.0,
+   "cost": 5200.0,
    "negative_count": 5
   },
   {
@@ -102,6 +104,7 @@
    "channel_type": "PERFORMANCE_MAX",
    "bidding_strategy_type": "MAXIMIZE_CONVERSION_VALUE",
    "conversions_30d": 80.0,
+   "cost": 9310.75,
    "negative_count": 0
   }
  ]

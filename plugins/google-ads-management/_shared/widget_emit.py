@@ -114,4 +114,8 @@ def emit_widget(model, spec, brand, path, *, skill_name, source_prefix=None):
             "source_id": f"{prefix}:{pr.get('account_id', '')}",
         },
     }
-    Path(path).write_text(json.dumps(widget, ensure_ascii=False))
+    # encoding pinned: ensure_ascii=False emits real non-ASCII (fr/de campaign
+    # names now survive csv_input parsing), and write_text() would otherwise
+    # encode with the host's preferred encoding (cp1252 / POSIX C locale).
+    Path(path).write_text(json.dumps(widget, ensure_ascii=False),
+                          encoding="utf-8")

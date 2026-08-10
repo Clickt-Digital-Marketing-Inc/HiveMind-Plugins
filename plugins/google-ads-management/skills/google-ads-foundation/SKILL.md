@@ -26,7 +26,8 @@ There are **no** create/update/pause/budget tools. Do not look for them.
 
 1. Call `customers_list_accessible_customers`.
 2. For each returned ID, query the `customer` resource for
-   `customer.id, customer.descriptive_name, customer.manager, customer.currency_code, customer.time_zone`.
+   `customer.id, customer.descriptive_name, customer.manager, customer.currency_code, customer.time_zone`
+   (authoritative constant: `CUSTOMER_FIELDS` in [scripts/account_fields.py](scripts/account_fields.py)).
 3. **Skip manager accounts** (`customer.manager = true`) — they hold no campaign metrics. Query
    child (client) accounts directly by their `customer_id`.
 4. If more than one client account is reachable and the user has not named one, **ask which

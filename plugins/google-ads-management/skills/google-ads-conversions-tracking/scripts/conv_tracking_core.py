@@ -151,6 +151,24 @@ def _num(v) -> float:
         return 0.0
 
 
+def _liveness_note(row: dict) -> str:
+    """Conditional-phrasing seam for recently_active trend rows (HM-603) — the
+    note the recommendation layer surfaces so a CVR-drop on a paused/idle/gone-
+    dark campaign is hedged ("confirm intent") rather than presented as a hard
+    Critical. Empty for live (nothing to caveat) and dormant (never scored)."""
+    if row.get("liveness") != "recently_active":
+        return ""
+    enabled = str(row.get("campaign_status") or "").strip().upper() == "ENABLED"
+    cur = _num(row.get("cost_curr"))
+    if not enabled and cur > 0:
+        return (f"Paused/removed mid-window after spending {cur:,.2f} — confirm intent "
+                "before acting on the trend.")
+    if enabled and cur <= 0:
+        return "Enabled but no spend in the current window — confirm it should be running."
+    return ("Spent only in the prior window — the CVR trend may be an artifact of going "
+            "dark; confirm intent.")
+
+
 # --------------------------------------------------------------------------
 # Dataset 1 — conversion-action config health (status="config")
 # --------------------------------------------------------------------------
@@ -235,6 +253,9 @@ def build_trend_universe(campaign_trend: list) -> list:
         cvr_prior = (conv_prior / clicks_prior) if scored else None
         rows.append({
             "campaign_id": c.get("campaign_id"), "campaign": c.get("campaign", ""),
+            # Raw campaign.status under a NEW key — the pipeline "status"
+            # (scored/no_benchmark) below is a different axis and must not collide.
+            "campaign_status": c.get("campaign_status", ""),
             "clicks_curr": clicks_curr, "impressions_curr": impr_curr,
             "cost_curr": _num(c.get("cost_curr")), "conversions_curr": conv_curr,
             "ctr_curr": ctr_curr, "cvr_curr": cvr_curr,
@@ -243,6 +264,14 @@ def build_trend_universe(campaign_trend: list) -> list:
             "ctr_prior": ctr_prior, "cvr_prior": cvr_prior,
             "status": "scored" if scored else "no_benchmark",
         })
+    # Campaign liveness (HM-603): three-band — this dataset carries campaign.status
+    # (campaign_status), current-window spend (cost_curr) AND prior-window spend
+    # (cost_prior), so all three bands are fully derivable. Severity is gated on
+    # live+recently_active in classify_trend; dormant rows stay present-but-tagged.
+    rows = analytics.segment_liveness(rows, status_key="campaign_status",
+                                      spend_key="cost_curr", prior_spend_key="cost_prior")
+    for r in rows:
+        r["liveness_note"] = _liveness_note(r)
     rows.sort(key=lambda r: r["cost_curr"], reverse=True)
     return rows
 
@@ -292,6 +321,13 @@ def classify_trend(universe: list, params: dict) -> list:
         flags = list(flags)
         if "cvr_drop" in flags and "ctr_held_or_up" in flags:
             flags.append("landing_page_suspect")
+        # Liveness gate (HM-603): a dormant campaign (not ENABLED, zero spend in
+        # BOTH windows) never manufactures a CVR-drop finding — flags cleared, so
+        # score 0 and tier "" follow. The row survives, tagged liveness="dormant".
+        # live + recently_active rows are scored normally (recently_active carries
+        # a liveness_note so the recommendation is hedged, not the score).
+        if r.get("liveness") == "dormant":
+            flags = []
         score = analytics.pre_score({"flags": flags}, TREND_WEIGHTS)
         rr = dict(r)
         rr["flags"] = flags
@@ -331,11 +367,27 @@ def trend_sensitivity(universe: list, params: dict, ladder: list | None = None) 
     return out
 
 
+def config_segments(config_rows: list) -> tuple[list, list]:
+    """Split the config-health rows by primary_for_goal — primary-for-goal
+    actions (which Smart Bidding optimizes toward, so they drive the health
+    framing) vs. secondary actions (listed separately, never dropped). Both
+    keep the score sort already applied by build_config_rows."""
+    primary = [r for r in config_rows if r.get("primary_for_goal")]
+    secondary = [r for r in config_rows if not r.get("primary_for_goal")]
+    return primary, secondary
+
+
 def summarize_config(config_rows: list, no_primary_action: bool) -> dict:
     flagged = [r for r in config_rows if r["verdict"] == "flag"]
+    primary, secondary = config_segments(config_rows)
     return {
         "actions": len(config_rows), "flagged": len(flagged), "clean": len(config_rows) - len(flagged),
         "no_primary_action": no_primary_action,
+        # Primary-for-goal actions drive the health framing; secondary listed with its own count.
+        "primary_actions": len(primary),
+        "primary_flagged": sum(1 for r in primary if r["verdict"] == "flag"),
+        "secondary_actions": len(secondary),
+        "secondary_flagged": sum(1 for r in secondary if r["verdict"] == "flag"),
         "dormant_primary": sum(1 for r in config_rows if "dormant_primary" in r["flags"]),
         "every_counting_lead": sum(1 for r in config_rows if "every_counting_lead" in r["flags"]),
         "legacy_attribution": sum(1 for r in config_rows if "legacy_attribution" in r["flags"]),

@@ -10,6 +10,7 @@ Exit 0 = all pass, 1 = a failure.
 """
 import json
 import re
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -21,6 +22,7 @@ sys.path.insert(0, str(HERE.parents[2] / "_shared"))  # the shared render toolki
 import pmax_listing_core as core  # noqa: E402
 
 FIXTURE = HERE / "sample-pmax-findings.json"
+EMPTY_RETAIL_FIXTURE = HERE / "sample-pmax-findings-empty-retail.json"
 _failures = []
 
 
@@ -28,6 +30,36 @@ def check(name, cond, detail=""):
     print(f"  {'PASS' if cond else 'FAIL'}  {name}" + (f"  — {detail}" if detail and not cond else ""))
     if not cond:
         _failures.append(name)
+
+
+def chart_args():
+    """`[]` when the pinned chart renderer is importable, `["--no-charts"]` when it is not.
+
+    This skill's spec DECLARES charts, and `_shared/render/bundle.py` deliberately
+    hard-fails (exit 2) when charts are declared while `vl-convert-python` is absent,
+    rather than silently shipping a chartless report. That is correct product
+    behavior — but the builder test below asserts on md/html/xlsx EMISSION, on the
+    md root-cause sentence and on the campaign-benchmark no-row-loss table, never on
+    chart SVGs, so a missing optional native wheel must not turn it red (HM-803).
+    Opting out only when the renderer is genuinely unavailable keeps the full chart
+    path under test on any machine that has the dependency `requirements.txt` pins.
+
+    The probe mirrors the guard it compensates for (`_shared/render/charts.py`'s
+    `render_chart_svg`, and `_has_vl_convert()` in the shared toolkit's own tests):
+    a REAL import, never `importlib.util.find_spec`. A dist that is locatable but
+    not importable (arch-mismatched wheel, half-extracted native extension)
+    resolves under `find_spec` while the builder still exits 2 — the exact red this
+    helper exists to remove. The selected mode is printed so a green log can be told
+    apart from a chart-blind one.
+    """
+    try:
+        import vl_convert  # noqa: F401
+        mode = []
+    except Exception:      # absent, or present-but-unimportable
+        mode = ["--no-charts"]
+    print("    chart mode: " + ("charts rendered" if not mode
+                                else "charts skipped (vl_convert unimportable)"))
+    return mode
 
 
 def test_fixture_counts():
@@ -132,6 +164,77 @@ def test_empty_universes():
                                "conversions": 0.0, "conversions_value": 0.0}]})
     check("absent partitions -> empty rows", m2["rows"] == [] and m2["summary"]["universe"] == 0)
     check("partition sensitivity computed without crash", len(m2["sensitivity"]) == len(core.FACTOR_LADDER))
+
+
+def test_empty_retail_universe_present_but_empty():
+    """HM-599: `listing_groups: []` and `products: []` (both PRESENT, both empty)
+    is a legitimate empty universe — a feedless lead-gen account — not a missing
+    source. It must load and compute cleanly, never raise FindingsError."""
+    print("test_empty_retail_universe_present_but_empty")
+    findings = core.load_findings(str(EMPTY_RETAIL_FIXTURE))
+    check("present-but-empty listing_groups/products load without error", True)
+    model = core.compute_model(findings)
+    s = model["summary"]
+    check("partitions universe == 0", s["universe"] == 0, f"got {s['universe']}")
+    check("products universe == 0", s["item"]["universe"] == 0, f"got {s['item']['universe']}")
+    check("no rows dropped/fabricated (rows == [])", model["rows"] == [])
+    check("no items dropped/fabricated (items == [])", model["items"] == [])
+    check("campaign benchmarks still present (2 rows, independent of retail feed)",
+          len(model["benchmarks"]) == 2, f"got {len(model['benchmarks'])}")
+
+    # Contrast: BOTH keys truly ABSENT (never pulled/assembled) must still be a
+    # hard load failure — only presence-with-empty-array is a valid empty universe.
+    bad = {"meta": {}, "benchmarks": []}
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "no-source-keys.json"
+        p.write_text(json.dumps(bad))
+        try:
+            core.load_findings(str(p))
+            ok = False
+        except core.FindingsError:
+            ok = True
+        check("both keys truly absent is still a hard load failure", ok)
+
+
+def test_empty_retail_builder_bundle():
+    """HM-599 acceptance: the CLI builder must exit 0 on a present-but-empty
+    retail universe, emit all declared formats, state the root cause plainly in
+    the md, and still render the campaign benchmark table (no-row-loss) in the
+    xlsx — none of the 2 benchmark rows dropped."""
+    print("test_empty_retail_builder_bundle")
+    build_script = HERE.parent / "scripts" / "build_pmax_listing_filter.py"
+    with tempfile.TemporaryDirectory() as td:
+        result = subprocess.run(
+            [sys.executable, str(build_script), "--input", str(EMPTY_RETAIL_FIXTURE),
+             "--outdir", td, "--brand", "Lead Gen Co", "--formats", "md,html,xlsx"] + chart_args(),
+            capture_output=True, text=True)
+        check("builder exits 0 on present-but-empty retail universe",
+              result.returncode == 0, f"rc={result.returncode} stderr={result.stderr}")
+        out = Path(td)
+        md_files = list(out.glob("*.md"))
+        html_files = list(out.glob("*_explorer.html"))
+        xlsx_files = list(out.glob("*.xlsx"))
+        check("md emitted", len(md_files) == 1, f"got {len(md_files)}")
+        check("html emitted", len(html_files) == 1, f"got {len(html_files)}")
+        check("xlsx emitted", len(xlsx_files) == 1, f"got {len(xlsx_files)}")
+        if not (md_files and html_files and xlsx_files):
+            return
+
+        md_text = md_files[0].read_text()
+        check("md states the root cause plainly",
+              "No retail listing groups returned" in md_text
+              and "no Merchant Center feed" in md_text and "lead-gen PMax" in md_text)
+
+        import openpyxl
+        wb = openpyxl.load_workbook(str(xlsx_files[0]), data_only=False)
+        ws = wb["Controls"]
+        bench_rows = []
+        r = 33  # aux "CAMPAIGN BENCHMARKS" start_row (pmax_listing_xlsx_spec.py)
+        while ws.cell(row=r, column=1).value not in (None, ""):
+            bench_rows.append(ws.cell(row=r, column=1).value)
+            r += 1
+        check("campaign benchmark table renders both campaigns (no-row-loss)",
+              bench_rows == ["Lead Gen - Search", "Lead Gen - PMax"], bench_rows)
 
 
 def test_dedupe_by_key():
@@ -511,12 +614,18 @@ def test_mcp_vs_csv_identical_model():
 
 def main():
     for t in (test_fixture_counts, test_no_benchmark_rows_present, test_block_boundaries_strict,
-              test_no_benchmark_campaign_blocks_both, test_empty_universes, test_dedupe_by_key,
+              test_no_benchmark_campaign_blocks_both, test_empty_universes,
+              test_empty_retail_universe_present_but_empty,
+              test_dedupe_by_key,
               test_fractional_conversions, test_sensitivity_and_near_miss_shapes,
               test_assemble_findings_from_raw, test_bundle_md_html_parity_and_lazy,
               test_tier_concentration_and_signal_strict, test_tier_signal_roas_boundary_strict,
               test_tier_signal_zero_cost_no_roas_signal, test_recommendations_grounded_in_model,
-              test_mcp_vs_csv_identical_model):
+              test_mcp_vs_csv_identical_model,
+              # runs last: reads an xlsx back with openpyxl in THIS process, which
+              # would otherwise poison test_bundle_md_html_parity_and_lazy's
+              # "did not import openpyxl" check for md/html-only builds
+              test_empty_retail_builder_bundle):
         t()
     print()
     if _failures:

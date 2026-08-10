@@ -31,6 +31,7 @@ set. The `SPEC` in `scripts/audience_spec.py` intentionally has no `html_*`/`js_
     "client_name": "...", "account_id": "...", "currency": "...",
     "window_30d": "2026-06-06 to 2026-07-05", "generated": "2026-07-05",
     "source": "mcp",
+    "metrics_granularity": "ad_group_level",
     "first_party_source": "user_csv",
     "reconciliation": {
       "audiences": {"rows": 12, "sums": {"cost": 0.0, "clicks": 0.0, "impressions": 0.0, "conversions": 0.0}},
@@ -42,7 +43,10 @@ set. The `SPEC` in `scripts/audience_spec.py` intentionally has no `html_*`/`js_
   "audiences": [
     {"campaign": "...", "ad_group": "...", "list_name": "...", "list_type": "REMARKETING",
      "bid_modifier": 1.25, "criterion_status": "ENABLED", "negative": false,
-     "impressions": 0, "clicks": 0, "cost": 0.0, "conversions": 0}
+     "impressions": 0, "clicks": 0, "cost": 0.0, "conversions": 0, "metrics_status": "joined"},
+    {"campaign": "...", "ad_group": "...", "list_name": "...", "list_type": "REMARKETING",
+     "bid_modifier": 1.0, "criterion_status": "ENABLED", "negative": false,
+     "impressions": null, "clicks": null, "cost": null, "conversions": null, "metrics_status": "manual"}
   ],
   "first_party": [
     {"category": "Enhanced Conversions", "item": "Enhanced Conversions for web enabled on the primary conversion action",
@@ -53,7 +57,16 @@ set. The `SPEC` in `scripts/audience_spec.py` intentionally has no `html_*`/`js_
 
 - `audiences` — every applied-audience criterion (`ad_group_criterion`, `type = USER_LIST`) pulled
   for the account, deduped by `(campaign, ad_group, list_name)`. `source` is `"mcp"` or
-  `"user_csv"` (honest label, never implied).
+  `"user_csv"` (honest label, never implied). `metrics_status` (`"joined"` or `"manual"`) is stamped
+  per row by the assembler — `"manual"` means no `ad_group_audience_view` row matched that
+  criterion's `ad_group.id` for the window, so `impressions`/`clicks`/`cost`/`conversions` are
+  `null` (never a fabricated `0`). Rows without a `metrics_status` field at all (legacy findings
+  predating HM-602, and every CSV-path row) default to `"joined"` — never manual.
+- `meta.metrics_granularity` — `"ad_group_level"` for the MCP two-pull path (metrics come from
+  `ad_group_audience_view`, which cannot attribute performance below the ad group), `"list_level"`
+  for the CSV path (a Google Ads UI "Audiences" export IS per-audience) and any legacy findings.
+  Surfaced in every artifact (`provenance.metrics_granularity` in the model) — see "Ad-group-level
+  metrics — the honesty contract" below.
 - `first_party` — Customer Match / Enhanced Conversions / Consent Mode v2 / CMP readiness rows.
   **Always** `first_party_source = "user_csv"` once supplied (`"not_supplied"` if the CLI's
   `--first-party-csv` was omitted) — this dataset has **no MCP path**; the Google Ads API does not
@@ -61,25 +74,68 @@ set. The `SPEC` in `scripts/audience_spec.py` intentionally has no `html_*`/`js_
   state (see `google-ads-foundation/references/artifact-formats.md`, "What the MCP cannot
   return"). Never present this data as an API-confirmed pull.
 
-## The MCP path — two GAQL pulls
+## Ad-group-level metrics — the honesty contract (HM-602)
 
-1. **Applied-audience criteria** (`ad_group_criterion`):
+`ad_group_criterion` — the resource that carries the USER_LIST identity (which list, which ad
+group, bid modifier, status, negative) — exposes **zero `metrics.*` fields** (metadata-confirmed
+live 2026-07-16: its `selectable` list contains no `metrics.*` entry at all). A single query
+combining identity and metrics against this resource, as this skill once documented, is **rejected
+outright** by the live Google Ads API with `Cannot select or filter on the following metrics: ...
+since metric is incompatible with the resource in the FROM clause`.
+
+The only Google Ads resource that reports USER_LIST performance is `ad_group_audience_view`. Its
+`selectable` list carries `metrics.*` but **no** identity fields beyond its own `resource_name` —
+joining `campaign.id`/`ad_group.id` onto it works (the same cross-resource join pattern this
+skill's pull 1 already uses for `campaign.name`/`ad_group.name` on `ad_group_criterion`), but
+`ad_group_criterion.user_list.user_list` does **not** resolve when joined onto this view in this
+MCP's GAQL implementation — verified live: the query succeeds, but the field comes back an empty
+string on every row. So metrics can only be joined at the **ad_group** grain, not the individual
+user-list grain: **every USER_LIST criterion sharing an ad group shows the SAME
+cost/clicks/impressions/conversions.**
+
+This is not a bug to work around — it is what the API actually supports, and it is disclosed
+honestly everywhere a number appears: `meta.metrics_granularity` in the findings, `provenance.
+metrics_granularity` in the model, a granularity line in `md_params`/xlsx subtitle, a plain-
+language callout in `md_narrative`, and relabeled table headers (`Cost (ad-group level)`, etc.) in
+the md row table. The **xlsx** rows-sheet column headers (`Cost`, `Conversions`, `Impressions`,
+`Clicks`, `CTR`) are NOT relabeled — the generic renderer (`_shared/render/xlsx.py`) derives
+formula ranges (`{R:Cost}`, `{C:Conversions}`, the `{COSTR}` SUMPRODUCT range) from those exact
+header strings, so renaming them would break every formula; the granularity disclosure lives in
+the xlsx subtitle and intro text instead.
+
+## The MCP path — three GAQL pulls
+
+1. **Applied-audience criteria** (`ad_group_criterion`, identity only — no metrics):
    ```
-   fields: campaign.name, ad_group.name, ad_group_criterion.type,
+   fields: campaign.name, ad_group.name, ad_group.id, ad_group_criterion.type,
            ad_group_criterion.user_list.user_list, ad_group_criterion.bid_modifier,
-           ad_group_criterion.status, ad_group_criterion.negative,
-           metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions
+           ad_group_criterion.status, ad_group_criterion.negative
    condition: ad_group_criterion.type = 'USER_LIST'
    ```
-2. **User-list names/types** (`user_list`) — GAQL cannot join `user_list.name`/`user_list.type`
-   into the `ad_group_criterion` query above (they live on a different resource), so a second,
-   cheap query resolves them:
+   (`scripts/assemble_findings.py`'s `CRITERIA_FIELDS`.)
+2. **Ad-group-level audience metrics** (`ad_group_audience_view`):
+   ```
+   fields: ad_group.id, metrics.impressions, metrics.clicks, metrics.cost_micros,
+           metrics.conversions
+   condition: segments.date BETWEEN '<window start>' AND '<window end>'
+   ```
+   (`scripts/assemble_findings.py`'s `METRICS_FIELDS`.) Joined onto pull 1 by `ad_group.id` — see
+   "Ad-group-level metrics" above for why this is the join grain. A criterion whose `ad_group.id`
+   has no matching row here gets `metrics_status = "manual"` and null metric values (never a
+   fabricated zero) — never dropped from the `audiences` array.
+3. **User-list names/types** (`user_list`) — GAQL cannot join `user_list.name`/`user_list.type`
+   into pull 1 (they live on a different resource), so a third, cheap query resolves them:
    ```
    fields: user_list.id, user_list.name, user_list.type
    ```
-   `scripts/assemble_findings.py` joins pull 2 onto pull 1 by the numeric id parsed from the
-   `ad_group_criterion.user_list.user_list` resource name. A list with no match in pull 2 keeps a
-   fallback name (`"List <id>"`) rather than being dropped.
+   (`scripts/assemble_findings.py`'s `USERLIST_FIELDS`.) Joined onto pull 1 by the numeric id
+   parsed from the `ad_group_criterion.user_list.user_list` resource name. A list with no match
+   here keeps a fallback name (`"List <id>"`) rather than being dropped.
+
+Reconciliation (`meta.reconciliation.audiences`) is embedded over the assembled `audiences` array
+(sums of `cost`/`clicks`/`impressions`/`conversions`, `null` metrics on manual rows contributing
+`0`) and stamps `raw_files` provenance for **all three** raw pulls (criteria, metrics, user_lists) —
+so any of the three files being swapped or hand-edited after assembly is caught at load time.
 
 **Never pulled**: remarketing list membership size, Customer Match match rate, Enhanced
 Conversions / Consent Mode configuration state — all API-blind; verify in the UI or supply via
@@ -148,6 +204,15 @@ Every deduped applied-audience row gets a `status`:
   signals above would manufacture false positives. Kept (never dropped) so the report can show
   which lists are attached as exclusions, letting the advisor confirm — by name, honestly, not by
   inferred semantics — that a recent-converters exclusion is actually in place.
+- **`manual`** — a targeting criterion (`negative = false`) whose ad group has no matching
+  `ad_group_audience_view` row for the window (`metrics_status = "manual"`). **Never scored** — no
+  cost/CTR/CPA exists to evaluate the signals against. `impressions`/`clicks`/`cost`/`conversions`/
+  `ctr` are all `None` in the model (`build_universe`), never `0` — the md/xlsx renderers show
+  `"—"`/a blank cell, never a fabricated zero. Excluded from every campaign benchmark
+  (`_campaign_stats` only aggregates `status == "scored"` rows) so a manual row can never distort
+  another audience's `campaign_avg_cost`/`_ctr`/`_cpa`. Kept (never dropped) — the report's summary
+  KPI and priority-breakdown table both surface the manual count so a reviewer knows exactly how
+  much of the applied-audience universe has no ad-group metrics this window.
 
 A bonus KPI, `_shared/analytics.concentration(scored_rows, "cost", top_n=3)`, reports how
 concentrated applied-audience spend is across the top 3 audiences (`top_share`, `hhi`,
@@ -187,11 +252,15 @@ auto-discovered by `skills/google-ads/tests/run_parity.py analytics-primitives`.
 
 `scripts/build_audience_report.py --formats md,xlsx` (default) emits:
 
-- `*.md` — provenance, headline KPIs, the priority breakdown table, the first-party readiness
-  table, the clean-result framing, and the full per-audience table (status/flags/score/priority;
-  no row loss).
-- `*.xlsx` — Controls (tunable weights/bars/thresholds + live COUNTIF/COUNTIFS/SUMPRODUCT
-  results) + Audiences (every row, formula-scored) + First-Party Readiness (static snapshot).
+- `*.md` — provenance (including `metrics_granularity`), headline KPIs (scored/excluded/manual
+  counts), the priority breakdown table (Critical/High/Medium/Clean/Excluded/**Manual**), the
+  first-party readiness table, the clean-result framing, the ad-group-level granularity callout
+  when applicable, and the full per-audience table (status/flags/score/priority; no row loss —
+  manual rows show `"—"` metrics, never a fabricated zero).
+- `*.xlsx` — Controls (tunable weights/bars/thresholds + live COUNTIF/COUNTIFS/SUMPRODUCT results,
+  including a Manual count) + Audiences (every row, formula-scored — manual rows get blank formula
+  cells, same treatment as excluded rows) + First-Party Readiness (static snapshot, including the
+  priority breakdown with its Manual row).
 
 Plus `*_bid_adjustments.csv` (Google Ads Editor import, via
 `google-ads-foundation/scripts/make_editor_csv.py`'s `bid_adjustments` schema) — **only** for
@@ -201,4 +270,5 @@ are **not** auto-written to the CSV: no defensible number can be assigned withou
 remarketing tier a list represents (a low-intent vs. high-intent audience should NOT get the same
 treatment, and this skill has no way to know which is which from the data alone) — those stay
 manual recommendations in the report and the advisor's conversational narration, per the honesty
-rules in SKILL.md.
+rules in SKILL.md. `manual`-status rows (no ad-group metrics) are never eligible either — the CSV
+writer already filters to `status == "scored"`.

@@ -79,6 +79,11 @@ def run_case(case) -> int:
         check(r.returncode == 0, f"[{tag}] assemble failed: {r.stderr.strip()}")
         size = whtml.stat().st_size if whtml.exists() else 1 << 30
         check(size < SIZE_CEILING, f"[{tag}] assembled widget {size}B < ceiling {SIZE_CEILING}B")
+        head = whtml.read_bytes()[:200]
+        check(head.lstrip().lower().startswith(b"<!doctype html>"),
+              f"[{tag}] assembled widget starts with <!DOCTYPE html> (HM-607 H1): {head[:40]!r}")
+        check(b'<meta charset="utf-8">' in head,
+              f"[{tag}] assembled widget declares UTF-8 charset (HM-607 H1): {head[:80]!r}")
 
         # 2) no data loss: md + xlsx carry the FULL universe
         r = subprocess.run([PY, str(build), "--input", str(fixture), "--outdir", str(td),

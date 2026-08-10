@@ -58,6 +58,10 @@ CAMPAIGNS_COLUMN_MAP = {
     "bidding_strategy_type": {"aliases": ["Bid strategy type"], "type": "str"},
     "conversions_30d": {"aliases": ["Conversions"], "type": "num"},
     "negative_count": {"aliases": ["Campaign negative keywords"], "type": "num"},
+    # 30d window spend — drives campaign liveness (HM-603). Optional: legacy
+    # exports without a Cost column degrade to 0 spend (liveness then keys off
+    # status alone), never a hard failure.
+    "cost": {"aliases": ["Cost"], "type": "num"},
 }
 CAMPAIGNS_REQUIRED = ("campaign", "status", "channel_type", "bidding_strategy_type",
                       "conversions_30d", "negative_count")
@@ -96,6 +100,7 @@ def assemble(adgroups_csv: str, campaigns_csv: str, meta: dict) -> dict:
         "status": _status(r["status"]), "channel_type": _channel_type(r["channel_type"]),
         "bidding_strategy_type": str(r["bidding_strategy_type"] or "").strip().upper().replace(" ", "_"),
         "conversions_30d": r["conversions_30d"], "negative_count": r["negative_count"],
+        "cost": r.get("cost", 0.0) or 0.0,
     } for r in camp_rows]
 
     meta = dict(meta)

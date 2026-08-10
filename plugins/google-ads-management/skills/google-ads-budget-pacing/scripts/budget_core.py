@@ -151,7 +151,28 @@ def resolve_params(raw: dict | None, meta: dict | None = None) -> dict:
     return p
 
 
-def build_rows(campaigns: list) -> list:
+def _liveness_note(row: dict) -> str:
+    """Conditional-phrasing seam for recently_active rows (HM-603) — the note the
+    advisor surfaces so a paused/idle campaign's budget advice is hedged. Empty
+    for live (nothing to caveat) and dormant (never a recommendation source).
+    Two-band degradation (prior_spend_key=None): the "prior-window only" path is
+    unreachable here, so a recently_active row is always either paused-mid-window
+    (not enabled, spent) or enabled-but-idle."""
+    if row.get("liveness") != "recently_active":
+        return ""
+    enabled = str(row.get("campaign_status") or "").strip().upper() == "ENABLED"
+    cur = _num(row.get("cost"))
+    if not enabled and cur > 0:
+        return (f"Paused/removed mid-window after spending {cur:,.2f} — "
+                "confirm intent before changing budget.")
+    if enabled and cur <= 0:
+        return ("Enabled but no spend in the window — confirm it should be "
+                "running before adjusting budget.")
+    return "Spent only in the prior window — confirm intent before changing budget."
+
+
+def build_rows(campaigns: list, analytics=None) -> list:
+    analytics = analytics or _analytics()
     rows = []
     for c in campaigns:
         cost = _num(c.get("cost"))
@@ -161,6 +182,10 @@ def build_rows(campaigns: list) -> list:
             "campaign_id": c.get("campaign_id"),
             "campaign": c.get("campaign", str(c.get("campaign_id"))),
             "channel": c.get("channel", ""),
+            # Raw campaign.status (GAQL enum / UI "Campaign state") — kept under a
+            # DISTINCT key from the pipeline "status" (measured/no_budget) so the
+            # two never collide. Feeds liveness only.
+            "campaign_status": c.get("campaign_status", ""),
             "daily_budget": daily,
             "cost": cost,
             "mtd_spend": _num(c.get("mtd_spend")),
@@ -170,12 +195,27 @@ def build_rows(campaigns: list) -> list:
             "rank_lost_is": _opt(c.get("search_rank_lost_is")),
             "status": "measured" if daily is not None else "no_budget",
         })
+    # Campaign liveness (HM-603): TWO-BAND-derivable — this skill pulls
+    # campaign.status (campaign_status) and current-window spend (cost) but NO
+    # prior-*window* spend (mtd_spend is current-month-to-date, not a prior
+    # comparable window), so prior_spend_key=None. live/recently_active/dormant
+    # are all still reachable; only the "spent only in the prior window" path is
+    # unavailable (documented — never invented). Severity/bucketing/pace is gated
+    # on live+recently_active; dormant rows stay present-but-tagged (no-row-loss).
+    rows = analytics.segment_liveness(rows, status_key="campaign_status",
+                                      spend_key="cost", prior_spend_key=None)
+    for r in rows:
+        r["liveness_note"] = _liveness_note(r)
     rows.sort(key=lambda r: r["cost"], reverse=True)
     return rows
 
 
 def classify_row(row: dict, params: dict) -> dict:
-    if row["status"] != "measured":
+    # Liveness gate (HM-603): a dormant campaign (not ENABLED, zero spend in the
+    # window) is never bucketed — it behaves like the existing non-"measured"
+    # early return, staying present-but-tagged liveness="dormant". This is the
+    # fix for the self-contradicting "Low budget on a paused campaign" headline.
+    if row.get("liveness") == "dormant" or row["status"] != "measured":
         return {"bucket": ""}
     tcpa = params["target_cpa"]
     cost, conv, daily = row["cost"], row["conversions"], row["daily_budget"]
@@ -239,6 +279,17 @@ def add_pace(rows: list, params: dict, analytics=None) -> list:
     out = []
     for r in rows:
         rr = dict(r)
+        # Liveness gate (HM-603): a dormant campaign never contributes a pace
+        # verdict, flag or score — pace is suppressed exactly like the no-budget
+        # early-out (ratio None, verdict n/a), so it stays out of the summary's
+        # over/under-pace counts and the advisor's trim list while remaining
+        # present-but-tagged. Mirrors budget_spec.JS_KERNEL's pace() dormant gate.
+        if r.get("liveness") == "dormant":
+            rr["campaign_pace_ratio"] = None
+            rr["pace_verdict"] = "n/a"
+            rr["pace_confidence"] = "low"
+            out.append(rr)
+            continue
         daily, mtd = r["daily_budget"], r["mtd_spend"]
         ratio = _r2(mtd / (daily * de)) if (daily is not None and daily > 0 and de) else None
         rr["campaign_pace_ratio"] = ratio
@@ -247,8 +298,12 @@ def add_pace(rows: list, params: dict, analytics=None) -> list:
         out.append(rr)
     flags = analytics.signals(out, _pace_rules(params))
     for rr, fl in zip(out, flags):
-        rr["pace_flags"] = fl
-        rr["pace_score"] = analytics.pre_score({"flags": fl}, PACE_FLAG_WEIGHTS)
+        if rr.get("liveness") == "dormant":
+            rr["pace_flags"] = []
+            rr["pace_score"] = 0.0
+        else:
+            rr["pace_flags"] = fl
+            rr["pace_score"] = analytics.pre_score({"flags": fl}, PACE_FLAG_WEIGHTS)
     return out
 
 
@@ -340,6 +395,9 @@ def summarize(rows: list, params: dict, analytics=None) -> dict:
         "no_budget": sum(1 for r in rows if r["status"] == "no_budget"),
         "mtd_spend": pace["mtd_spend"], "expected_mtd": pace["expected_mtd"],
         "pace_ratio": pace["pace_ratio"], "pace_verdict": pace["verdict"],
+        # Passthrough of the tunable (not derived) — lets the html KPI row show
+        # the monthly goal alongside its inline assumption marker (HM-604).
+        "monthly_goal": pace["monthly_goal"] or None,
         # Spend concentration (analytics.concentration over window `cost`, top-3).
         "conc_top_share": conc["top_share"], "conc_hhi": conc["hhi"],
         "conc_effective_n": conc["effective_n"],
@@ -388,7 +446,7 @@ def provenance(findings: dict, params: dict) -> dict:
 def compute_model(findings: dict) -> dict:
     analytics = _analytics()
     params = resolve_params(findings.get("params"), findings.get("meta"))
-    rows = build_rows(findings["campaigns"])
+    rows = build_rows(findings["campaigns"], analytics)
     classified = classify(rows, params)
     paced = add_pace(classified, params, analytics)
     return {
@@ -398,5 +456,9 @@ def compute_model(findings: dict) -> dict:
         "summary": summarize(paced, params, analytics),
         "advisor": build_advisor(paced, params),
         "goal_sensitivity": goal_sensitivity(rows, params),
+        # Pass-through so every renderer sees the assembler's meta.assumptions
+        # (HM-604 provenance/assumptions contract) and meta.source verbatim —
+        # this dict is never re-derived or re-labeled here.
+        "meta": dict(findings.get("meta") or {}),
         "_rows": rows,
     }

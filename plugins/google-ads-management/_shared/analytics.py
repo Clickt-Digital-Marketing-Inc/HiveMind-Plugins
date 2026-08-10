@@ -80,7 +80,10 @@ signals(rows, rules) -> list[list[str]]  (one flag-id list per row, in order)
   (missing data is no signal, mirroring the audit pre-scorer's skip
   discipline). eq/ne are exact float comparisons (== / !=; JS === / !==).
   Malformed rules (unknown op, missing id/key, neither value nor value_key,
-  non-finite threshold) raise ValueError — a spec bug fails loudly.
+  non-finite threshold, `mult` on an absolute `value` rule) raise ValueError —
+  a spec bug fails loudly. `mult` is meaningful ONLY in the relative form: an
+  absolute rule carrying it would silently compare against the unscaled
+  `value`, so it is rejected rather than ignored.
   xlsx: one boolean column per rule, e.g. =IF(ISNUMBER(v), v > t, FALSE).
 
 pre_score(row, weights) -> float
@@ -91,13 +94,41 @@ pre_score(row, weights) -> float
   half-up rounding domain).
   xlsx: SUMPRODUCT(flag_booleans, weights) with each flag a 0/1 column.
 
+segment_liveness(rows, *, status_key, spend_key, prior_spend_key=None)
+    -> list[dict]  (one shallow-copied row per input row, order preserved,
+                    with a "liveness" field added — never mutates the input)
+  Classifies every row into one of three liveness bands, so a scoring skill
+  can gate its severity/recommendation universe on live+recently_active and
+  leave long-dead campaigns present-but-tagged (no-row-loss) generating zero
+  recommendations. Per row, with cur = _nonneg(row[spend_key]) (current-window
+  spend), prior = _nonneg(row[prior_spend_key]) if prior_spend_key else 0
+  (prior-window spend; 0 when no prior window is available), and enabled =
+  (row[status_key] is a string that upper/strip-normalizes to "ENABLED"):
+    live            = enabled AND cur > 0
+    recently_active = any recent signal that isn't live —
+                      enabled (enabled-but-idle: cur == 0)
+                      OR cur > 0 (PAUSED/REMOVED but spent mid-window)
+                      OR prior > 0 (spend only in the prior window)
+    dormant         = NOT enabled AND cur == 0 AND prior == 0
+  Equivalent branch order (mirrored verbatim): live if enabled & cur>0; else
+  recently_active if (enabled | cur>0 | prior>0); else dormant. Spend coercion
+  is `_nonneg` (missing/None/negative/non-numeric -> 0, so "zero spend" and
+  "spend > 0" are well-defined); status coercion is exact string ==/=== after
+  upper+strip, so a non-string or non-"ENABLED" status is "not enabled".
+  Two-band degradation: when prior_spend_key is None the prior-window signal
+  can't fire (prior is always 0) — live/recently_active/dormant are still all
+  reachable, but the "spent only in the prior window" path is unavailable; a
+  skill with a single window documents this rather than inventing prior data.
+  xlsx: one text column, e.g. =IF(AND(UPPER(status)="ENABLED", cur>0), "live",
+  IF(OR(UPPER(status)="ENABLED", cur>0, prior>0), "recently_active", "dormant")).
+
 Stdlib only.
 """
 from __future__ import annotations
 
 import math
 
-__all__ = ["concentration", "signals", "pre_score", "JS_MIRROR"]
+__all__ = ["concentration", "signals", "pre_score", "segment_liveness", "JS_MIRROR"]
 
 _OPS = ("gt", "ge", "lt", "le", "eq", "ne")
 
@@ -124,6 +155,13 @@ def _nonneg(v) -> float:
 def _num(v) -> float | None:
     """Signal-operand coercion: finite number -> float, else None (no signal)."""
     return float(v) if _is_finite_number(v) else None
+
+
+def _status_enabled(v) -> bool:
+    """Liveness status coercion: a string that upper/strip-normalizes to
+    "ENABLED" -> True, anything else -> False (kernel-mirror contract; handles
+    both the GAQL enum "ENABLED" and the Google Ads UI export label "Enabled")."""
+    return isinstance(v, str) and v.strip().upper() == "ENABLED"
 
 
 def concentration(rows, value_key: str, top_n: int = 3) -> dict:
@@ -174,9 +212,14 @@ def _validate_rule(rule) -> None:
     if has_value == has_vkey:   # neither, or both
         raise ValueError("signals: rule %r needs exactly one of "
                          "'value' or 'value_key'" % (rid,))
-    if has_value and _num(rule["value"]) is None:
-        raise ValueError("signals: rule %r 'value' is not a finite number: %r"
-                         % (rid, rule["value"]))
+    if has_value:
+        if _num(rule["value"]) is None:
+            raise ValueError("signals: rule %r 'value' is not a finite number: %r"
+                             % (rid, rule["value"]))
+        if "mult" in rule:
+            raise ValueError("signals: rule %r has 'mult' but no 'value_key' "
+                             "('mult' scales a relative threshold; an absolute "
+                             "'value' rule would silently ignore it)" % (rid,))
     if has_vkey:
         if not isinstance(rule["value_key"], str) or not rule["value_key"]:
             raise ValueError("signals: rule %r 'value_key' must be a "
@@ -253,6 +296,30 @@ def pre_score(row, weights) -> float:
     return _round_half_up(score, 4)
 
 
+def segment_liveness(rows, *, status_key: str, spend_key: str,
+                     prior_spend_key: str | None = None) -> list:
+    """Annotate every row with a `liveness` band (live/recently_active/dormant).
+
+    Returns one shallow copy of each input row with `liveness` added (input
+    rows are never mutated; order preserved). See the module docstring for the
+    exact three-band contract (the kernel-mirror contract). Deterministic and
+    row-order-independent — each row's band depends only on its own fields."""
+    out = []
+    for r in (rows or []):
+        r = r or {}
+        cur = _nonneg(r.get(spend_key))
+        prior = _nonneg(r.get(prior_spend_key)) if prior_spend_key else 0.0
+        enabled = _status_enabled(r.get(status_key))
+        if enabled and cur > 0:
+            liveness = "live"
+        elif enabled or cur > 0 or prior > 0:
+            liveness = "recently_active"
+        else:
+            liveness = "dormant"
+        out.append({**r, "liveness": liveness})
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Canonical JS mirror — splice into a skill spec's `js_kernel` verbatim.
 # The parity gate (run_parity.py analytics-primitives) evaluates THIS string
@@ -268,6 +335,9 @@ function gxNonneg(v) {
 }
 function gxNum(v) {
   return (typeof v === "number" && isFinite(v)) ? v : null;
+}
+function gxStatusEnabled(v) {
+  return typeof v === "string" && v.trim().toUpperCase() === "ENABLED";
 }
 function gxConcentration(rows, valueKey, topN) {
   if (topN === undefined) topN = 3;
@@ -335,5 +405,23 @@ function gxPreScore(row, weights) {
     if (Object.prototype.hasOwnProperty.call(weights, flags[i])) score += weights[flags[i]];
   }
   return gxRoundHalfUp(score, 4);
+}
+function gxSegmentLiveness(rows, statusKey, spendKey, priorSpendKey) {
+  return (rows || []).map(function (r) {
+    r = r || {};
+    var cur = gxNonneg(r[spendKey]);
+    var prior = priorSpendKey ? gxNonneg(r[priorSpendKey]) : 0;
+    var enabled = gxStatusEnabled(r[statusKey]);
+    var liveness;
+    if (enabled && cur > 0) liveness = "live";
+    else if (enabled || cur > 0 || prior > 0) liveness = "recently_active";
+    else liveness = "dormant";
+    var out = {};
+    for (var k in r) {
+      if (Object.prototype.hasOwnProperty.call(r, k)) out[k] = r[k];
+    }
+    out.liveness = liveness;
+    return out;
+  });
 }
 """

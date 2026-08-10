@@ -34,7 +34,10 @@ def check(name, cond, detail=""):
 
 def _write(td, name, text):
     p = Path(td) / name
-    p.write_text(text)
+    # Encoding pinned: the locale fixtures below carry NBSP / narrow-NBSP and
+    # csv_input reads with utf-8-sig — a platform-default encoding here would
+    # write a different file, or raise, on a non-utf-8 machine (HM-778).
+    p.write_text(text, encoding="utf-8")
     return str(p)
 
 
@@ -238,6 +241,246 @@ def test_typed_conversion():
         check("percent -> fraction", abs(r["ctr"] - 0.123) < 1e-12)
 
 
+# A Google Ads UI export from an fr/de-locale account: no-break-space
+# thousands groups (U+00A0 on the money column, U+202F — the group separator
+# current CLDR gives fr-FR — on the counts), comma decimals, and a percent
+# column with a no-break space before the sign. Before HM-778 EVERY numeric
+# cell here parsed to 0.0 with no CsvInputError, and reconcile.build derived
+# its control totals from the same zeroed rows, so reconcile.verify passed on
+# a $0 account. This fixture exists to be able to express that failure: strip
+# the NBSPs out of it and it stops testing anything.
+_LOCALE_CSV = (
+    "Search term,Campaign,Cost,Clicks,Conversions,CTR\n"
+    'chaussures acme,Marque,"1 234,56","2 048","12,5","3,5 %"\n'
+    'bottes pas cher,Generique,"987,00","1 024","0","2,1 %"\n'
+    # The summary row the fr UI writes below the data: the label is localized
+    # too, and fr spaces the colon. Its cells are real numbers now, so a
+    # filter that only knows "total:" leaks the row in and DOUBLES every
+    # control total below (build and verify would agree on the inflated sum).
+    'Total : tous les termes,,"2 221,56","3 072","12,5","2,8 %"\n'
+)
+
+# The same leak in German, where the label never matched at all.
+_LOCALE_CSV_DE = (
+    "Search term,Campaign,Cost,Clicks,Conversions,CTR\n"
+    'acme schuhe,Marke,"1.234,56","2 048","12,5","3,5 %"\n'
+    'Gesamt: Konto,,"1.234,56","2 048","12,5","3,5 %"\n'
+)
+
+
+def test_locale_number_formats():
+    """HM-778: fr/de number formatting parses to real values, not silent 0.0.
+
+    Also hard-asserts, on top of `check()`: this file's checks only accumulate
+    into `_failures` (honest under `main()`, green under a bare pytest
+    collection), and a regression test for a silent-zeroing bug must be red
+    under every runner.
+    """
+    print("test_locale_number_formats")
+    _before = len(_failures)
+
+    # -- the issue's named criterion, and the rest of the no-break-space family
+    check("NBSP thousands + dot decimal (the HM-778 case)",
+          C._num("1 234.56") == 1234.56, repr(C._num("1 234.56")))
+    check("NBSP thousands + comma decimal (fr money)",
+          C._num("1 234,56") == 1234.56, repr(C._num("1 234,56")))
+    check("narrow NBSP thousands (U+202F, current fr-FR group separator)",
+          C._num("1 234,56") == 1234.56, repr(C._num("1 234,56")))
+    check("thin space thousands (U+2009)",
+          C._num("1 234,56") == 1234.56, repr(C._num("1 234,56")))
+    check("plain space thousands",
+          C._num("1 234,56") == 1234.56, repr(C._num("1 234,56")))
+    check("NBSP in a count column",
+          C._num("2 048") == 2048.0, repr(C._num("2 048")))
+    check("dot-grouped comma-decimal money (de)",
+          C._num("1.234,56") == 1234.56, repr(C._num("1.234,56")))
+    check("negative keeps its sign",
+          C._num("-1 234,56") == -1234.56, repr(C._num("-1 234,56")))
+    check("fr percent cell -> fraction",
+          abs(C._pct("12,3 %") - 0.123) < 1e-12, repr(C._pct("12,3 %")))
+
+    # -- en forms this module already handled: unchanged, or the fix regressed
+    for raw, want in (("1,234.56", 1234.56), ("5,000", 5000.0),
+                      ("1,234,567", 1234567.0), ("CA$1,023.31", 1023.31),
+                      ("$5", 5.0), ("12.3%", 12.3), ("1.234", 1.234),
+                      ("--", 0.0), ("", 0.0)):
+        check(f"en form unchanged: {raw!r} -> {want}", C._num(raw) == want,
+              repr(C._num(raw)))
+    check("en percent -> fraction unchanged",
+          abs(C._pct("12.3%") - 0.123) < 1e-12, repr(C._pct("12.3%")))
+    # Documented, deliberate limitation (see _clean_separators / HM-785):
+    # a dot-grouped de integer is read as an en decimal.
+    check("dot-only stays the en decimal reading (documented limitation)",
+          C._num("1.234") == 1.234, repr(C._num("1.234")))
+
+    # -- separator/currency shapes the first pass got wrong (R17 gate findings)
+    check("comma decimal with 3+ places is a decimal, not a group (fr CVR)",
+          C._num("1,2345") == 1.2345, repr(C._num("1,2345")))
+    check("comma decimal with 4 places after a group-sized head",
+          C._num("1234,5678") == 1234.5678, repr(C._num("1234,5678")))
+    check("a single ',' + exactly 3 digits stays the en group reading",
+          C._num("1,234") == 1234.0, repr(C._num("1,234")))
+    check("two or more dots is unambiguously grouping, not a parse failure",
+          C._num("1.234.567") == 1234567.0, repr(C._num("1.234.567")))
+    check("three dot groups too",
+          C._num("12.345.678") == 12345678.0, repr(C._num("12.345.678")))
+    check("euro prefix (the very locales this fix targets)",
+          C._num("\u20ac1 234,56") == 1234.56, repr(C._num("\u20ac1 234,56")))
+    check("euro suffix",
+          C._num("1 234,56 \u20ac") == 1234.56, repr(C._num("1 234,56 \u20ac")))
+    check("pound prefix",
+          C._num("\u00a31,234.56") == 1234.56, repr(C._num("\u00a31,234.56")))
+
+    # -- _pct's unsigned branch. `_num` no longer strips the comma, so '0,9'
+    # is 0.9 and takes the already-a-fraction branch exactly as its en twin
+    # '0.9' does (pre-HM-778 it parsed as 9.0 and came back 0.09). That is a
+    # real output change on such cells, and the intended one: pin both.
+    check("pct: unsigned comma-decimal below 1 is already a fraction",
+          C._pct("0,9") == 0.9, repr(C._pct("0,9")))
+    check("pct: its en twin reads identically",
+          C._pct("0.9") == 0.9, repr(C._pct("0.9")))
+
+    # -- parse_num is the public form skills reuse instead of cloning it
+    check("parse_num(default=None): absent stays missing, not a false 0.0",
+          C.parse_num("--", None) is None and C.parse_num("", None) is None,
+          repr(C.parse_num("--", None)))
+    check("parse_num(default=None): unparseable ('Shared') stays missing",
+          C.parse_num("Shared", None) is None, repr(C.parse_num("Shared", None)))
+    check("parse_num(default=None): locale cells parse exactly like _num",
+          C.parse_num("1 234,56", None) == C._num("1 234,56") == 1234.56,
+          repr(C.parse_num("1 234,56", None)))
+    check("parse_num's default default is the 'num' column default (0.0)",
+          C.parse_num("--") == 0.0, repr(C.parse_num("--")))
+
+    # -- end to end: the export must assemble to real values AND real totals
+    with tempfile.TemporaryDirectory() as td:
+        rows, findings = C.assemble_from_csv(
+            _write(td, "fr_export.csv", _LOCALE_CSV), COLUMN_MAP, REQUIRED,
+            RECONCILE_SPEC, meta=dict(META))
+        check("locale export: both rows kept", len(rows) == 2, repr(rows))
+        check("locale export: NBSP money parsed",
+              [r["cost"] for r in rows] == [1234.56, 987.0], repr(rows))
+        check("locale export: NBSP counts parsed",
+              [r["clicks"] for r in rows] == [2048.0, 1024.0], repr(rows))
+        check("locale export: comma-decimal conversions parsed",
+              [r["conversions"] for r in rows] == [12.5, 0.0], repr(rows))
+        check("locale export: percent column -> fraction",
+              abs(rows[0]["ctr"] - 0.035) < 1e-12, repr(rows[0]["ctr"]))
+        check("locale export: no numeric cell silently zeroed",
+              all(r[f] > 0 for r in rows for f in ("cost", "clicks")),
+              repr(rows))
+        rec = findings["meta"]["reconciliation"]["search_terms"]
+        check("locale export: control totals are the real totals",
+              abs(rec["sums"]["cost"] - 2221.56) < 1e-9
+              and abs(rec["sums"]["clicks"] - 3072.0) < 1e-9, repr(rec))
+        R.verify(findings, {"search_terms": RECONCILE_SPEC["sums"]})
+        check("locale export: findings pass reconcile.verify", True)
+
+        rows_de, findings_de = C.assemble_from_csv(
+            _write(td, "de_export.csv", _LOCALE_CSV_DE), COLUMN_MAP, REQUIRED,
+            RECONCILE_SPEC, meta=dict(META))
+        check("de export: the 'Gesamt: ...' summary row is dropped",
+              len(rows_de) == 1, repr(rows_de))
+        check("de export: control totals are not doubled by a leaked total row",
+              abs(findings_de["meta"]["reconciliation"]["search_terms"]
+                  ["sums"]["cost"] - 1234.56) < 1e-9,
+              repr(findings_de["meta"]["reconciliation"]))
+
+    new = _failures[_before:]
+    assert not new, ("HM-778 locale parsing regressed: " + ", ".join(new))
+
+
+def test_comma_three_digit_decimals():
+    """HM-794: a single comma + exactly 3 fractional digits is a decimal wherever
+    it is DECIDABLE, not a blanket en thousands group.
+
+    R17 (573dbee) already fixed the >3-fractional-digit case ('1,2345' -> 1.2345)
+    by grouping only on `,\\d{3}$`. That guard was still too wide: it grouped
+    '0,125' -> 125.0 and '1 234,125' -> 1234125.0, inflating fr/de decimal
+    columns 1000x while reconcile.verify still passed on the inflated rows (the
+    silent-agreement mode HM-778 fixed for the under-read direction). This pins
+    the two decidable fixes, the boundaries around them, and the ONE irreducible
+    ambiguous core that stays the en reading (HM-785). Hard-asserts, like the
+    HM-778 test, so it is red under every runner.
+    """
+    print("test_comma_three_digit_decimals")
+    _before = len(_failures)
+
+    # -- DECIDABLE decimals the pre-HM-794 guard mis-grouped
+    check("leading zero -> decimal (no locale groups a value < 1000)",
+          C._num("0,125") == 0.125, repr(C._num("0,125")))
+    check("leading zero, 4 fractional -> decimal",
+          C._num("0,1234") == 0.1234, repr(C._num("0,1234")))
+    check(">=4 leading digits -> decimal, not a 1000x group",
+          C._num("1234,125") == 1234.125, repr(C._num("1234,125")))
+    check("5 leading digits -> decimal",
+          C._num("12345,678") == 12345.678, repr(C._num("12345,678")))
+    # fr/de space-grouped decimal: parse_num strips the space (incl. the NBSP
+    # family) BEFORE _clean_separators, leaving a >=4-digit head -> decidable.
+    for label, sep in (("plain space", " "), ("NBSP U+00A0", " "),
+                       ("narrow NBSP U+202F", " "),
+                       ("thin space U+2009", " ")):
+        cell = f"1{sep}234,125"
+        check(f"space-grouped fr decimal ({label}) -> 1234.125",
+              C._num(cell) == 1234.125, repr(C._num(cell)))
+
+    # -- the ONE irreducible ambiguous core: stays the en group reading (HM-785)
+    check("irreducible core '1,234' stays the en group reading (1234)",
+          C._num("1,234") == 1234.0, repr(C._num("1,234")))
+    check("3-leading-digit core '123,456' stays the en group reading",
+          C._num("123,456") == 123456.0, repr(C._num("123,456")))
+    check("2-leading-digit core '10,500' stays the en group reading",
+          C._num("10,500") == 10500.0, repr(C._num("10,500")))
+
+    # -- BOUNDARIES (move the constant and one of these flips):
+    #    frac-length: '1,56' (2) decimal | '1,234' (3) group | '1,2345' (4) dec
+    check("boundary frac<3: '1,56' -> 1.56 (decimal)",
+          C._num("1,56") == 1.56, repr(C._num("1,56")))
+    check("boundary frac>3: '1,2345' -> 1.2345 (decimal, R17)",
+          C._num("1,2345") == 1.2345, repr(C._num("1,2345")))
+    #    head-length: '999,456' (3) group | '1000,456' (4) decimal
+    check("boundary head=3: '999,456' -> 999456.0 (en group core)",
+          C._num("999,456") == 999456.0, repr(C._num("999,456")))
+    check("boundary head=4: '1000,456' -> 1000.456 (decimal)",
+          C._num("1000,456") == 1000.456, repr(C._num("1000,456")))
+    #    leading-zero: '0,456' decimal | '1,456' group
+    check("boundary leading-zero: '0,456' -> 0.456 (decimal)",
+          C._num("0,456") == 0.456, repr(C._num("0,456")))
+
+    # -- multi-comma stays unambiguous grouping (guarded by the count==1 gate)
+    check("two commas still group ('1,234,567')",
+          C._num("1,234,567") == 1234567.0, repr(C._num("1,234,567")))
+
+    # -- end to end: an fr export whose money column is space-grouped WITH 3
+    # decimals ('1 234,125') and whose conv-rate is a leading-zero fraction
+    # ('0,125') must assemble to the REAL values, and reconcile.verify must pass
+    # on the real (un-inflated) totals. Pre-HM-794 cost read 1234125.0.
+    cmap = {"term": {"aliases": ["Search term"], "type": "str"},
+            "campaign": {"aliases": ["Campaign"], "type": "str"},
+            "cost": {"aliases": ["Cost"], "type": "num"},
+            "conversions": {"aliases": ["Conversions"], "type": "num"}}
+    req = ("term", "campaign", "cost", "conversions")
+    spec = {"array": "rows", "sums": ["cost", "conversions"]}
+    fr = ("Search term,Campaign,Cost,Conversions\n"
+          'chaussures,Marque,"1 234,125","0,125"\n'
+          'bottes,Generique,"12 345,678","1,5"\n')
+    with tempfile.TemporaryDirectory() as td:
+        rows, findings = C.assemble_from_csv(_write(td, "fr.csv", fr), cmap,
+                                             req, spec, meta=dict(META))
+        check("fr 3-decimal money not inflated 1000x",
+              [r["cost"] for r in rows] == [1234.125, 12345.678], repr(rows))
+        check("fr leading-zero conv rate is a fraction",
+              rows[0]["conversions"] == 0.125, repr(rows[0]["conversions"]))
+        rec = findings["meta"]["reconciliation"]["rows"]["sums"]
+        check("reconcile totals are the real (un-inflated) totals",
+              abs(rec["cost"] - 13579.803) < 1e-9, repr(rec))
+        R.verify(findings, {"rows": spec["sums"]})
+        check("fr export findings pass reconcile.verify", True)
+
+    new = _failures[_before:]
+    assert not new, ("HM-794 comma-decimal parsing regressed: " + ", ".join(new))
+
+
 def test_contract_validation():
     print("test_contract_validation")
     with tempfile.TemporaryDirectory() as td:
@@ -264,11 +507,23 @@ def test_contract_validation():
               msg or "")
 
 
+# ── the pytest binding (added by HM-791; the checks above are untouched) ────
+# check() only APPENDS to _failures, so under pytest every test_* function
+# above passes whatever it observed. Defined LAST so pytest (definition order)
+# runs it after them, and it is what actually makes a failed check red here.
+# See also ../conftest.py for the order/selection-independent guard.
+def test_no_check_failures():
+    assert not _failures, (
+        f"{len(_failures)} failed check(s): " + ", ".join(_failures)
+    )
+
+
 def main():
     for t in (test_csv_matches_mcp_shape, test_aliased_headers,
               test_missing_columns, test_ambiguous_columns,
               test_empty_and_missing_file, test_extra_columns_and_total_rows,
-              test_typed_conversion, test_contract_validation):
+              test_typed_conversion, test_locale_number_formats,
+              test_comma_three_digit_decimals, test_contract_validation):
         t()
     print()
     if _failures:

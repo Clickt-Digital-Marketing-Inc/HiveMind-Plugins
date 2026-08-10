@@ -6,11 +6,13 @@
 Covers the fixture's documented priority tiers, no-row-loss (audiences +
 first_party), dedupe-by-(campaign, ad_group, list_name), the excluded/negative
 never-scored path, first-party gap/severity text-matching (including the
-row_type default), the empty-input edges, the MCP raw-pull assembler
-(transcription firewall: micros conversion, reconciliation round-trip +
-tamper rejection), the CSV path (both datasets) via audience_csv.py, MCP-vs-
-CSV parity, and the md-only bundle (lazy openpyxl). Exit 0 = all pass, 1 = a
-failure.
+row_type default), the empty-input edges, the MCP two-pull raw-pull assembler
+(transcription firewall: micros conversion, ad_group.id join, the unjoinable-
+criterion -> status='manual' path, reconciliation round-trip + tamper
+rejection), the CSV path (both datasets) via audience_csv.py, MCP-vs-CSV
+parity, the reduced (md+xlsx) bundle build from findings carrying a manual
+row plus an xlsx soffice-recalc scan for error literals, and the md-only
+bundle (lazy openpyxl). Exit 0 = all pass, 1 = a failure.
 """
 from __future__ import annotations
 
@@ -174,50 +176,74 @@ def test_assemble_findings_from_raw():
     print("test_assemble_findings_from_raw")
     import tempfile
     import assemble_findings as A
+    # Pull 1 — identity only. No metrics.* fields (ad_group_criterion cannot
+    # carry them — the whole point of the HM-602 two-pull redesign).
     raw_criteria = {"result": [
-        {"campaign.name": "C1", "ad_group.name": "AG1", "ad_group_criterion.type": "USER_LIST",
+        {"campaign.name": "C1", "ad_group.name": "AG1", "ad_group.id": "9001",
+         "ad_group_criterion.type": "USER_LIST",
          "ad_group_criterion.user_list.user_list": "customers/1/userLists/111",
          "ad_group_criterion.bid_modifier": 1.25, "ad_group_criterion.status": "enabled",
-         "ad_group_criterion.negative": False, "metrics.impressions": 2000, "metrics.clicks": 40,
-         "metrics.cost_micros": 30_000_000, "metrics.conversions": 2},
+         "ad_group_criterion.negative": False},
         # bid_modifier present but null in this row (the API's "unset" shape) ->
-        # the assembler must default it to 1.0
-        {"campaign.name": "C1", "ad_group.name": "AG1", "ad_group_criterion.type": "USER_LIST",
+        # the assembler must default it to 1.0. This ad group has NO matching
+        # pull-2 row -> must come back status='manual', never dropped.
+        {"campaign.name": "C1", "ad_group.name": "AG2", "ad_group.id": "9002",
+         "ad_group_criterion.type": "USER_LIST",
          "ad_group_criterion.user_list.user_list": "customers/1/userLists/222",
          "ad_group_criterion.bid_modifier": None, "ad_group_criterion.status": "PAUSED",
-         "ad_group_criterion.negative": False, "metrics.impressions": 0, "metrics.clicks": 0,
-         "metrics.cost_micros": 0, "metrics.conversions": 0},
+         "ad_group_criterion.negative": False},
         # a criterion type the pull's condition should have excluded — defensively skipped
-        {"campaign.name": "C1", "ad_group.name": "AG1", "ad_group_criterion.type": "KEYWORD",
+        {"campaign.name": "C1", "ad_group.name": "AG1", "ad_group.id": "9001",
+         "ad_group_criterion.type": "KEYWORD",
          "ad_group_criterion.user_list.user_list": "", "ad_group_criterion.bid_modifier": None,
-         "ad_group_criterion.status": "ENABLED", "ad_group_criterion.negative": False,
-         "metrics.impressions": 0, "metrics.clicks": 0, "metrics.cost_micros": 0, "metrics.conversions": 0},
+         "ad_group_criterion.status": "ENABLED", "ad_group_criterion.negative": False},
+    ]}
+    # Pull 2 — ad-group-level metrics (ad_group_audience_view). Only AG1 (9001)
+    # has a row; AG2 (9002) has none -> its criterion joins to nothing.
+    raw_metrics = {"result": [
+        {"ad_group.id": "9001", "metrics.impressions": 2000, "metrics.clicks": 40,
+         "metrics.cost_micros": 30_000_000, "metrics.conversions": 2},
     ]}
     raw_userlists = {"result": [
         {"user_list.id": "111", "user_list.name": "Cart abandoners 7d", "user_list.type": "REMARKETING"},
         # 222 deliberately absent -> the assembler must fall back to "List 222", not drop the row
     ]}
     meta = {"client_name": "T", "account_id": "1", "currency": "CAD", "window_30d": "w30",
-            "generated": "2026-07-05"}
+            "generated": "2026-07-05", "metrics_granularity": "ad_group_level"}
     with tempfile.TemporaryDirectory() as td:
         pc = Path(td) / "criteria.txt"; pc.write_text(json.dumps(raw_criteria))
+        pm = Path(td) / "metrics.txt"; pm.write_text(json.dumps(raw_metrics))
         pu = Path(td) / "userlists.txt"; pu.write_text(json.dumps(raw_userlists))
-        f = A.assemble(str(pc), str(pu), dict(meta))
+        f = A.assemble(str(pc), str(pm), str(pu), dict(meta))
         check("KEYWORD row skipped, two USER_LIST rows kept", len(f["audiences"]) == 2, f"{len(f['audiences'])}")
         a1 = next(r for r in f["audiences"] if r["list_name"] == "Cart abandoners 7d")
         check("micros converted (30_000_000 -> 30.0)", a1["cost"] == 30.0, f"{a1['cost']}")
         check("list_type resolved from the user_list pull", a1["list_type"] == "REMARKETING")
         check("status upper-cased ('enabled' -> 'ENABLED')", a1["criterion_status"] == "ENABLED")
+        check("joined row stamped metrics_status='joined'", a1["metrics_status"] == "joined")
         a2 = next(r for r in f["audiences"] if r["list_name"] == "List 222")
         check("unresolved list name falls back to 'List <id>' (never dropped)", a2 is not None)
         check("missing bid_modifier in the raw pull defaults to 1.0", a2["bid_modifier"] == 1.0)
+        check("unjoined row stamped metrics_status='manual', null metrics (never a fabricated zero)",
+              a2["metrics_status"] == "manual" and a2["cost"] is None and a2["conversions"] is None,
+              f"{a2}")
 
         rec = f["meta"]["reconciliation"]
-        check("reconciliation embedded with raw stamps",
-              rec["audiences"]["rows"] == 2 and len(rec.get("raw_files", [])) == 2)
+        check("reconciliation embedded with raw stamps (3 raw files: criteria, metrics, user_lists)",
+              rec["audiences"]["rows"] == 2 and len(rec.get("raw_files", [])) == 3,
+              f"{rec}")
+        check("meta stamps ad_group_level granularity",
+              f["meta"]["metrics_granularity"] == "ad_group_level")
         fp = Path(td) / "findings.json"; fp.write_text(json.dumps(f))
-        core.load_findings(str(fp))
+        loaded = core.load_findings(str(fp))
         check("assembled findings pass core verification", True)
+        model = core.compute_model(loaded)
+        m2 = next(r for r in model["rows"] if r["list_name"] == "List 222")
+        check("unjoined criterion classified status='manual' in the model, never scored",
+              m2["status"] == "manual" and m2["score"] is None and m2["priority"] == "",
+              f"{m2}")
+        check("model provenance carries ad_group_level granularity",
+              model["provenance"]["metrics_granularity"] == "ad_group_level")
         f["audiences"][0]["cost"] += 500
         fp.write_text(json.dumps(f))
         try:
@@ -268,6 +294,139 @@ def test_csv_path_and_mcp_parity():
           f"{fp_model['summary']}")
 
 
+def test_bundle_with_manual_rows_and_xlsx_recalc():
+    print("test_bundle_with_manual_rows_and_xlsx_recalc")
+    import tempfile
+    import assemble_findings as A
+    import audience_spec as spec_mod
+    import audience_xlsx_spec as xspec
+    from render import xlsx as xlsxmod
+    from openpyxl import load_workbook
+
+    raw_criteria = {"result": [
+        {"campaign.name": "C1", "ad_group.name": "AG1", "ad_group.id": "9001",
+         "ad_group_criterion.type": "USER_LIST",
+         "ad_group_criterion.user_list.user_list": "customers/1/userLists/111",
+         "ad_group_criterion.bid_modifier": 1.25, "ad_group_criterion.status": "ENABLED",
+         "ad_group_criterion.negative": False},
+        {"campaign.name": "C1", "ad_group.name": "AG2", "ad_group.id": "9002",
+         "ad_group_criterion.type": "USER_LIST",
+         "ad_group_criterion.user_list.user_list": "customers/1/userLists/222",
+         "ad_group_criterion.bid_modifier": 1.0, "ad_group_criterion.status": "ENABLED",
+         "ad_group_criterion.negative": False},
+    ]}
+    raw_metrics = {"result": [
+        {"ad_group.id": "9001", "metrics.impressions": 2000, "metrics.clicks": 40,
+         "metrics.cost_micros": 30_000_000, "metrics.conversions": 2},
+        # 9002 deliberately absent -> its criterion carries status='manual'
+    ]}
+    raw_userlists = {"result": [
+        {"user_list.id": "111", "user_list.name": "Cart abandoners 7d", "user_list.type": "REMARKETING"},
+        {"user_list.id": "222", "user_list.name": "Site visitors 30d", "user_list.type": "REMARKETING"},
+    ]}
+    meta = {"client_name": "Manual Rows Co", "account_id": "1-2-3", "currency": "USD",
+            "window_30d": "2026-06-06 to 2026-07-05", "generated": "2026-07-16"}
+    with tempfile.TemporaryDirectory() as td:
+        pc = Path(td) / "criteria.txt"; pc.write_text(json.dumps(raw_criteria))
+        pm = Path(td) / "metrics.txt"; pm.write_text(json.dumps(raw_metrics))
+        pu = Path(td) / "userlists.txt"; pu.write_text(json.dumps(raw_userlists))
+        findings = A.assemble(str(pc), str(pm), str(pu), dict(meta))
+        fp = Path(td) / "findings.json"; fp.write_text(json.dumps(findings))
+        model = core.compute_model(core.load_findings(str(fp)))
+        check("model has 1 scored + 1 manual row",
+              model["summary"]["scored"] == 1 and model["summary"]["manual"] == 1,
+              f"{model['summary']}")
+
+        spec = dict(spec_mod.SPEC); spec["xlsx"] = xspec.XLSX
+        from render import build_bundle
+        written = build_bundle(model, spec, td, formats=("md", "xlsx"))
+        check("md + xlsx built from a findings file carrying a manual row",
+              len(written) == 2, f"{written}")
+        md_path = next(p for p in written if p.suffix == ".md")
+        md = md_path.read_text()
+        check("md flags the manual row honestly ('manual' status appears in the row table)",
+              "| C1 | AG2 | Site visitors 30d |" in md and "manual" in md, "row/status text missing")
+        check("md carries the ad-group-level granularity note",
+              "ad-group level" in md, "granularity note missing from md")
+
+        xlsx_path = next(p for p in written if p.suffix == ".xlsx")
+        wb = load_workbook(str(xlsx_path), data_only=False)
+        check("xlsx opens cleanly after LibreOffice normalize", wb is not None)
+        rows_ws = wb["Audiences"]
+        headers = [c.value for c in rows_ws[1]]
+        status_col = headers.index("Status") + 1
+        cost_col = headers.index("Cost") + 1
+        priority_col = headers.index("Priority") + 1
+        statuses = [rows_ws.cell(row=r, column=status_col).value for r in range(2, rows_ws.max_row + 1)]
+        check("xlsx Audiences sheet carries a 'manual' status row", "manual" in statuses, statuses)
+        manual_row_idx = statuses.index("manual") + 2
+        check("manual row's Cost cell is genuinely blank (never a fabricated zero)",
+              rows_ws.cell(row=manual_row_idx, column=cost_col).value is None,
+              rows_ws.cell(row=manual_row_idx, column=cost_col).value)
+        check("manual row's Priority formula column is blank (never scored, same as excluded)",
+              rows_ws.cell(row=manual_row_idx, column=priority_col).value is None,
+              rows_ws.cell(row=manual_row_idx, column=priority_col).value)
+
+        wb_v = load_workbook(str(xlsx_path), data_only=True)
+        for sheet in wb_v.sheetnames:
+            for row in wb_v[sheet].iter_rows():
+                for cell in row:
+                    v = cell.value
+                    if isinstance(v, str) and v.startswith("#"):
+                        check(f"no xlsx error literal in {sheet}!{cell.coordinate}: {v!r}", False)
+        check("xlsx recalc produced no #VALUE!/#REF!/#DIV/0! literals (soffice-cached values scanned)", True)
+
+
+# The md-only build is asserted to be openpyxl-free. `"openpyxl" not in sys.modules`
+# is a claim about PROCESS-GLOBAL state, so it is only meaningful in an interpreter
+# that has done nothing else: run in-process it silently reports on whichever module
+# happened to import openpyxl first, which under a whole-plugin `pytest` run is some
+# other skill's xlsx test (HM-803). The probe therefore builds the md bundle in a
+# fresh interpreter and reports the import verdict back as JSON — order-independent
+# and selection-independent, so it holds under pytest, under `pytest <this file>`,
+# and under the standalone runner alike. It imports the same module surface the
+# in-process test file imports at module scope — audience_core, audience_csv,
+# audience_spec and the render toolkit — so a hard openpyxl dependency added to
+# any of them is still caught (the deleted in-process check covered them all).
+_LAZY_OPENPYXL_PROBE = """
+import json, sys, tempfile
+sys.path.insert(0, sys.argv[1])   # <skill>/scripts
+sys.path.insert(0, sys.argv[2])   # _shared (the render toolkit)
+import audience_core as core
+import audience_csv                # noqa: F401 — module-scope surface of the skill
+import audience_spec as spec_mod
+from render import build_bundle
+model = core.compute_model(core.load_findings(sys.argv[3]))
+formats = tuple(f for f in sys.argv[4].split(",") if f)
+with tempfile.TemporaryDirectory() as td:
+    build_bundle(model, dict(spec_mod.SPEC), td, formats=formats)
+print(json.dumps({"openpyxl_imported": "openpyxl" in sys.modules}))
+"""
+
+
+def _md_build_imported_openpyxl(formats=("md",)):
+    """True/False from a fresh interpreter, or None if the probe itself failed.
+
+    None is never treated as a pass — the caller reports probe breakage under its
+    own check name and only an explicit False satisfies the laziness claim.
+    """
+    import subprocess
+    scripts, shared = HERE.parent / "scripts", HERE.parents[2] / "_shared"
+    for p in (scripts, shared, FIXTURE):
+        if not p.exists():          # a tree move must not read as a laziness regression
+            return None, f"probe path missing: {p}"
+    probe = subprocess.run(
+        [sys.executable, "-B", "-c", _LAZY_OPENPYXL_PROBE,
+         str(scripts), str(shared), str(FIXTURE), ",".join(formats)],
+        capture_output=True, text=True)
+    if probe.returncode != 0 or not probe.stdout.strip():
+        return None, f"probe rc={probe.returncode} stderr={probe.stderr.strip()}"
+    try:
+        return json.loads(probe.stdout.strip().splitlines()[-1])["openpyxl_imported"], ""
+    except Exception as exc:  # unparseable stdout is a failed probe, not a pass
+        return None, f"probe stdout unparseable ({exc}): {probe.stdout!r}"
+
+
 def test_bundle_md_lazy_no_openpyxl():
     print("test_bundle_md_lazy_no_openpyxl")
     import tempfile
@@ -286,15 +445,25 @@ def test_bundle_md_lazy_no_openpyxl():
     check("md surfaces the 'user_csv' honesty label nowhere it isn't true "
           "(fixture has no first_party_source key -> 'not_supplied')",
           "not_supplied" not in md or True)  # sanity: doesn't crash rendering meta.first_party_source
-    check("building md did not import openpyxl", "openpyxl" not in sys.modules)
+    imported, probe_detail = _md_build_imported_openpyxl(formats=("md",))
+    # Probe breakage (an unrelated import-time error, no subprocess) is reported
+    # separately: a broken probe must not read as a laziness regression (HM-803 gate).
+    check("openpyxl laziness probe ran in a fresh interpreter", imported is not None,
+          probe_detail)
+    if imported is not None:
+        check("building md did not import openpyxl", imported is False,
+              "the md-only build pulled openpyxl into sys.modules")
     check("written artifact is the md file", len(written) == 1 and written[0].suffix == ".md")
 
 
 def main():
+    # test_bundle_md_lazy_no_openpyxl checks its claim in a subprocess (HM-803),
+    # so it no longer depends on running before any xlsx-building test; the
+    # declaration order below is kept only because it reads well.
     for t in (test_fixture_priorities, test_no_row_loss, test_dedupe_audiences,
               test_bid_modifier_default, test_first_party_gap_and_row_type, test_empty_findings,
               test_assemble_findings_from_raw, test_csv_path_and_mcp_parity,
-              test_bundle_md_lazy_no_openpyxl):
+              test_bundle_md_lazy_no_openpyxl, test_bundle_with_manual_rows_and_xlsx_recalc):
         t()
     print()
     if _failures:

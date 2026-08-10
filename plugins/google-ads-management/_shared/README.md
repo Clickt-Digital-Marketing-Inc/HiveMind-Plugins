@@ -113,13 +113,19 @@ COLUMN_MAP = {
 - Matching is normalized (case-insensitive, whitespace-collapsed, BOM/quotes
   stripped); a parenthesised header suffix is tolerated (`Cost (CAD)` matches
   alias `Cost`, but `Cost per click` does not).
-- Types: `str` (default), `num` (float; tolerates thousands separators,
-  currency prefixes, `%`, and absent markers `''`/`--`/dashes → 0.0), `pct`
-  (percent-scale column → fraction: `12.3%` → 0.123).
+- Types: `str` (default), `num` (float; locale-tolerant — group/decimal
+  separators in either order (`1,234.56`, `1.234,56`), no-break-space groups
+  (U+00A0/U+202F/U+2009), currency symbols on either side, `%`, and absent
+  markers `''`/`--`/dashes → 0.0), `pct` (percent-scale column → fraction:
+  `12.3%` → 0.123). The one undecidable cell shape, a single-dot `1.234`
+  (en decimal vs de group), keeps the en reading — tracked in HM-785.
+  `csv_input.parse_num(v, default)` is the public form: reuse it, never
+  re-derive a local number parser.
 - Missing required columns and ambiguous mappings raise `CsvInputError`
   naming the fields, the offending columns, and the accepted aliases.
 - UI-export quirks handled: title rows above the real header (defensive
   header-row scan anchored on `required_fields`), `Total: ...` summary rows
+  (localized labels too: `Total : ...`, `Gesamt: ...`; the colon is required)
   dropped, extra unmapped columns ignored, UTF-8 BOM.
 - When a real export uses a header spelling that isn't mapped yet, add it to
   the alias list **and a fixture test**, and append the lesson to the Lessons
@@ -214,6 +220,7 @@ functions + JS strings — **a spec never imports openpyxl**.
 |---|---|---|
 | `slug_prefix`, `title` | all | filename stem + report title (required) |
 | `methodology_ref` | md | path to the skill's authoritative reference doc |
+| `methodology_note` | md | optional footer sentence about the metric methodology; defaults to a generic `metrics.conversions` note |
 | `md_params(model)` | md | extra provenance-table rows `[(label, value)]` |
 | `md_kpis(model)` | md | headline bullets `[(label, value_str)]` |
 | `md_narrative(model)` | md | optional prose lines (e.g. the "0/0 is clean" block) |
@@ -279,9 +286,53 @@ the Python and JS kernels in sync.
 `waste_filter_core.py` (model/kernel) → `waste_filter_spec.py` (md/html spec) +
 `waste_filter_xlsx_spec.py` (xlsx layout) → `build_waste_filter.py` (thin CLI).
 
+## `tests/fixtures/gaql_schema_2026-07.json` — the GAQL schema fixture (HM-606)
+
+A recorded snapshot of `mcp__google-ads-mcp__metadata_get_resource_metadata`
+for every Google Ads resource the plugin queries — reduced to
+`{selectable, filterable, sortable}` field-name lists per resource, with a
+`recorded` date and a customer-independence caveat. It's the ground truth
+`skills/google-ads/tests/test_gaql_schema.py` checks every skill's `*_FIELDS`
+constant against, so a documented pull can't silently drift from what the
+live API actually accepts.
+
+**Recorded resources:** `campaign`, `campaign_budget`, `ad_group`,
+`ad_group_ad`, `ad_group_criterion`, `ad_group_audience_view`,
+`campaign_criterion`, `keyword_view`, `search_term_view`, `conversion_action`,
+`user_list`, `asset_group`, `asset_group_product_group_view`,
+`asset_group_listing_group_filter`, `shopping_performance_view`, `customer`.
+`campaign_budget` is recorded separately from `campaign` because GAQL selects
+`campaign_budget.*` fields via an implicit join FROM `campaign`, but the
+metadata tool only lists a resource's *own* fields — a field's dotted prefix
+names the resource to check it against, not the skill's declared `FROM`
+resource (see the test module docstring for the full routing rule).
+
+**Refresh procedure** (do this if the fixture's `recorded` date is more than
+~6 months old, a live query errors with an unexpected "field not selectable"
+message, or a new resource needs adding):
+
+1. For each resource above (plus any new one), call
+   `mcp__google-ads-mcp__metadata_get_resource_metadata` with that
+   `resource_name`. Results are large and may auto-save to `tool-results/*.txt`
+   — do **not** read them into the model's context; process them with a
+   script.
+2. Each result is already exactly `{"resource", "selectable", "filterable",
+   "sortable"}` — no further reduction needed beyond collecting the 15–16
+   objects and sorting each array for a stable diff.
+3. Rebuild the fixture: `{"recorded": "<today, YYYY-MM-DD>", "caveat": "...",
+   "source": "mcp__google-ads-mcp__metadata_get_resource_metadata (live,
+   per-resource)", "resources": {<resource>: {selectable, filterable,
+   sortable}, ...}}`. Keep the caveat wording (customer-independent, but can
+   drift release-to-release).
+4. Re-run `python3 skills/google-ads/tests/test_gaql_schema.py` — a field a
+   skill declares that the new snapshot no longer selects is a real API
+   change, not a test bug; fix the skill's constant and SKILL.md, don't just
+   silence the test.
+
 ## Tests
 
 ```
 python3 _shared/render/tests/test_render_toolkit.py      # toolkit invariants
 python3 skills/google-ads-keywords-search-terms/tests/test_filter.py
+python3 skills/google-ads/tests/test_gaql_schema.py       # GAQL field-list <-> live schema
 ```

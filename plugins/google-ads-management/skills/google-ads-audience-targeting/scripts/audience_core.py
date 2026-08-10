@@ -9,13 +9,21 @@ The findings-JSON input contract is documented authoritatively in
 Two independent datasets, one findings JSON:
 
   audiences   — applied-audience criteria (ad_group_criterion, type=USER_LIST)
-                with performance metrics. SCORED via `_shared/analytics`
+                joined (by ad_group.id, in scripts/assemble_findings.py) onto
+                AD-GROUP-LEVEL metrics from ad_group_audience_view (the
+                Google Ads API exposes zero metrics.* fields on
+                ad_group_criterion itself — see references/
+                audience-targeting-filter.md). SCORED via `_shared/analytics`
                 (signals -> pre_score -> a priority tier), benchmarked against
                 each audience's OWN campaign (mean cost, weighted-mean CTR
                 over that campaign's scored audiences — no separate benchmark
                 pull). Negative/exclusion criteria are never scored (status
                 "excluded" — kept for coverage visibility, e.g. confirming a
-                recent-converters exclusion list is actually attached).
+                recent-converters exclusion list is actually attached). A
+                criterion whose ad group has no matching ad_group_audience_view
+                row in the window is never dropped either: status "manual",
+                null metric values (never a fabricated zero) — the assembler
+                stamps this per-row via `metrics_status`.
   first_party — Customer Match / Enhanced Conversions / Consent Mode v2 / CMP
                 readiness. ALWAYS user-supplied (CSV/manual) — this is not in
                 the Google Ads API. Every row carries a `status` of "manual"
@@ -177,7 +185,11 @@ def _akey(r: dict) -> tuple:
 def dedupe_audiences(audiences: list) -> list:
     """Merge rows sharing (campaign, ad_group, list_name): SUM the four metric
     fields, keep the first non-metric values (bid_modifier/status/type/
-    negative should not legitimately differ for the same criterion)."""
+    negative/metrics_status should not legitimately differ for the same
+    criterion). Metrics are summed as floats regardless of metrics_status —
+    None is treated as 0.0 here for safe arithmetic; build_universe() below is
+    what turns a 'manual' (unjoined) row's displayed metrics back into null
+    rather than a fabricated zero."""
     merged: dict = {}
     order: list = []
     for r in audiences or []:
@@ -189,6 +201,11 @@ def dedupe_audiences(audiences: list) -> list:
                 "bid_modifier": _num_or(r.get("bid_modifier"), 1.0),
                 "criterion_status": str(r.get("criterion_status", "") or "").upper(),
                 "negative": bool(r.get("negative", False)),
+                # Default "joined" — legacy/CSV-path findings that predate the
+                # two-pull MCP redesign (HM-602) carry no metrics_status field
+                # at all, and their metrics ARE real (CSV export is per-row,
+                # or a pre-HM-602 single-pull fixture) — never manual.
+                "metrics_status": str(r.get("metrics_status") or "joined"),
                 "impressions": 0.0, "clicks": 0.0, "cost": 0.0, "conversions": 0.0,
             }
             order.append(k)
@@ -202,12 +219,24 @@ def dedupe_audiences(audiences: list) -> list:
 
 def build_universe(audiences: list) -> list:
     """Every deduped applied-audience row, annotated with a status. Nothing
-    dropped. status = 'scored' (targeting criterion) or 'excluded' (negative/
-    exclusion criterion — never classified, kept for coverage visibility)."""
+    dropped. status:
+      'excluded' — negative/exclusion criterion, never classified.
+      'manual'   — a targeting criterion whose ad group has no matching
+                   ad_group_audience_view row (metrics_status != "joined");
+                   metrics are null (never a fabricated zero), never scored.
+      'scored'   — a targeting criterion with ad-group-level metrics."""
     universe = []
     for a in dedupe_audiences(audiences):
-        impr, clicks = a["impressions"], a["clicks"]
         negative = bool(a["negative"])
+        has_metrics = a["metrics_status"] == "joined"
+        impr = a["impressions"] if has_metrics else None
+        clicks = a["clicks"] if has_metrics else None
+        cost = round(a["cost"], 6) if has_metrics else None
+        conversions = round(a["conversions"], 6) if has_metrics else None
+        ctr = None
+        if has_metrics:
+            ctr = (clicks / impr) if impr else 0.0
+        status = "excluded" if negative else ("scored" if has_metrics else "manual")
         universe.append({
             "campaign": a["campaign"], "ad_group": a["ad_group"],
             "list_name": a["list_name"] or "(unnamed list)",
@@ -215,13 +244,13 @@ def build_universe(audiences: list) -> list:
             "bid_modifier": round(a["bid_modifier"], 4),
             "criterion_status": a["criterion_status"] or "UNKNOWN",
             "negative": negative,
-            "impressions": impr, "clicks": clicks,
-            "cost": round(a["cost"], 6), "conversions": round(a["conversions"], 6),
-            "ctr": (clicks / impr) if impr else 0.0,
+            "impressions": impr, "clicks": clicks, "cost": cost, "conversions": conversions,
+            "ctr": ctr,
             "is_paused": 1.0 if a["criterion_status"] == "PAUSED" else 0.0,
-            "status": "excluded" if negative else "scored",
+            "metrics_status": a["metrics_status"],
+            "status": status,
         })
-    universe.sort(key=lambda r: r["cost"], reverse=True)
+    universe.sort(key=lambda r: r["cost"] or 0, reverse=True)
     return universe
 
 
@@ -407,6 +436,13 @@ def provenance(findings: dict, params: dict) -> dict:
         # path. Never presented as an API pull when it wasn't one.
         "source": meta.get("source", "mcp"),
         "first_party_source": meta.get("first_party_source", "not_supplied"),
+        # Honest granularity label (HM-602): "ad_group_level" for the MCP
+        # two-pull path (ad_group_audience_view is the only grain the API
+        # supports for this join — metrics are shared across every USER_LIST
+        # criterion on the same ad group); "list_level" for the CSV path (a
+        # Google Ads UI "Audiences" export IS per-audience) and any legacy
+        # findings that predate HM-602.
+        "metrics_granularity": meta.get("metrics_granularity", "list_level"),
         "params": dict(params),
     }
 
@@ -414,6 +450,7 @@ def provenance(findings: dict, params: dict) -> dict:
 def summarize(classified: list, first_party: list) -> dict:
     scored = [r for r in classified if r["status"] == "scored"]
     excluded = [r for r in classified if r["status"] == "excluded"]
+    manual = [r for r in classified if r["status"] == "manual"]
     critical = [r for r in scored if r["priority"] == "Critical"]
     high = [r for r in scored if r["priority"] == "High"]
     medium = [r for r in scored if r["priority"] == "Medium"]
@@ -426,6 +463,7 @@ def summarize(classified: list, first_party: list) -> dict:
         "total_audiences": len(classified),
         "scored": len(scored),
         "excluded": len(excluded),
+        "manual": len(manual),
         "critical": len(critical), "high": len(high), "medium": len(medium), "clean": len(clean),
         "flagged_cost": round(sum(r["cost"] for r in scored if r["priority"] != ""), 2),
         "spend_top3_share": conc["top_share"],

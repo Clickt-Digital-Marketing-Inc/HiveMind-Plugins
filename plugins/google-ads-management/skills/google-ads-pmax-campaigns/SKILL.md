@@ -34,12 +34,15 @@ metrics.cost_micros, metrics.conversions, metrics.conversions_value`. Convert
 `cost_micros / 1e6` to currency; `conversions_value` is already in currency. Full
 GAQL, the conversion/ROAS convention, and the findings-JSON schema are in
 [references/pmax-momentum-filter.md](references/pmax-momentum-filter.md).
+Authoritative constant: `WINDOW_FIELDS` in
+[scripts/assemble_findings.py](scripts/assemble_findings.py).
 
 Two more OPTIONAL pulls power the asset-group concentration + cannibalization
 diagnostics (last-14d snapshots, not last/prev pairs): `resource = "asset_group"`
-for the campaign's asset-group breakdown, and `resource = "campaign"` filtered to
-`SEARCH` for the Search-side cannibalization pairing. Full GAQL in the reference
-doc's "M1.4 (optional) — the two structural pulls".
+for the campaign's asset-group breakdown (constant: `ASSET_GROUP_FIELDS`), and
+`resource = "campaign"` filtered to `SEARCH` for the Search-side cannibalization
+pairing (reuses `WINDOW_FIELDS`). Full GAQL in the reference doc's "M1.4
+(optional) — the two structural pulls".
 
 **Dual input.** This skill also accepts a user-supplied Google Ads UI CSV export
 instead of the MCP (`scripts/assemble_findings_csv.py`) — run google-ads-foundation's

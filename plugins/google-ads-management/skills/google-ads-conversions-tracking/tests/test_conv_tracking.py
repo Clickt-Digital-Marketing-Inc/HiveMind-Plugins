@@ -31,9 +31,9 @@ def test_fixture_counts():
     print("test_fixture_counts")
     model = core.compute_model(core.load_findings(str(FIXTURE)))
     s = model["summary"]
-    check("campaigns == 6", s["campaigns"] == 6, f"got {s['campaigns']}")
+    check("campaigns == 7", s["campaigns"] == 7, f"got {s['campaigns']}")
     check("scored == 5", s["scored"] == 5, f"got {s['scored']}")
-    check("no_benchmark == 1", s["no_benchmark"] == 1, f"got {s['no_benchmark']}")
+    check("no_benchmark == 2", s["no_benchmark"] == 2, f"got {s['no_benchmark']}")
     check("critical == 1", s["critical"] == 1, f"got {s['critical']}")
     check("high == 1", s["high"] == 1, f"got {s['high']}")
     check("watch == 2", s["watch"] == 2, f"got {s['watch']}")
@@ -41,6 +41,12 @@ def test_fixture_counts():
     check("landing_page_suspect == 1", s["landing_page_suspect"] == 1, f"got {s['landing_page_suspect']}")
     check("config_actions == 6", s["config_actions"] == 6, f"got {s['config_actions']}")
     check("config_flagged == 4", s["config_flagged"] == 4, f"got {s['config_flagged']}")
+    check("config_primary_actions == 3", s["config_primary_actions"] == 3, f"got {s['config_primary_actions']}")
+    check("config_primary_flagged == 2", s["config_primary_flagged"] == 2, f"got {s['config_primary_flagged']}")
+    check("config_secondary_actions == 3", s["config_secondary_actions"] == 3, f"got {s['config_secondary_actions']}")
+    check("config_secondary_flagged == 2", s["config_secondary_flagged"] == 2, f"got {s['config_secondary_flagged']}")
+    check("primary+secondary == total actions",
+          s["config_primary_actions"] + s["config_secondary_actions"] == s["config_actions"])
     check("config_no_primary_action is False", s["config_no_primary_action"] is False)
     check("manual_checks == 2", s["manual_checks"] == 2, f"got {s['manual_checks']}")
     check("manual_user_confirmed == 2", s["manual_user_confirmed"] == 2, f"got {s['manual_user_confirmed']}")
@@ -99,12 +105,16 @@ def test_no_benchmark_row_present():
     print("test_no_benchmark_row_present")
     model = core.compute_model(core.load_findings(str(FIXTURE)))
     nb = [r for r in model["rows"] if r["status"] == "no_benchmark"]
-    check("exactly one no_benchmark row", len(nb) == 1, f"got {len(nb)}")
-    check("no_benchmark row has empty tier", nb and nb[0]["tier"] == "")
-    check("no_benchmark row can still carry non-relative flags (thin_volume)",
-          nb and "thin_volume" in nb[0]["flags"], nb[0]["flags"] if nb else None)
-    check("no_benchmark row never fires a relative (prior-window) flag",
-          nb and "cvr_drop" not in nb[0]["flags"] and "ctr_held_or_up" not in nb[0]["flags"])
+    by_id = {r["campaign_id"]: r for r in model["rows"]}
+    # Two no_benchmark rows: 105 (live, still carries thin_volume) and the dormant
+    # row 107 (flags cleared by the liveness gate but never dropped).
+    check("two no_benchmark rows", len(nb) == 2, f"got {len(nb)}")
+    live_nb = by_id[105]
+    check("live no_benchmark row has empty tier", live_nb["tier"] == "")
+    check("live no_benchmark row can still carry non-relative flags (thin_volume)",
+          "thin_volume" in live_nb["flags"], live_nb["flags"])
+    check("live no_benchmark row never fires a relative (prior-window) flag",
+          "cvr_drop" not in live_nb["flags"] and "ctr_held_or_up" not in live_nb["flags"])
 
 
 def test_empty_universe():
@@ -128,24 +138,24 @@ def test_assemble_findings_from_raw():
          "conversion_action.type": "PURCHASE", "conversion_action.category": "PURCHASE",
          "conversion_action.primary_for_goal": True, "conversion_action.counting_type": "ONE_PER_CLICK",
          "conversion_action.attribution_model_settings.attribution_model": "GOOGLE_SEARCH_ATTRIBUTION_DATA_DRIVEN",
-         "metrics.conversions": 40},
+         "metrics.all_conversions": 40},
         # same id split across two raw rows (e.g. by a segment) -> must merge
         {"conversion_action.id": 1, "conversion_action.name": "Purchase", "conversion_action.status": "ENABLED",
          "conversion_action.type": "PURCHASE", "conversion_action.category": "PURCHASE",
          "conversion_action.primary_for_goal": True, "conversion_action.counting_type": "ONE_PER_CLICK",
          "conversion_action.attribution_model_settings.attribution_model": "GOOGLE_SEARCH_ATTRIBUTION_DATA_DRIVEN",
-         "metrics.conversions": 5},
+         "metrics.all_conversions": 5},
     ]}
     curr_raw = {"result": [
-        {"campaign.id": 9, "campaign.name": "C9", "metrics.clicks": 100, "metrics.impressions": 2000,
-         "metrics.cost_micros": 50_000_000, "metrics.conversions": 8},
+        {"campaign.id": 9, "campaign.name": "C9", "campaign.status": "ENABLED", "metrics.clicks": 100,
+         "metrics.impressions": 2000, "metrics.cost_micros": 50_000_000, "metrics.conversions": 8},
     ]}
     prior_raw = {"result": [
-        {"campaign.id": 9, "campaign.name": "C9", "metrics.clicks": 90, "metrics.impressions": 1800,
-         "metrics.cost_micros": 45_000_000, "metrics.conversions": 10},
+        {"campaign.id": 9, "campaign.name": "C9", "campaign.status": "ENABLED", "metrics.clicks": 90,
+         "metrics.impressions": 1800, "metrics.cost_micros": 45_000_000, "metrics.conversions": 10},
         # a campaign that only ran in the prior window -> no-row-loss via the join
-        {"campaign.id": 10, "campaign.name": "C10-paused", "metrics.clicks": 40, "metrics.impressions": 900,
-         "metrics.cost_micros": 20_000_000, "metrics.conversions": 3},
+        {"campaign.id": 10, "campaign.name": "C10-paused", "campaign.status": "PAUSED", "metrics.clicks": 40,
+         "metrics.impressions": 900, "metrics.cost_micros": 20_000_000, "metrics.conversions": 3},
     ]}
     meta = {"client_name": "T", "account_id": "1", "currency": "CAD",
             "window_curr": "wc", "window_prior": "wp", "generated": "2026-07-12"}
@@ -190,14 +200,14 @@ def test_mcp_vs_csv_identical_model_shape():
          "conversion_action.type": "PURCHASE", "conversion_action.category": "PURCHASE",
          "conversion_action.primary_for_goal": True, "conversion_action.counting_type": "ONE_PER_CLICK",
          "conversion_action.attribution_model_settings.attribution_model": "GOOGLE_SEARCH_ATTRIBUTION_DATA_DRIVEN",
-         "metrics.conversions": 40},
+         "metrics.all_conversions": 40},
     ]}
-    curr_raw = {"result": [{"campaign.id": 9, "campaign.name": "C9", "metrics.clicks": 100,
-                            "metrics.impressions": 2000, "metrics.cost_micros": 50_000_000,
-                            "metrics.conversions": 8}]}
-    prior_raw = {"result": [{"campaign.id": 9, "campaign.name": "C9", "metrics.clicks": 90,
-                             "metrics.impressions": 1800, "metrics.cost_micros": 45_000_000,
-                             "metrics.conversions": 10}]}
+    curr_raw = {"result": [{"campaign.id": 9, "campaign.name": "C9", "campaign.status": "ENABLED",
+                            "metrics.clicks": 100, "metrics.impressions": 2000,
+                            "metrics.cost_micros": 50_000_000, "metrics.conversions": 8}]}
+    prior_raw = {"result": [{"campaign.id": 9, "campaign.name": "C9", "campaign.status": "ENABLED",
+                             "metrics.clicks": 90, "metrics.impressions": 1800,
+                             "metrics.cost_micros": 45_000_000, "metrics.conversions": 10}]}
     meta = {"client_name": "T", "account_id": "1", "currency": "CAD",
             "window_curr": "wc", "window_prior": "wp", "generated": "2026-07-12"}
     with tempfile.TemporaryDirectory() as td:
@@ -228,6 +238,54 @@ def test_mcp_vs_csv_identical_model_shape():
               set(m1["rows"][0].keys()) == set(m2["rows"][0].keys()))
 
 
+def test_liveness_gating():
+    print("test_liveness_gating")
+    # Three-band coverage: this dataset carries campaign_status + current + prior
+    # spend, so live / recently_active / dormant are all derivable. Each row is
+    # given a would-be CVR drop (cvr_curr << cvr_prior) so the gate's effect is
+    # visible: the dormant row is zeroed despite it, the recently_active row is
+    # still scored (only its recommendation is hedged, via liveness_note).
+    f = {"meta": {"currency": "CAD"}, "conversion_actions": [], "manual_checks": [],
+         "campaign_trend": [
+            {"campaign_id": 1, "campaign": "Live", "campaign_status": "ENABLED",
+             "clicks_curr": 100, "impressions_curr": 2000, "cost_curr": 500.0, "conversions_curr": 5,
+             "clicks_prior": 100, "impressions_prior": 2000, "cost_prior": 480.0, "conversions_prior": 50},
+            {"campaign_id": 2, "campaign": "Paused mid-window", "campaign_status": "PAUSED",
+             "clicks_curr": 100, "impressions_curr": 2000, "cost_curr": 200.0, "conversions_curr": 5,
+             "clicks_prior": 100, "impressions_prior": 2000, "cost_prior": 0.0, "conversions_prior": 50},
+            # Dormant: not ENABLED, zero spend in BOTH windows — yet it has a real
+            # CVR "drop" (clicks with zero cost). The liveness gate must zero it.
+            {"campaign_id": 3, "campaign": "Dormant with a CVR drop", "campaign_status": "REMOVED",
+             "clicks_curr": 100, "impressions_curr": 2000, "cost_curr": 0.0, "conversions_curr": 1,
+             "clicks_prior": 100, "impressions_prior": 2000, "cost_prior": 0.0, "conversions_prior": 50},
+         ]}
+    model = core.compute_model(f)
+    rows = {r["campaign_id"]: r for r in model["rows"]}
+    check("every campaign survives (no-row-loss)", len(model["rows"]) == 3, f"got {len(model['rows'])}")
+    check("live band", rows[1]["liveness"] == "live", rows[1]["liveness"])
+    check("paused-mid-window -> recently_active", rows[2]["liveness"] == "recently_active", rows[2]["liveness"])
+    check("removed + zero spend both windows -> dormant", rows[3]["liveness"] == "dormant", rows[3]["liveness"])
+    # (a) dormant row present + tagged, zeroed even though its CVR dropped
+    check("dormant row tier empty", rows[3]["tier"] == "", rows[3]["tier"])
+    check("dormant row score 0", rows[3]["score"] == 0.0, rows[3]["score"])
+    check("dormant row no flags (cleared despite the CVR drop)", rows[3]["flags"] == [], rows[3]["flags"])
+    check("dormant row has empty note", rows[3]["liveness_note"] == "")
+    # (b) recently_active row is STILL scored (tier computed) + carries a note
+    check("paused-mid-window row still scored (tier computed)",
+          rows[2]["tier"] in ("Critical", "High", "Watch"), rows[2]["tier"])
+    check("paused-mid-window row flags a CVR drop", "cvr_drop" in rows[2]["flags"], rows[2]["flags"])
+    check("recently_active row carries a conditional liveness_note",
+          "confirm intent" in rows[2]["liveness_note"] and "spending 200.00" in rows[2]["liveness_note"],
+          rows[2]["liveness_note"])
+    check("live row has no note", rows[1]["liveness_note"] == "", rows[1]["liveness_note"])
+    check("live row still scored", rows[1]["tier"] in ("Critical", "High", "Watch"), rows[1]["tier"])
+    # (c) html_embed trend rows carry liveness + liveness_note
+    import conv_tracking_spec as spec_mod
+    emb = spec_mod.html_embed(model)["rows"]
+    check("html embed carries liveness + liveness_note on every row",
+          all("liveness" in r and "liveness_note" in r for r in emb))
+
+
 def test_bundle_md_html_parity_and_lazy():
     print("test_bundle_md_html_parity_and_lazy")
     import re
@@ -249,7 +307,16 @@ def test_bundle_md_html_parity_and_lazy():
     check("md row table has every campaign", len(md_rows) == n, f"{len(md_rows)} vs {n}")
     check("html embeds every campaign (in-play envelope == scored, matches trend rows count)",
           html_rows == n, f"{html_rows} vs {n}")
-    check("md has the config-health section", "## Conversion-action config health" in md)
+    check("md has the primary config-health section",
+          "## Conversion-action config health — primary-for-goal actions" in md)
+    check("md has the secondary config-health section",
+          "## Conversion-action config health — secondary actions" in md)
+    check("md labels counts as all conversions (incl. secondary)",
+          "All conv. (incl. secondary)" in md)
+    check("md carries the corrected all_conversions methodology line",
+          "`metrics.all_conversions`" in md and "all conversions including" in md)
+    check("md no longer carries the false primary metrics.conversions claim",
+          "account's primary `metrics.conversions`" not in md)
     check("md has the manual EC/Consent-Mode section",
           "## Enhanced Conversions / Consent Mode (manual)" in md)
     blob = C.vendor_blob()
@@ -263,11 +330,29 @@ def test_bundle_md_html_parity_and_lazy():
     check("building md/html did not import openpyxl", "openpyxl" not in sys.modules)
 
 
+def test_tier_counts_chart_truncates_labels():
+    """The cost-vs-benchmark bar chart's x-axis must truncate/hide campaign
+    labels at high cardinality (HM-607 H2) — asserted on the built Vega-Lite
+    spec (both the static SVG path and the live explorer read this same
+    declaration, so one check covers both render paths)."""
+    print("test_tier_counts_chart_truncates_labels")
+    import conv_tracking_spec as spec_mod
+    from render import charts as C
+    decl = next(c for c in spec_mod.SPEC["charts"] if c["id"] == "tier_counts")
+    vl = C.build_vl_spec(decl)
+    axis = vl["encoding"]["x"].get("axis", {})
+    check("x axis declares labelLimit (truncates long campaign names)",
+          isinstance(axis.get("labelLimit"), int) and axis["labelLimit"] > 0, axis)
+    check("x axis declares labelOverlap (hides colliding labels at ~100 rows)",
+          axis.get("labelOverlap") in ("greedy", "parity", True), axis)
+
+
 def main():
     for t in (test_fixture_counts, test_no_row_loss_both_datasets, test_config_health_flags,
               test_manual_checks_honesty, test_no_benchmark_row_present, test_empty_universe,
               test_assemble_findings_from_raw, test_mcp_vs_csv_identical_model_shape,
-              test_bundle_md_html_parity_and_lazy):
+              test_liveness_gating, test_bundle_md_html_parity_and_lazy,
+              test_tier_counts_chart_truncates_labels):
         t()
     print()
     if _failures:

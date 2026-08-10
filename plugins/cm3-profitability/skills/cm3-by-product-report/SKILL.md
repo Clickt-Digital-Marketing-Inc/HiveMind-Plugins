@@ -1,270 +1,193 @@
 ---
 name: cm3-by-product-report
-description: Generate a per-product CM3 contribution-margin report from a Google Ads "Shopping products" CSV (optionally enriched with a Shopify "Gross profit by product" CSV). Default output is the locked 3-format analytical bundle from one compute pass — (1) an Obsidian-ready .md doc, (2) a self-contained interactive HTML explorer, and (3) a detailed Clickt-branded multi-tab .xlsx; the 7-slide executive .pptx deck is opt-in (--pptx). Segments every product into 5 CM3 bands (Excellent / High / Average / Low / Poor) and rolls up by Campaign, every Category level (L1–L5), every Product type level (L1–L5), and Vendor.
+description: Generate a protected CM3 profitability report remotely from a required Google Ads Shopping CSV and optional Shopify Gross profit by product CSV. Use when the user wants product-level contribution-margin metrics and expiring Markdown, HTML, and XLSX artifacts without exposing CSV rows or proprietary compute to the agent.
 ---
 
-# CM3 by Product — Report Generator (md + HTML explorer + xlsx; pptx opt-in)
+# CM3 by Product — protected remote workflow
 
-You are running the `cm3-by-product-report` skill. Your job: locate (or
-collect) two CSVs plus four variable-cost assumptions, then call the bundled
-`cm3_by_product.py` script — which produces the locked 3-format bundle from a
-single compute pass:
+Guide the user through the frozen CM3 remote contract. The agent selects files
+and assumptions; the protected service performs every parse, calculation,
+finding, and render. The only distributed executable used by this workflow is
+[`remote_workflow.py`](remote_workflow.py), a stdlib-only metadata, validation,
+and direct-upload helper.
 
-1. **Obsidian Markdown** (`.md`) — provenance frontmatter, KPI + band tables,
-   callouts, a full no-row-loss product table, and a `## Charts` section of
-   static SVGs written to `{stem}_charts/` next to the md (revenue by CM3 band
-   + revenue-vs-CM3% scatter, rendered at the run's parameters).
-2. **Interactive HTML explorer** (`_explorer.html`) — self-contained (zero
-   external refs); tune shipping/processing/fixed costs and the band cutoffs and
-   the whole report re-bands live — the top-line KPIs, the by-band table, the
-   charts, the **rollups** (By Campaign / By Vendor / By Category L1–L5 / By
-   Product Type L1–L5, switched by a pill nav), and every product row all
-   recompute from the same rows on every control change. It carries every report
-   tab the xlsx does, plus a Methodology panel. The embedded JS matches the
-   Python model (pinned by a jsdom rollup-parity harness).
-3. **Detailed Excel** (`.xlsx`) — Clickt-branded multi-tab workbook,
-   LibreOffice-normalized so it opens reliably in Excel.
+Contract: `HiveMind CM3 Protected Compute Remote Contract` version `1.0`, frozen
+at `hivemind-compute-mcp@d32ba711b146ea73a801b806e950eeee94549051`.
 
-The **7-slide executive `.pptx` deck is opt-in** — pass `--pptx` (or an explicit
-`--output-pptx` path). It is not in the default bundle.
+## Non-negotiable boundary
 
-The compute logic, CSV parsing, COGS lookup, banding, rollups, and all the
-writers live in `cm3_by_product.py` (+ `cm3_html.py` for the explorer). **Do NOT
-recompute CM3 in Claude's head. Do NOT pre-parse either CSV.** The script is the
-authoritative implementation.
+- Never open, preview, parse, sample, summarize, attach, paste, base64-encode, or
+  put either CSV into a prompt, MCP argument, transcript, log, or model output.
+- Never call a local CM3 parser, compute module, findings engine, renderer,
+  template, workbook builder, chart bundle, or legacy report command. There is
+  no local fallback. If the remote service is unavailable, stop with the safe
+  guidance in [`references/remote-workflow.md`](references/remote-workflow.md).
+- CSV bytes travel only from the local file handle to the presigned HTTPS PUT.
+  MCP JSON contains filename, byte size, SHA-256, role, job ID, and assumptions.
+- Do not print signed upload URLs, credential values, raw service exceptions,
+  object keys, request dumps, filesystem paths, or response files. Artifact
+  download URLs may be shown only in the final result and expire after one hour.
 
-## Operating procedure
+Legacy local implementation files remain in this repository temporarily for
+the HM-888 cutover. Their presence is not permission to execute or describe
+them, and this skill does not reference them as an alternate path.
 
-Execute these steps in order. Do not skip ahead.
+## 1. Preflight
 
-### Step 1 — Look for the two CSVs in the current workspace
+Confirm both MCP tools are available:
 
-Glob the cwd for both inputs:
+- `cm3_prepare_uploads`
+- `cm3_generate_report`
 
-- **Google Ads Shopping products CSV** — match any of: `*shopping*products*.csv`,
-  `*google*ads*.csv`.
-- **Shopify Gross profit by product CSV** (optional) — match any of:
-  `*gross*profit*product*.csv`, `*shopify*gross*.csv`.
+Confirm the MCP client has the service URL and service-issued credential in its
+private connection/secret configuration. Never ask the user to paste a key.
+See [`references/remote-workflow.md`](references/remote-workflow.md) for the
+credential, network, and temporary-file rules.
 
-If exactly one file matches each glob, use it. If multiple match, show the user
-the matches and ask which to use.
+If either tool is absent or authentication fails, stop. Do not attempt local
+generation.
 
-### Step 2 — If the Google Ads CSV is missing, ask for it (verbatim)
+## 2. Locate inputs without reading rows
 
-```
-I need your Google Ads Shopping products CSV. To export: Google Ads → Reports → Predefined reports → Shopping → Shopping products → set date range → Download → CSV. Drop the file into this folder (or paste an absolute path) and tell me when it's ready.
-```
+Look only at filenames and paths in the current workspace.
 
-Validate the file exists at the given path before continuing.
+Required Google Ads Shopping CSV filename candidates:
 
-### Step 3 — Always offer the optional Shopify CSV (verbatim)
+- `*shopping*products*.csv`
+- `*google*ads*.csv`
 
-```
-Optional: a Shopify 'Gross profit by product' CSV gives accurate per-product COGS. To export: Shopify admin → Analytics → Reports → Gross profit by product → set date range → Export → CSV. If you don't have one, I'll use the blanket COGS% fallback.
-```
+Optional Shopify Gross profit by product CSV candidates:
 
-If the user provides a path, validate it exists. Otherwise proceed with the
-blanket fallback.
+- `*gross*profit*product*.csv`
+- `*shopify*gross*.csv`
 
-### Step 4 — Collect the 4 numeric inputs
+If more than one candidate matches a role, list filenames only and ask the user
+which file to use. If the required Google Ads file is missing, say:
 
-If `./cm3-by-product-inputs.json` exists, read it. Otherwise prompt with these
-defaults:
+> I need your Google Ads Shopping products CSV. Export it from Google Ads →
+> Reports → Predefined reports → Shopping → Shopping products, choose the date
+> range, download CSV, and provide its local path.
 
-| Field             | JSON key      | Unit | Default |
-| ----------------- | ------------- | ---- | ------- |
-| COGS % (fallback) | `cogs_pct`    | %    | 65      |
-| Shipping %        | `ship_pct`    | %    | 20      |
-| Processing %      | `proc_pct`    | %    | 2.9     |
-| Fixed costs       | `fixed_costs` | $    | 0       |
+Always offer the optional input:
 
-Persist the result to `./cm3-by-product-inputs.json` so the run is re-runnable.
+> Optional: a Shopify “Gross profit by product” CSV supplies product-level gross
+> profit data. Export it from Shopify admin → Analytics → Reports → Gross profit
+> by product. If omitted, the remote report uses the COGS fallback assumption.
 
-### Step 5 — Run the script
+Do not validate inputs by reading headers or rows. The service owns CSV
+validation and returns `MALFORMED_CSV` safely when unsupported.
 
-From the plugin's `skills/cm3-by-product-report/` directory (or any cwd; the
-script is location-independent):
+## 3. Gather assumptions
 
-```bash
-TS=$(date +%Y%m%d-%H%M%S)
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/cm3-by-product-report/cm3_by_product.py" \
-  --csv "<google-ads-shopping.csv>" \
-  --cogs-csv "<shopify-gross-profit.csv-or-omit>" \
-  --inputs ./cm3-by-product-inputs.json \
-  --output-md   "./clickt-cm3-by-product-${TS}.md" \
-  --output-html "./clickt-cm3-by-product-${TS}_explorer.html" \
-  --output-xlsx "./clickt-cm3-by-product-${TS}.xlsx"
-```
+Confirm these values with the user. The public contract examples use the shown
+defaults; band thresholds are decimal ratios and must be strictly descending.
 
-- `--cogs-csv` is optional.
-- If you pass none of the `--output-*` flags, the script defaults to writing the
-  3-format bundle (md + `_explorer.html` + xlsx) with a timestamped name in the
-  current directory.
-- Add `--pptx` to also emit the executive deck (off by default).
-- The md's chart SVGs land in `<md-stem>_charts/` next to the md — ship that
-  folder with the md. Static chart rendering needs `vl-convert-python` (in
-  `requirements.txt`); if it is missing the build fails with exit code 2 —
-  pass `--no-charts` to skip every chart (md SVGs, live explorer charts, and
-  the tuner widget chart).
-- The xlsx is LibreOffice-normalized by default; if LibreOffice (`soffice`) is
-  missing the build fails with exit code 2 — pass `--no-normalize` to skip.
-- Integrity-check a built workbook with `python3 "${CLAUDE_PLUGIN_ROOT}/skills/cm3-by-product-report/cm3_by_product.py" --check <file.xlsx>`.
+| Assumption | Contract key | Default | Allowed |
+|---|---|---:|---:|
+| Fallback COGS percent | `cogs_pct` | 65 | 0–100 |
+| Shipping percent | `ship_pct` | 20 | 0–100 |
+| Processing percent | `proc_pct` | 2.9 | 0–100 |
+| Fixed costs | `fixed_costs` | 0 | 0 or greater |
+| Excellent lower threshold | `band_exc` | 0.10 | -10–10 |
+| High lower threshold | `band_high` | 0.05 | -10–10 |
+| Average lower threshold | `band_avg` | 0 | -10–10 |
+| Low lower threshold | `band_low` | -0.25 | -10–10 |
 
-### Step 6 — Read the script's stdout JSON and report back
+Optionally collect a human-readable `period` of at most 128 characters. Do not
+infer a period by opening the CSV.
 
-The script's **final stdout line** is a single JSON object with these keys:
+## 4. Derive metadata locally
 
-```
-{"md": "...", "html": "...", "xlsx": "...",   // "pptx" only when --pptx was passed
- "revenue": ..., "ad_spend": ..., "cm3": ..., "cm3_pct": ..., "roas": ...,
- "excellent_count": ..., "poor_count": ...}
-```
-
-Print a 5-line headline summary to the user:
-
-```
-Revenue:         $<revenue>
-Ad spend:        $<ad_spend>
-CM3 (weighted):  <cm3_pct as %>
-Excellent band:  <excellent_count> products
-Poor band:       <poor_count> products
-```
-
-Then print the three output paths. Done.
-
-## Bands
-
-CM3% per product determines the band. The four lower cutoffs below are the
-**defaults** — they are tunable via `--inputs`, the `--band-*` CLI flags, or the
-in-Claude tuner, and the tuned values flow through every output and its provenance.
-
-| Band      | CM3% range (default)                | Style    |
-| --------- | ----------------------------------- | -------- |
-| Excellent | ≥ 10%                               | Strong   |
-| High      | 5% – 10%                            | Healthy  |
-| Average   | 0% – 5%                             | Amber    |
-| Low       | −25% – 0%                           | Amber    |
-| Poor      | < −25%  OR  ad spend with $0 rev    | Red      |
-| Inactive  | $0 spend AND $0 revenue             | (excl.)  |
-
-## Output — Interactive HTML explorer (`_explorer.html`)
-
-A single self-contained file (inline CSS + JS, data embedded as JSON, zero
-external refs). Left rail tunes shipping %, processing %, fixed costs, and the
-five band cutoffs; the KPI strip, band distribution, the live charts, and the
-full product table recompute live in the browser. The embedded JS is
-byte-identical to the Python model at the saved assumptions, and every product
-appears in the table (no row loss). Built by `cm3_html.py` (stdlib at import;
-the chart layer lazy-loads `vl-convert-python` only for static renders). The
-only third-party bytes in the file are the pinned, checksummed Vega/Vega-Lite
-runtime inlined from `_charts/vendor/`.
-
-## Charts — generated, never authored
-
-Two charts are declared in `cm3_html.CHARTS` and generated through the vendored
-chart module (`_charts/charts.py` + `_charts/vendor/`, vendored from Clickt's
-shared render toolkit chart layer; a drift test enforces byte-parity in the
-development monorepo):
-
-| id                    | mark  | where                               |
-| --------------------- | ----- | ----------------------------------- |
-| `revenue_by_band`     | bar   | md SVG · live explorer · tuner widget |
-| `revenue_cm3_scatter` | point | md SVG · live explorer              |
-
-One declaration drives both render paths: static SVG at build time
-(vl-convert, exact-pinned) and the live explorer charts (vendored runtime),
-which re-derive from the same recomputed rows as the table on every control
-change. Chart colors are the explorer's own band palette. All aggregation
-lives in the Vega-Lite `transform` array. `--no-charts` opts out.
-
-> **Charts are generated, never authored.** Every chart is produced by
-> `cm3_by_product.py` through the vendored chart module from the declared
-> chart specs. Never hand-write or edit SVG, Vega-Lite JSON, chart HTML, or
-> the vendored JS; never "fix" a chart in the output file. If a chart is
-> wrong, the spec or the model is wrong — change it there and re-run the
-> builder. Same run, same chart, byte for byte.
-
-## In-Claude tuner (`--emit-widget`)
-
-When this skill is launched through the **Google Ads hub** it is treated as a
-*tunable* task: instead of building files up front, the hub renders an in-Claude
-tuner. The same `cm3_by_product.py` builder emits it:
+Run the helper from this skill directory. It reads files in binary chunks only
+to derive byte size and SHA-256; its stdout is contract-safe metadata JSON.
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/cm3-by-product-report/cm3_by_product.py" --csv "<shopping.csv>" [--cogs-csv "<shopify.csv>"] \
-  --brand "<label>" --emit-widget /tmp/cm3_widget.html
+python3 remote_workflow.py metadata \
+  --google-ads "/absolute/path/google-ads-shopping.csv" \
+  --shopify "/absolute/path/shopify-gross-profit.csv"
 ```
 
-This writes a self-contained `show_widget` HTML **fragment** (no `build_widget.py`
-step — cm3 is bespoke). It reuses the explorer's recompute kernel and exposes the
-same tunable controls (COGS fallback / shipping / processing / fixed costs + the
-four band cutoffs), plus a Charts card inlining the widget-flagged static SVG
-(`revenue_by_band`) rendered at the report defaults. Its **Outputs** row — Save to HiveMind / Export Excel /
-Download HTML / Export PowerPoint — `sendPrompt`s a one-shot rebuild via this
-builder at the operator's tuned params (`--cogs-pct --ship-pct --proc-pct
---fixed-costs --band-exc --band-high --band-avg --band-low` + one `--output-*`).
-Save writes `--output-md` into the vault `raw/reports/`; the tuned params are
-recorded in the md frontmatter so the saved report matches the tuner. See the hub
-SKILL.md Step 4 (mode A) / Step 5 for the orchestration.
+Omit `--shopify` when absent. Do not print the input paths in the user-facing
+reply. Each file must be a non-empty, safely named `.csv` no larger than 25 MiB.
 
-## Output — Excel tabs (detailed)
+Report safe progress only: “Validated local metadata for the required Google
+Ads file” and, when applicable, “and the optional Shopify file.” Do not report
+row counts or file contents.
 
-- **Summary** — Hero CM3, total revenue, ad spend, all KPIs, band breakdown
-- **By Band** — One section per band with top products
-- **By Product** — 1 row per product, sorted by CM3 desc, frozen header,
-  auto-filter; band column rendered as a coloured pill
-- **By Campaign** — Per-campaign rollup with CM3, ROAS, share of CM3
-- **By Vendor** — Vendor extracted from `" : Vendor"` title suffix
-  (only present when the Google Ads titles contain that pattern)
-- **By Category** — Levels 1–5 of Google product Category (only non-empty levels)
-- **By Product Type** — Levels 1–5 of merchant Product type (only non-empty levels)
-- **Inputs & Methodology** — Every input, formula, band threshold, plus the
-  COGS resolution coverage table (Title / Vendor / Store avg / Input)
+## 5. Prepare, check version, then upload
 
-## Output — Executive PowerPoint deck (opt-in, `--pptx`)
+Call `cm3_prepare_uploads` with the exact metadata JSON from step 4. Do not add
+path, content, rows, headers, snippets, bytes, or base64 fields.
 
-1. Title slide — period + currency, Clickt brand band
-2. Headline KPIs — Revenue, Ad spend, CM3 $, CM3 %, ROAS, MER
-3. CM3 band distribution — bar chart, product count per band
-4. Top 10 products by CM3 $ — table
-5. Bottom 10 products by CM3 $ — loss-leader table
-6. Top 5 campaigns by CM3 $ — table with CM3 % column
-7. What to do next — 3 deterministic data-driven bullets
-
-## Output — Obsidian Markdown
-
-YAML frontmatter, executive paragraph, KPI table, band-distribution table, a
-`## Charts` section referencing the static SVGs in `<stem>_charts/` (relative
-paths, so the md renders on GitHub and in editor previews), top/bottom 10
-tables, rollups by Campaign / Category L1 / Product Type L1 / Vendor,
-`> [!warning]` and `> [!success]` callouts, and a Related section with
-`[[CM3 Calculator]]` + `[[Max CAC]]` wikilinks.
-
-## Constraints — do not deviate
-
-- Variable-cost formulas: `CM1 = Rev × (1 − cogs_pct − ship_pct − proc_pct)`,
-  `CM2 = CM1 − Ad spend`, `CM3 = CM2 − Allocated fixed`. When a Shopify GP
-  CSV is supplied, `cogs_pct` is resolved per-product; otherwise the input
-  `cogs_pct` is the blanket value.
-- The script consumes all 5 Category levels and all 5 Product type levels.
-  Empty levels are auto-skipped — keep this behaviour so the same script
-  works for any merchant.
-- Currency is read from the Google Ads `Currency code` column.
-- Output is deterministic: same inputs ⇒ same numbers, same layout. No
-  random ordering, no "creative" exec summaries — the wording on the
-  recommendation slide / callouts is template-driven from the data.
-
-## Install / first-run
-
-After installing the plugin, run once:
+Before any PUT, require `contract_version == "1.0"`. Save the exact successful
+tool response mechanically to a mode-0600 temporary JSON file without printing
+it. Then run:
 
 ```bash
-pip install -r "${CLAUDE_PLUGIN_ROOT}/requirements.txt"
+python3 remote_workflow.py upload \
+  --google-ads "/absolute/path/google-ads-shopping.csv" \
+  --shopify "/absolute/path/shopify-gross-profit.csv" \
+  --prepare-response "/private/temp/cm3-prepare-response.json"
 ```
 
-## On error
+Omit `--shopify` when absent. The helper rejects version mismatch, role drift,
+filename drift, and expired 15-minute sessions before opening an upload. It
+streams each file as the raw PUT body and propagates every returned required
+header exactly. It never prints a signed URL or body.
 
-- If the script exits non-zero, surface its stderr verbatim. Do not retry
-  silently. Do not guess at the failure.
-- If `openpyxl` or `python-pptx` is missing, the script's traceback names the
-  module; relay the `pip install -r "${CLAUDE_PLUGIN_ROOT}/requirements.txt"` hint.
+After both required uploads complete, report only: “Uploads completed; report
+generation is starting.” Do not reuse a job or upload session after a mismatch,
+expiry, or failed PUT.
+
+## 6. Generate remotely
+
+Call `cm3_generate_report` with exactly:
+
+```json
+{
+  "contract_version": "1.0",
+  "job_id": "<job_id from prepare>",
+  "cogs_pct": 65,
+  "ship_pct": 20,
+  "proc_pct": 2.9,
+  "fixed_costs": 0,
+  "band_exc": 0.1,
+  "band_high": 0.05,
+  "band_avg": 0,
+  "band_low": -0.25,
+  "period": "<optional user-confirmed period>"
+}
+```
+
+Replace defaults with the confirmed assumptions and omit `period` when absent.
+No other field is allowed. Never retry the same job with changed assumptions;
+start again at prepare.
+
+## 7. Present the safe result
+
+Require response `contract_version == "1.0"`, exactly three artifacts in this
+order (Markdown, HTML, XLSX), `expiry_seconds == 3600` for each, and future
+`expires_at` timestamps. If any artifact is already expired or malformed, show
+no links and use the artifact-expiry guidance.
+
+Present only:
+
+- currency, product count, revenue, ad spend, CM3, CM3 percent, ROAS,
+  excellent-product count, and poor-product count;
+- artifact filename, download link, and expiry for Markdown, HTML, and XLSX;
+- “Download promptly; links expire one hour after generation. Do not paste
+  signed links into support tickets or logs.”
+
+Do not claim the service changed Google Ads or Shopify. Do not describe hidden
+formulas, findings logic, templates, or rendering implementation.
+
+## Errors
+
+Ignore server-provided prose and translate only stable public error codes into
+the static, redacted action in
+[`references/remote-workflow.md`](references/remote-workflow.md). A safe request
+ID may be shared with support; credentials, signed URLs, request dumps, paths,
+CSV data, object identifiers, and stack traces may not.
+
+For any unknown code or malformed response, stop with a generic contract error.
+There is no local fallback.

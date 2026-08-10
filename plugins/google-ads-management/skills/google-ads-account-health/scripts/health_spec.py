@@ -39,7 +39,7 @@ def md_params(model):
         ("Ad-group sprawl", f"≥ {p['sprawl_min_keywords']} keywords AND CTR < {p['sprawl_max_ctr'] * 100:.1f}%"),
         ("No campaign negatives", f"≤ {p['negatives_max_count']} campaign-level negatives (Search)"),
         ("Automation without data", f"automated bidding AND conversions(30d) < {p['automation_min_conversions']}"),
-        ("Naming convention", "unconfirmed default — see below"),
+        ("Naming convention", "unconfirmed default — see below" + M.inline_marker(model, "naming_regex")),
         ("PMax brand cannibalization", "PMax campaign present AND an enabled brand Search campaign exists "
                                        "(brand-exclusion confirmation is manual — see below)"),
     ]
@@ -65,6 +65,13 @@ def md_narrative(model):
     # back into params.naming_regex verbatim.
     lines = [f"**Naming convention** (unconfirmed default — confirm with the user): "
             f"`{model['params']['naming_regex']}`", ""]
+    orphan = model.get("orphan_negatives") or {}
+    if orphan.get("count"):
+        lines += [
+            f"> {orphan['count']} negative(s) belong to removed/out-of-scope campaigns "
+            f"({len(orphan['campaign_ids'])} campaign id(s)) — not counted against active "
+            "structure.", "",
+        ]
     if model["summary"]["total_flagged"] == 0:
         lines += [
             "> **0 flags across all five checks is a clean result, not an error.** Every ad group, "
@@ -138,7 +145,7 @@ def md_rows(model):
     """Every (check, entity) row with its status — the no-row-loss layer."""
     headers = ["Check", "Entity type", "Entity", "Campaign", "Keywords", "Ad-group CTR",
                "Negatives", "Bidding strategy", "Conv (30d)", "Name OK?", "PMax?", "Brand present?",
-               "Brand excl. confirmed?", "Flagged?", "Pre-score", "Status"]
+               "Brand excl. confirmed?", "Liveness", "Flagged?", "Pre-score", "Status"]
     out = []
     for r in model["rows"]:
         out.append([
@@ -152,15 +159,17 @@ def md_rows(model):
             _fmt_val(r["check"], "pmax_present", r["pmax_present"]),
             _fmt_val(r["check"], "brand_present", r["brand_present"]),
             _fmt_val(r["check"], "has_brand_exclusion", r["has_brand_exclusion"]),
+            r.get("liveness", "").replace("_", " "),
             "yes" if r["is_flagged"] else "no",
             f"{r['pre_score']:.1f}", r["status"],
         ])
     return {
         "title": "Every checked entity (no row loss)",
         "note": "Every ad group / campaign evaluated by any of the five checks, one row per "
-                "(check, entity) pair, with its status (`scored` / `config` / `manual`) and "
-                "whether it was flagged. `—` marks a column that does not apply to that check.",
-        "headers": headers, "aligns": ["l"] * 4 + ["r", "r", "r", "l", "r"] + ["l"] * 5 + ["r", "l"],
+                "(check, entity) pair, with its status (`scored` / `config` / `manual`), its "
+                "liveness band, and whether it was flagged. Dormant (long-dead) campaigns are "
+                "kept and tagged but never flagged. `—` marks a column that does not apply.",
+        "headers": headers, "aligns": ["l"] * 4 + ["r", "r", "r", "l", "r"] + ["l"] * 5 + ["l", "r", "l"],
         "rows": out,
         "empty": "_No ad groups or campaigns in scope._",
     }

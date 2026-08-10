@@ -54,6 +54,11 @@ import bidding_core as core   # noqa: E402  (owns the reconcile contract)
 
 CAMPAIGN_FIELDS = ("campaign.id", "campaign.name", "campaign.bidding_strategy_type",
                    "metrics.conversions", "metrics.cost_micros")
+# campaign.status is SELECTed by the GAQL (see SKILL.md) and read via .get()
+# below for the HM-603 liveness band, but — like metrics.conversions_value and
+# ai_max_setting — it is NOT in the require_fields tuple above: older pulls that
+# omit it degrade to an empty status (recently_active/dormant) rather than
+# hard-failing the "wrong file" check.
 
 RECONCILE_ARRAYS = core.RECONCILE_ARRAYS
 
@@ -67,6 +72,10 @@ COLUMN_MAP = {
     "conv30":                 {"aliases": ["Conversions"], "type": "num"},
     "cost":                   {"aliases": ["Cost"], "type": "num"},
     "value":                  {"aliases": ["Conv. value", "Conversion value", "All conv. value"], "type": "num"},
+    # Optional (not in REQUIRED_FIELDS): the Google Ads UI "Campaign state"
+    # column, mapped to `status` for HM-603 liveness. Absent from many exports —
+    # when missing, csv_input omits the key and liveness degrades honestly.
+    "status":                 {"aliases": ["Campaign state", "Campaign status", "Status"], "type": "str"},
 }
 REQUIRED_FIELDS = ("campaign_id", "campaign", "bidding_strategy_type", "conv30", "cost")
 RECONCILE_SPEC = {"array": "campaigns", "sums": RECONCILE_ARRAYS["campaigns"]}
@@ -102,6 +111,7 @@ def assemble_mcp(campaigns_path: str, meta: dict, judgment: dict) -> dict:
                 "campaign_id": cid, "campaign": r.get("campaign.name", ""),
                 "bidding_strategy_type": r.get("campaign.bidding_strategy_type", ""),
                 "ai_max_enabled": bool(r.get("campaign.ai_max_setting.enable_ai_max", False)),
+                "status": r.get("campaign.status", ""),   # HM-603 liveness (campaign.status -> status)
                 "conv30": 0.0, "cost": 0.0, "value": 0.0,
             }
             order.append(cid)
@@ -113,6 +123,8 @@ def assemble_mcp(campaigns_path: str, meta: dict, judgment: dict) -> dict:
             m["campaign"] = r["campaign.name"]
         if not m["bidding_strategy_type"] and r.get("campaign.bidding_strategy_type"):
             m["bidding_strategy_type"] = r["campaign.bidding_strategy_type"]
+        if not m["status"] and r.get("campaign.status"):
+            m["status"] = r["campaign.status"]
         if r.get("campaign.ai_max_setting.enable_ai_max"):
             m["ai_max_enabled"] = True
 

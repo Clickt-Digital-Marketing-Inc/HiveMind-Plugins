@@ -19,6 +19,16 @@ sys.path.insert(0, str(HERE.parents[2] / "_shared"))
 import budget_core as core  # noqa: E402
 
 FIXTURE = HERE / "sample-findings.json"
+#: The liveness matrix (HM-799) — a fixture of its own so the bands can carry
+#: the shapes the gates need (a dormant row that WOULD classify and score
+#: without them) without disturbing sample-findings.json's hand-oracled totals.
+LIVENESS_FIXTURE = HERE / "sample-liveness.json"
+#: Row keys that legitimately differ between the fixture's recently_active /
+#: dormant twins (campaigns 3 and 4). Everything else must be equal, which is
+#: what makes 'campaign_status' the single distinguishing input.
+_LIVENESS_DERIVED = {"campaign_id", "campaign", "campaign_status", "liveness",
+                     "liveness_note", "bucket", "campaign_pace_ratio",
+                     "pace_verdict", "pace_flags", "pace_score"}
 _failures = []
 
 
@@ -195,6 +205,28 @@ def test_csv_path_identical_to_mcp():
     check("csv findings stamp meta.source == user_csv", csv_findings["meta"]["source"] == "user_csv")
     check("csv findings carry reconciliation", bool(csv_findings["meta"].get("reconciliation")))
 
+    # HM-778 follow-through: the three columns this script reads as "str" and
+    # re-parses (daily_budget, both lost-IS) must go through the SAME parser as
+    # the "num" columns. They were a local clone, so an fr/de export produced
+    # one findings file with correct cost/conversions and a 100x-off or dropped
+    # daily budget. Locale cells here, en cells identical to the sample file.
+    check("locale daily_budget parses like the shared 'num' coercion",
+          ACSV._num_or_none("300,00") == 300.0
+          and ACSV._num_or_none("1 234,56") == 1234.56
+          and ACSV._num_or_none("1.234,56") == 1234.56,
+          repr([ACSV._num_or_none("300,00"), ACSV._num_or_none("1 234,56")]))
+    check("locale lost-IS percent parses like the shared 'pct' coercion",
+          abs(ACSV._pct_or_none("12,3 %") - 0.123) < 1e-12,
+          repr(ACSV._pct_or_none("12,3 %")))
+    check("absent/unparseable still means missing, not a false 0.0",
+          ACSV._num_or_none("--") is None and ACSV._num_or_none("") is None
+          and ACSV._num_or_none("Shared") is None
+          and ACSV._pct_or_none("--") is None,
+          repr(ACSV._num_or_none("Shared")))
+    check("en forms unchanged", ACSV._num_or_none("CA$1,023.31") == 1023.31
+          and ACSV._num_or_none("300.00") == 300.0
+          and abs(ACSV._pct_or_none("25.00%") - 0.25) < 1e-12)
+
     m_mcp = core.compute_model(core.load_findings(str(FIXTURE)))
     m_csv = core.compute_model(csv_findings)
 
@@ -245,18 +277,21 @@ def test_assemble_findings_from_raw():
     import assemble_findings as A
     perf = {"result": [
         {"campaign.id": 1, "campaign.name": "S | Brand", "campaign.advertising_channel_type": "SEARCH",
+         "campaign.status": "ENABLED",
          "metrics.cost_micros": 3_000_000_000, "metrics.conversions": 60,
          "metrics.search_budget_lost_impression_share": 0.25,
          "metrics.search_rank_lost_impression_share": 0.05},
         # same campaign split across raw rows (e.g. by a segment) -> must merge:
-        # cost/conversions summed, name/channel/IS point-in-time from the first row
+        # cost/conversions summed, name/channel/status/IS point-in-time from the first row
         {"campaign.id": 1, "campaign.name": "S | Brand", "campaign.advertising_channel_type": "SEARCH",
+         "campaign.status": "ENABLED",
          "metrics.cost_micros": 1_000_000_000, "metrics.conversions": 40,
          "metrics.search_budget_lost_impression_share": 0.25,
          "metrics.search_rank_lost_impression_share": 0.05},
         # PMax: lost-IS fields absent entirely -> null pass-through, and it is
         # absent from the budgets pull -> no daily_budget key -> status no_budget
         {"campaign.id": 2, "campaign.name": "PMax | Feed", "campaign.advertising_channel_type": "PERFORMANCE_MAX",
+         "campaign.status": "PAUSED",
          "metrics.cost_micros": 500_000_000, "metrics.conversions": 10},
     ]}
     budgets = {"result": [
@@ -288,6 +323,9 @@ def test_assemble_findings_from_raw():
               and abs(c1["search_rank_lost_is"] - 0.05) < 1e-12)
         check("PMax lost-IS absent -> null",
               c2["search_budget_lost_is"] is None and c2["search_rank_lost_is"] is None)
+        check("campaign.status emitted as campaign_status (point-in-time)",
+              c1["campaign_status"] == "ENABLED" and c2["campaign_status"] == "PAUSED",
+              (c1.get("campaign_status"), c2.get("campaign_status")))
         check("no budgets row -> no daily_budget key", "daily_budget" not in c2)
         rec = f["meta"]["reconciliation"]
         check("reconciliation embedded with raw stamps",
@@ -308,6 +346,111 @@ def test_assemble_findings_from_raw():
         except core.FindingsError:
             ok = True
         check("hand-edited findings rejected by core", ok)
+
+
+def test_liveness_gating():
+    print("test_liveness_gating")
+    # Two-band-derivable: this skill pulls campaign.status + current-window spend
+    # (cost), but no prior-window spend -> prior_spend_key=None. live /
+    # recently_active / dormant are all reachable here; only the "spent only in
+    # the prior window" note path is not (documented in budget_core).
+    # The matrix lives in the SHIPPED fixture (HM-799), not in an inline dict —
+    # one definition, and the same file the port's golden is generated from.
+    m = core.compute_model(core.load_findings(str(LIVENESS_FIXTURE)))
+    rows = {r["campaign_id"]: r for r in m["rows"]}
+    check("every campaign survives (no-row-loss)", len(m["rows"]) == 4, f"got {len(m['rows'])}")
+    check("live band", rows[1]["liveness"] == "live", rows[1]["liveness"])
+    check("paused-but-spent -> recently_active", rows[2]["liveness"] == "recently_active", rows[2]["liveness"])
+    check("enabled-but-idle -> recently_active", rows[3]["liveness"] == "recently_active", rows[3]["liveness"])
+    check("removed + zero window spend -> dormant", rows[4]["liveness"] == "dormant", rows[4]["liveness"])
+    # (a) dormant: present but generates nothing — not bucketed, no pace score.
+    check("dormant row not bucketed", rows[4]["bucket"] == "", rows[4]["bucket"])
+    check("dormant row pace_score 0", rows[4]["pace_score"] == 0.0, rows[4]["pace_score"])
+    check("dormant row no pace flags", rows[4]["pace_flags"] == [], rows[4]["pace_flags"])
+    check("dormant row pace_verdict n/a", rows[4]["pace_verdict"] == "n/a", rows[4]["pace_verdict"])
+    check("dormant row campaign_pace_ratio None", rows[4]["campaign_pace_ratio"] is None)
+    check("dormant row empty liveness_note", rows[4]["liveness_note"] == "")
+    check("dormant row excluded from the under-pace count",
+          m["summary"]["under_pace"] == 3, m["summary"]["under_pace"])
+    adv = m["advisor"]
+    fund_names = {r["campaign"] for r in adv["fund"]}
+    # The advisor-absence claim is only evidence if the fixture COULD express its
+    # failure. As shipped, neither twin is advisor-eligible (search_budget_lost_is
+    # 0.0, zero conversions), so a bare `"Dormant | Removed" not in fund_names`
+    # passes with EVERY dormant gate in budget_core deleted. Assert it against a
+    # row perturbed IN MEMORY (the shipped fixture is untouched) into the one
+    # shape that reaches advisor.fund — Raise-bucketed: budget-constrained
+    # (budget-lost IS > 0.10), converting, CPA at/under target — while remaining
+    # dormant (REMOVED + zero window spend). Only classify_row's liveness gate
+    # keeps it out now: delete that gate and this row is bucketed Raise and lands
+    # in the shortlist.
+    f_adv = core.load_findings(str(LIVENESS_FIXTURE))
+    for c in f_adv["campaigns"]:
+        if c["campaign_id"] == 4:
+            c["conversions"], c["search_budget_lost_is"] = 5, 0.30
+    m_adv = core.compute_model(f_adv)
+    r4_adv = next(r for r in m_adv["rows"] if r["campaign_id"] == 4)
+    fund_adv = [r["campaign"] for r in m_adv["advisor"]["fund"]]
+    check("perturbed twin is still dormant", r4_adv["liveness"] == "dormant", r4_adv["liveness"])
+    check("an otherwise-fundable dormant row is still not bucketed",
+          r4_adv["bucket"] == "", r4_adv["bucket"])
+    check("an otherwise-fundable dormant row stays out of advisor.fund",
+          "Dormant | Removed" not in fund_adv, fund_adv)
+    # advisor.trim gets no equivalent, deliberately: both of its sources require
+    # window spend > 0 (Kill = 0 conversions AND cost >= kill_multiple x target
+    # CPA; over_pace = cpa above target, and cpa is 0/None without cost), which a
+    # dormant row cannot have by definition. An absence check there would pass
+    # with every gate deleted, so the intent is documented here instead of
+    # asserted — same call as perf_core's provably non-decisive
+    # `liveness == "dormant"` term (routed to HM-790).
+    # (b) the gates are load-bearing, not decoration: rows 3 and 4 differ in
+    # exactly ONE input field (campaign_status), and row 3 — the recently_active
+    # twin — carries every value the gates suppress on row 4. Delete a gate and
+    # row 4 becomes row 3 ("Low budget" on a REMOVED campaign, the HM-603
+    # self-contradiction); widen one past dormant and row 3 loses its pacing.
+    check("recently_active twin IS bucketed", rows[3]["bucket"] == "Low budget", rows[3]["bucket"])
+    check("recently_active twin IS paced", rows[3]["campaign_pace_ratio"] == 0.0,
+          rows[3]["campaign_pace_ratio"])
+    check("recently_active twin keeps its pace flags",
+          rows[3]["pace_flags"] == ["under_pace", "zero_conv"], rows[3]["pace_flags"])
+    check("recently_active twin keeps a non-zero pace_score",
+          rows[3]["pace_score"] == 3.0, rows[3]["pace_score"])
+    check("the twins' COMPUTED rows differ ONLY in the derived keys",
+          {k: v for k, v in rows[3].items() if k not in _LIVENESS_DERIVED}
+          == {k: v for k, v in rows[4].items() if k not in _LIVENESS_DERIVED},
+          "twin rows diverge in an input field, so the contrast proves nothing")
+    # ...and the same premise asserted where it actually lives: the FIXTURE
+    # INPUTS. The computed-row comparison above only sees fields that survive
+    # onto the output row, so an input the model folds away (or normalizes to an
+    # equal value) can drift between the twins and keep it green while the
+    # one-field premise this whole contrast rests on is already broken.
+    raw = {c["campaign_id"]: c
+           for c in json.loads(LIVENESS_FIXTURE.read_text(encoding="utf-8"))["campaigns"]}
+    twin_diff = {k for k in set(raw[3]) | set(raw[4]) if raw[3].get(k) != raw[4].get(k)}
+    check("the twins' FIXTURE INPUTS differ ONLY in campaign_status (plus id/name)",
+          twin_diff == {"campaign_id", "campaign", "campaign_status"}, sorted(twin_diff))
+    # (c) recently_active carries conditional phrasing in this skill's voice.
+    # Both reachable note paths are asserted in full, so swapping the two
+    # branches cannot stay green.
+    check("paused-spent row has the paused-mid-window note",
+          rows[2]["liveness_note"] ==
+          "Paused/removed mid-window after spending 900.00 — confirm intent before changing budget.",
+          rows[2]["liveness_note"])
+    check("enabled-idle row has the enabled-but-idle note",
+          rows[3]["liveness_note"] ==
+          "Enabled but no spend in the window — confirm it should be running before adjusting budget.",
+          rows[3]["liveness_note"])
+    check("live row has no note", rows[1]["liveness_note"] == "", rows[1]["liveness_note"])
+    check("live row still bucketed (severity universe intact)",
+          rows[1]["bucket"] == "Raise", rows[1]["bucket"])
+    check("advisor.fund includes the live winner", "Live | Brand" in fund_names, fund_names)
+    # (d) html embed carries liveness + liveness_note (the JS-kernel dormant gate seam).
+    import budget_spec
+    emb = budget_spec.html_embed(m)["rows"]
+    check("html embed carries liveness + liveness_note on every row",
+          all("liveness" in r and "liveness_note" in r for r in emb))
+    check("html embed dormant row tagged dormant",
+          next(r for r in emb if r["campaign"] == "Dormant | Removed")["liveness"] == "dormant")
 
 
 def test_bundle_md_html_parity_and_lazy():
@@ -343,13 +486,71 @@ def test_bundle_md_html_parity_and_lazy():
     check("building md/html did not import openpyxl", "openpyxl" not in sys.modules)
 
 
+def test_assumptions_provenance():
+    print("test_assumptions_provenance")
+    import io
+    from contextlib import redirect_stderr
+    from render import model as M
+
+    # the raw fixture's monthly_goal (30000) carries no assumptions entry —
+    # require_assumptions must flag it, and the build script's warn call must
+    # actually reach stderr (mirrors the pattern used for reconciliation).
+    findings = json.loads(FIXTURE.read_text())
+    m = core.compute_model(findings)
+    check("fixture monthly_goal has no assumptions entry",
+          M.get_assumption(m, "monthly_goal") is None)
+    warnings = M.require_assumptions(m, ["monthly_goal"])
+    check("require_assumptions flags the unstamped goal", warnings != [])
+    buf = io.StringIO()
+    with redirect_stderr(buf):
+        M.print_warnings(warnings)
+    check("print_warnings reaches stderr", "UNVERIFIED" in buf.getvalue()
+          and "monthly_goal" in buf.getvalue())
+
+    # now stamp it (as assemble_findings.py --monthly-goal-source proxy would)
+    # and confirm the callout + inline marker appear in every declared format.
+    findings2 = json.loads(FIXTURE.read_text())
+    M.add_assumption(findings2["meta"], "monthly_goal", 30000, "proxy",
+                     "proxy: Sigma daily budgets x 31 days")
+    m2 = core.compute_model(findings2)
+    check("stamped model has a clean require_assumptions",
+          M.require_assumptions(m2, ["monthly_goal"]) == [])
+
+    import budget_spec
+    import budget_xlsx_spec
+    from render import build_bundle
+
+    spec = dict(budget_spec.SPEC)
+    spec["xlsx"] = budget_xlsx_spec.XLSX
+    with tempfile.TemporaryDirectory() as td:
+        written = build_bundle(m2, spec, td, formats=("md", "html", "xlsx"), charts=False,
+                               normalize=False)
+        md = next(p for p in written if p.suffix == ".md").read_text()
+        html = next(p for p in written if p.name.endswith("_explorer.html")).read_text()
+        xlsx_path = next(p for p in written if p.suffix == ".xlsx")
+        check("md has the callout", "## Provenance & assumptions" in md)
+        check("md carries the goal's inline marker",
+              "Monthly goal" in md and "(proxy: proxy: Sigma daily budgets" in md
+              or "proxy: Sigma daily budgets" in md)
+        check("html embeds the assumptions array", '"monthly_goal"' in html and '"proxy"' in html)
+        import openpyxl
+        wb = openpyxl.load_workbook(str(xlsx_path))
+        snap_cells = [c.value for row in wb["Snapshot"].iter_rows() for c in row if c.value is not None]
+        check("xlsx Snapshot has the callout", "Provenance & assumptions" in snap_cells)
+        check("xlsx Snapshot lists monthly_goal", "monthly_goal" in snap_cells)
+        ctrl_notes = [c.value for c in wb["Controls"]["D"] if c.value]
+        check("xlsx Controls note carries the inline marker",
+              any("proxy:" in (v or "") for v in ctrl_notes), ctrl_notes)
+
+
 def main():
     for t in (test_fixture_buckets_and_pacing, test_concentration_and_pace_prescore,
               test_pace_kernel_js_parity_over_pacing,
               test_advisor_shortlist, test_advisor_over_pace_trim_delta,
               test_csv_path_identical_to_mcp,
-              test_no_budget_not_bucketed, test_empty,
-              test_assemble_findings_from_raw, test_bundle_md_html_parity_and_lazy):
+              test_no_budget_not_bucketed, test_empty, test_liveness_gating,
+              test_assemble_findings_from_raw, test_bundle_md_html_parity_and_lazy,
+              test_assumptions_provenance):
         t()
     print()
     if _failures:

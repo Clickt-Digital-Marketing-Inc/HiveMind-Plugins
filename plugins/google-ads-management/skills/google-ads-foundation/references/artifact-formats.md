@@ -147,9 +147,13 @@ COLUMN_MAP = {
 - `aliases` — every header spelling the Google Ads UI may export (locale/version variance);
   matching is case-insensitive, whitespace-collapsed, BOM/quote-stripped, and tolerates a
   parenthesised suffix (`Cost (CAD)` matches `Cost`).
-- `type` — `str` (default) · `num` (float; tolerates thousands separators, currency prefixes,
-  `%`, absent markers `--`/dashes → 0.0) · `pct` (percent-scale → fraction: `12.3%` → 0.123).
-- Title rows above the real header and `Total: ...` summary rows are handled; missing required
+- `type` — `str` (default) · `num` (float; locale-tolerant — group/decimal separators in either
+  order (`1,234.56`, `1.234,56`), no-break-space groups, currency symbols either side, `%`, absent
+  markers `--`/dashes → 0.0; single-dot `1.234` keeps the en reading, HM-785) · `pct` (percent-scale
+  → fraction: `12.3%` → 0.123). Need different absent-cell semantics? Call
+  `_shared/csv_input.parse_num(v, default)` — never hand-roll a second number parser.
+- Title rows above the real header and `Total: ...` summary rows are handled (localized summary
+  labels too — `Total : ...`, `Gesamt: ...`; the colon is required); missing required
   columns and ambiguous mappings raise `CsvInputError` naming the fields and accepted aliases.
 - When a real export uses an unmapped header spelling: add the alias **and a fixture test**, and
   append the lesson to the project's Lessons Log.
@@ -228,6 +232,34 @@ Rules of use:
 - Each recommendation carries: severity · the specific action · the model number(s) behind it ·
   expected effect · the artifact that applies it (or a **manual** callout when no CSV can).
 
+### Campaign liveness (severity is gated on it)
+
+Real accounts carry a long tail of paused, long-dead campaigns — often the majority of rows. A
+scoring skill that treats every row as fair game manufactures findings on the dead (a paused
+campaign flagged "revert to Manual CPC", a zero-traffic campaign flagged for a "CVR drop", a
+paused campaign called "under-budget"). The shared primitive
+`_shared/analytics.segment_liveness(rows, status_key=, spend_key=, prior_spend_key=)` tags every
+row with a **liveness** band so severity is scored only on what's actually running:
+
+| `liveness` | Definition | Severity universe |
+|---|---|---|
+| **live** | status `ENABLED` **and** spend > 0 in the current window | Scored normally. |
+| **recently_active** | any recent signal that isn't live: `PAUSED`/`REMOVED` but spent mid-window · `ENABLED` but idle (zero current spend) · spend only in the prior window | Scored, but every recommendation is phrased **conditionally** ("paused mid-window after spending X — confirm intent before acting", per skill voice). |
+| **dormant** | not `ENABLED` **and** zero spend in both windows | **Present-but-tagged, zero recommendations.** Never dropped (no-row-loss); carries `liveness="dormant"` into the model, xlsx column, and HTML. |
+
+Rules of use:
+- **Gate the severity/recommendation universe on `live` + `recently_active`.** Dormant rows are
+  scored to zero (not flagged), so they can't manufacture Critical/High findings.
+- **`liveness` is data, not a tunable.** It depends on status + spend (fixed pulled facts), so it
+  is computed once in Python and mirrored verbatim into the browser kernel and xlsx column — the
+  live recompute reads the embedded tag rather than re-deriving it.
+- **Honest degradation.** A single-window skill (no prior-window spend) calls
+  `segment_liveness` with `prior_spend_key=None`: `live`/`recently_active`/`dormant` are still all
+  reachable, but the "spent only in the prior window" path can't fire. Document per skill what's
+  derivable — never invent a prior window to fake a third band.
+- **Surface it.** Every deliverable shows the `liveness` tag (a column in xlsx, a tag/column in
+  the HTML explorer) so the reader can see what was and wasn't in the scoring universe.
+
 ### Advisor checklist (per skill)
 
 - [ ] Builder emits the skill's declared bundle from the reconciled findings JSON.
@@ -236,3 +268,5 @@ Rules of use:
 - [ ] Apply-CSVs **offered** (not auto-dumped) via `make_editor_csv.py`, with the Editor apply
       path; manual-only items named.
 - [ ] Data source honest: `meta.source` surfaced; API-blind data labelled user-supplied.
+- [ ] Severity universe gated on `liveness` (dormant rows tagged, zero recommendations); the
+      `liveness` tag surfaced in xlsx and HTML.

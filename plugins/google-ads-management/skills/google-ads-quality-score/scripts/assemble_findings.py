@@ -56,6 +56,21 @@ LP_FIELD = "ad_group_criterion.quality_info.post_click_quality_score"
 AR_FIELD = "ad_group_criterion.quality_info.creative_quality_score"
 CTRQ_FIELD = "ad_group_criterion.quality_info.search_predicted_ctr"
 
+# SKILL.md "Pull the data" #2 (search terms, low-CTR drag) and #4 (ads/RSA
+# assets, ad-relevance matrix) are prose-only pulls with no findings
+# assembler of their own — these two constants exist purely to bind the
+# documented field lists to code per HM-606
+# (skills/google-ads/tests/test_gaql_schema.py); nothing here imports them.
+SEARCH_TERMS_FIELDS = ("campaign.id", "campaign.name", "ad_group.id", "ad_group.name",
+                       "search_term_view.search_term", "segments.keyword.info.text",
+                       "segments.keyword.info.match_type", "metrics.impressions",
+                       "metrics.clicks", "metrics.ctr", "metrics.cost_micros",
+                       "metrics.conversions")
+AD_ASSETS_FIELDS = ("campaign.id", "campaign.name", "ad_group.id", "ad_group.name",
+                    "ad_group_ad.ad.id", "ad_group_ad.ad_strength",
+                    "ad_group_ad.ad.responsive_search_ad.headlines",
+                    "ad_group_ad.ad.responsive_search_ad.descriptions")
+
 # Control totals verified by qs_core.load_findings on every build; the
 # contract (which arrays, which fields) is owned by the core.
 RECONCILE_ARRAYS = core.RECONCILE_ARRAYS

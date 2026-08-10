@@ -30,7 +30,8 @@ def md_params(model):
             f"(weight {p['volume_weight']:.2f})"),
         ("Value-variance / tracking-confidence", f"assumed {p['assumed_value_score']:.0f} / "
             f"{p['assumed_tracking_score']:.0f} when not supplied (weights {p['value_weight']:.2f} / "
-            f"{p['tracking_weight']:.2f})"),
+            f"{p['tracking_weight']:.2f})"
+            + M.inline_marker(model, "assumed_value_score") + M.inline_marker(model, "assumed_tracking_score")),
         ("Band edges", " · ".join(f"{p[f'band_edge_{i}']:.0f}" for i in (1, 2, 3, 4))
             + "  (Manual → Enhanced CPC → Target CPA → Target ROAS → + Exploration)"),
         ("Automation gate", f"conv30 < {p['conv_gate']:.0f} + any automated strategy = "
@@ -125,12 +126,14 @@ def md_sections(model):
 def md_rows(model):
     """Every campaign with a status — the no-row-loss layer."""
     cur = model["provenance"]["currency"]
-    headers = ["Campaign", "Status", "Bidding strategy", "Conv 30d", f"Cost ({cur})" if cur else "Cost",
+    headers = ["Campaign", "Status", "Liveness", "Bidding strategy", "Conv 30d",
+               f"Cost ({cur})" if cur else "Cost",
                "Maturity score", "Confidence", "Recommended strategy", "Mismatch"]
     out = []
     for r in model["rows"]:
         out.append([
-            r["campaign"], r["status"].replace("_", " "), r["bidding_strategy"] or "—",
+            r["campaign"], r["status"].replace("_", " "), r["liveness"].replace("_", " "),
+            r["bidding_strategy"] or "—",
             f"{r['conv30']:.2f}", f"{r['cost']:,.2f}",
             (f"{r['maturity_score']:.2f}" if r["maturity_score"] is not None else "—"),
             r["confidence"] if r["status"] == "scored" else "n/a",
@@ -138,10 +141,10 @@ def md_rows(model):
         ])
     return {
         "title": "All campaigns (every row, with status)",
-        "note": "No row loss: every campaign in the pulled/exported universe appears here, scored "
-                "or held out with a reason. Sorted by cost (highest first).",
+        "note": "No row loss: every campaign in the pulled/exported universe appears here (with its "
+                "liveness band), scored or held out with a reason. Sorted by cost (highest first).",
         "headers": headers,
-        "aligns": ["l", "l", "l", "r", "r", "r", "l", "l", "l"],
+        "aligns": ["l", "l", "l", "l", "r", "r", "r", "l", "l", "l"],
         "rows": out,
         "empty": "_No campaigns in the universe._",
     }
@@ -168,6 +171,7 @@ def html_embed(model):
         "gate_ladder": model["gate_ladder"],
         "rows": [{
             "campaign": r["campaign"], "status": r["status"],
+            "liveness": r["liveness"], "liveness_note": r.get("liveness_note", ""),
             "bidding_strategy": r["bidding_strategy"], "current_tier": r["current_tier"],
             "current_label": r["current_label"], "conv30": r["conv30"], "cost": r["cost"],
             "value_score": r["value_score"], "tracking_score": r["tracking_score"],
@@ -199,6 +203,7 @@ HTML_CONTROLS = [
 HTML_COLUMNS = [
     {"key": "campaign", "label": "Campaign"},
     {"key": "status", "label": "Status", "fmt": "status"},
+    {"key": "liveness", "label": "Liveness", "fmt": "status"},
     {"key": "bidding_strategy", "label": "Bidding strategy"},
     {"key": "current_label", "label": "Current tier"},
     {"key": "conv30", "label": "Conv30", "num": True, "fmt": "num"},
@@ -224,6 +229,12 @@ HTML_KPIS = [
 # gxRoundHalfUp) verbatim rather than re-writing that math.
 JS_KERNEL = analytics.JS_MIRROR + r"""
 classify = function(r,P){
+  // Liveness gate (HM-603): a dormant campaign (not ENABLED, zero spend in the
+  // window) is never scored or flagged — mirrors bidding_core.classify_row and
+  // the xlsx Mismatch formula. `liveness` is a static embedded field (not
+  // tuning-dependent), so the kernel only READS it.
+  if(r.liveness==="dormant") return {maturity_score:null, recommended_tier:null, tier_gap:null,
+    mismatch:"", block:"", severity:0, status:r.status};
   if(r.status!=="scored") return {maturity_score:null, recommended_tier:null, tier_gap:null,
     mismatch:"", block:"", severity:0, status:r.status};
   var convTarget = P.conv_target;

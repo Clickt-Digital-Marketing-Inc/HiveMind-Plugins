@@ -45,7 +45,7 @@ if (htmlPath === "--analytics") {
   // out the three kernels — the exact string skills splice into js_kernel.
   const lib = new Function(
     exp.js_mirror +
-    "\n;return {concentration: gxConcentration, signals: gxSignals, preScore: gxPreScore};"
+    "\n;return {concentration: gxConcentration, signals: gxSignals, preScore: gxPreScore, segmentLiveness: gxSegmentLiveness};"
   )();
   let aFail = 0;
   const numEq = (a, b) =>
@@ -67,6 +67,9 @@ if (htmlPath === "--analytics") {
       got = lib.concentration(c.args.rows, c.args.value_key, c.args.top_n ?? 3);
     else if (c.fn === "signals") got = lib.signals(c.args.rows, c.args.rules);
     else if (c.fn === "pre_score") got = lib.preScore(c.args.row, c.args.weights);
+    else if (c.fn === "segment_liveness")
+      got = lib.segmentLiveness(c.args.rows, c.args.status_key, c.args.spend_key,
+                                c.args.prior_spend_key ?? null);
     else { aFail++; console.log(`  FAIL: unknown fn '${c.fn}' (${c.file}#${c.i})`); continue; }
     if (!deepEq(got, c.expected)) {
       aFail++;

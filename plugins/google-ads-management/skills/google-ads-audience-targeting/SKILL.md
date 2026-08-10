@@ -36,16 +36,42 @@ Two independent datasets, each with its own path — decide **before** pulling a
    don't already have one; a report with no first-party data is still a valid, honest result (the
    report says so explicitly).
 
-## Pull the data
+## Pull the data — three pulls, honest ad-group-level metrics
 
-1. **Applied audiences** — `ad_group_criterion` (type=USER_LIST) with `user_list`, `bid_modifier`,
-   `status`, `negative`, and performance metrics.
-2. **User-list names/types** — a second `user_list` query (GAQL cannot join `user_list.name`/
-   `user_list.type` into the query above). See
+**`ad_group_criterion` exposes ZERO `metrics.*` fields** (metadata-confirmed live 2026-07-16 — a
+single combined identity+metrics query against it, as this skill once documented, is rejected
+outright by the API). Applied-audience identity and its performance metrics are therefore **two
+separate pulls**, joined by `ad_group.id` in
+[scripts/assemble_findings.py](scripts/assemble_findings.py):
+
+1. **Applied-audience criteria (identity only, no metrics)** — `ad_group_criterion.CRITERIA_FIELDS`
+   (`campaign.name`, `ad_group.name`, `ad_group.id`, `ad_group_criterion.type`,
+   `.user_list.user_list`, `.bid_modifier`, `.status`, `.negative`), condition
+   `ad_group_criterion.type = 'USER_LIST'`.
+2. **Ad-group-level audience metrics** — `ad_group_audience_view.METRICS_FIELDS` (`ad_group.id`,
+   `metrics.impressions`, `.clicks`, `.cost_micros`, `.conversions`) filtered by `segments.date`.
+   This is the only Google Ads resource that carries metrics for USER_LIST performance, and its
+   join grain is the **ad group**, not the individual list — `ad_group_criterion.user_list.user_list`
+   does not resolve when joined onto this view in this MCP's GAQL implementation (verified live).
+   Metrics pulled here are therefore **ad-group-level**: every USER_LIST criterion sharing an ad
+   group shows the SAME cost/clicks/impressions/conversions — the API cannot attribute performance
+   to one list among several on the same ad group. This limitation is labelled honestly throughout
+   every artifact (see `metrics_granularity` below); it is never presented as per-list data.
+3. **User-list names/types** — a third `user_list.USERLIST_FIELDS` query (GAQL cannot join
+   `user_list.name`/`user_list.type` into pull 1). See
    [references/audience-targeting-filter.md](references/audience-targeting-filter.md) for the
-   exact fields.
-3. **Campaign types** — `campaign` structure query (to spot PMax campaigns needing signals/brand
-   exclusions, and brand Search campaigns to protect) — used conversationally, not scored.
+   exact field lists (both pulled from the same constants `assemble_findings.py` uses — no
+   duplicated field lists to drift).
+
+A criterion whose ad group has no matching pull-2 row (no `ad_group_audience_view` activity in the
+window) is **never dropped**: it carries `status = "manual"` and `"—"` metric values — the assembler
+never fabricates a zero for a metric it didn't observe. This mirrors how this skill already treats
+first-party-readiness gaps: represent by status, don't drop.
+
+**Campaign types** — `campaign` structure query (to spot PMax campaigns needing signals/brand
+exclusions, and brand Search campaigns to protect) — used conversationally, not scored
+(authoritative constant: `CAMPAIGN_TYPE_FIELDS` in
+[scripts/assemble_findings.py](scripts/assemble_findings.py)).
 
 Note: remarketing list sizes, membership durations, Customer Match upload status/match rate,
 Enhanced Conversions, and Consent Mode are **not** exposed by this MCP — always the first-party
@@ -76,6 +102,9 @@ bars are tunable in the xlsx Controls sheet; defaults in
 exclusion criteria are **never scored** — kept and shown (never dropped) so the report can confirm,
 by name, which lists are attached as exclusions (e.g. verifying a recent-converters exclusion is
 actually in place — always **read the list name yourself**, never infer its purpose from the ID).
+A third status, **`manual`**, covers a targeting criterion whose ad group has no matching
+`ad_group_audience_view` metrics for the window — also never scored, values shown as `"—"`, never
+a fabricated zero.
 
 **First-party readiness** rows get a deterministic gap read from the free-text Readiness column
 the user supplies (case-insensitive; unrecognized text counts as a gap — cautious default), and a
@@ -135,7 +164,8 @@ python3 "${CLAUDE_PLUGIN_ROOT}/skills/google-ads-audience-targeting/scripts/buil
 - [scripts/audience_xlsx_spec.py](scripts/audience_xlsx_spec.py) — the xlsx workbook layout
   (Controls / Audiences / First-Party Readiness), pure data, no openpyxl.
 - [scripts/assemble_findings.py](scripts/assemble_findings.py) — MCP-path transcription-firewall
-  assembler (two raw pulls -> the `audiences` findings array).
+  assembler (three raw pulls — criteria identity, ad-group-level metrics, user-list names — joined
+  by `ad_group.id` into the `audiences` findings array).
 - [scripts/audience_csv.py](scripts/audience_csv.py) — the skill's `column_map`s + CSV assemblers
   for both datasets (applied audiences alternative path; first-party readiness — always this
   path).
@@ -151,6 +181,10 @@ python3 "${CLAUDE_PLUGIN_ROOT}/skills/google-ads-audience-targeting/scripts/buil
 - Don't claim list sizes, membership durations, Customer Match match rates, or Enhanced
   Conversions/Consent Mode status from MCP data — they aren't exposed. Always the first-party
   CSV/manual path, and label it (`meta.source` / `first_party_source`) honestly in the report.
+- Don't read an MCP-pulled audience's cost/clicks/conversions as caused solely by that one list —
+  it's **ad-group-level** (the API's audience-metrics view has no per-list grain; see "Pull the
+  data"). `meta.metrics_granularity` / `provenance.metrics_granularity` says so honestly in every
+  artifact; never re-narrate it as per-audience precision.
 - Don't infer what a negative/exclusion audience list is *for* from its name or ID — read the name
   and ask, don't guess whether it's actually the recent-converters exclusion.
 - Don't auto-generate a bid-adjustment percent for `paused_criterion` / `no_bid_adjustment` /

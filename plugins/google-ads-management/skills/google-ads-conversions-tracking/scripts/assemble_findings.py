@@ -10,8 +10,10 @@ as meta.reconciliation so conv_tracking_core hard-fails if the findings are
 later edited or were produced any other way.
 
 Two MCP pulls (required):
-    --conversion-actions <raw file>   conversion_action config + metrics.conversions
-                                       over the current-window date range
+    --conversion-actions <raw file>   conversion_action config + metrics.all_conversions
+                                       (all conversions, incl. secondary actions — the only
+                                       conversions metric selectable at the conversion_action
+                                       grain) over the current-window date range
     --campaign-curr      <raw file>   per-campaign clicks/impressions/cost/
                                        conversions, current window
     --campaign-prior     <raw file>   same shape, prior comparable window
@@ -58,9 +60,9 @@ CONFIG_FIELDS = ("conversion_action.id", "conversion_action.name", "conversion_a
                  "conversion_action.type", "conversion_action.category",
                  "conversion_action.primary_for_goal", "conversion_action.counting_type",
                  "conversion_action.attribution_model_settings.attribution_model",
-                 "metrics.conversions")
-CAMPAIGN_FIELDS = ("campaign.id", "campaign.name", "metrics.clicks", "metrics.impressions",
-                   "metrics.cost_micros", "metrics.conversions")
+                 "metrics.all_conversions")
+CAMPAIGN_FIELDS = ("campaign.id", "campaign.name", "campaign.status", "metrics.clicks",
+                   "metrics.impressions", "metrics.cost_micros", "metrics.conversions")
 
 RECONCILE_ARRAYS = core.RECONCILE_ARRAYS
 
@@ -79,14 +81,17 @@ DEFAULT_MANUAL_CHECKS = [
     {"check": "Enhanced Conversions", "value": "not confirmed via API",
      "data_source": "not_confirmed", "note": "No --ec-csv supplied — confirm in the UI."},
     {"check": "Consent Mode v2", "value": "not confirmed via API",
-     "data_source": "not_confirmed", "note": "No --ec-csv supplied — confirm in the UI."},
+     "data_source": "not_confirmed",
+     "note": "No manual Consent Mode v2 status supplied — confirm Basic/Advanced consent "
+             "signals in Tag Manager or the site's consent banner config."},
 ]
 
 
 def _agg_conversion_actions(rows: list) -> list:
-    """One row per conversion_action.id (defensive sum of metrics.conversions
+    """One row per conversion_action.id (defensive sum of metrics.all_conversions
     in case the pull is segmented); other config fields taken from the first
-    occurrence (they don't vary by segment)."""
+    occurrence (they don't vary by segment). conversions_30d holds all
+    conversions (incl. secondary) — the raw key is consumed directly, no rename."""
     merged: dict = {}
     order: list = []
     for r in rows:
@@ -104,7 +109,7 @@ def _agg_conversion_actions(rows: list) -> list:
                 "conversions_30d": 0.0,
             }
             order.append(cid)
-        merged[cid]["conversions_30d"] += G.num(r.get("metrics.conversions"))
+        merged[cid]["conversions_30d"] += G.num(r.get("metrics.all_conversions"))
     for cid in order:
         merged[cid]["conversions_30d"] = round(merged[cid]["conversions_30d"], 6)
     return [merged[cid] for cid in order]
@@ -118,6 +123,7 @@ def _agg_campaigns(rows: list) -> dict:
         cid = r.get("campaign.id")
         if cid not in merged:
             merged[cid] = {"campaign_id": cid, "campaign": r.get("campaign.name", ""),
+                           "status": r.get("campaign.status", ""),
                            "clicks": 0.0, "impressions": 0.0, "cost": 0.0, "conversions": 0.0}
         m = merged[cid]
         m["clicks"] += G.num(r.get("metrics.clicks"))
@@ -134,8 +140,12 @@ def _join_campaign_trend(curr: dict, prior: dict) -> list:
     for cid in sorted(set(curr) | set(prior), key=lambda k: (k is None, k)):
         c, p = curr.get(cid), prior.get(cid)
         name = (c or p)["campaign"]
+        # campaign.status is a current campaign attribute (same in both pulls) —
+        # take the current window's, falling back to the prior for a campaign that
+        # only ran then. Non-numeric, so it stays out of the reconcile totals.
+        campaign_status = (c or p).get("status", "")
         out.append({
-            "campaign_id": cid, "campaign": name,
+            "campaign_id": cid, "campaign": name, "campaign_status": campaign_status,
             "clicks_curr": round((c or {}).get("clicks", 0.0), 6),
             "impressions_curr": round((c or {}).get("impressions", 0.0), 6),
             "cost_curr": round((c or {}).get("cost", 0.0), 6),
@@ -176,7 +186,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Assemble conversions & tracking findings JSON "
                                              "from saved raw GAQL pulls (+ optional EC/Consent-Mode CSV).")
     ap.add_argument("--conversion-actions", required=True,
-                    help="raw conversion_action config + metrics.conversions results file")
+                    help="raw conversion_action config + metrics.all_conversions results file")
     ap.add_argument("--campaign-curr", required=True, help="raw per-campaign metrics, current window")
     ap.add_argument("--campaign-prior", required=True, help="raw per-campaign metrics, prior window")
     ap.add_argument("--ec-csv", default=None,
