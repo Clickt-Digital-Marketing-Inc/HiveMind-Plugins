@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Use when installing or reconfiguring the Morning Briefing plugin - first-time setup, "set up my morning briefing", changing which email account or calendar it uses, or changing how the briefing is delivered (Slack DM, local file). Detects connected Gmail, Calendar, Slack, and Linear MCPs, walks the user through the choices, and writes ~/.morning-briefing/config.json which the morning-briefing skill reads on every run.
+description: Use when installing or reconfiguring the Morning Briefing plugin - first-time setup, "set up my morning briefing", changing which email account or calendar it uses, or changing how the briefing is delivered (Slack DM, local file). Detects connected Gmail, Calendar, Slack, and Linear tools, apps, connectors, or MCP integrations, walks the user through the choices, and writes ~/.morning-briefing/config.json which the morning-briefing skill reads on every run.
 ---
 
 # Morning Briefing — Setup
@@ -19,18 +19,27 @@ Interactive configuration for the morning-briefing skill. Detect what's connecte
 
 ### Step 1: Detect connected sources
 
-Use ToolSearch to check availability of: Gmail tools (search threads, create draft), Calendar tools (list calendars, list events, create event), Slack tools (send message), and Linear tools (list issues, list projects). Build a detection summary:
+Inspect the tools already available through the host's connected apps,
+connectors, and MCP servers. When the host offers tool discovery or search, use
+it to locate Gmail capabilities (search threads, create draft), Calendar
+capabilities (list calendars, list events, create event), Slack capabilities
+(send message), and Linear capabilities (list issues, list projects). Claude
+Code example: use ToolSearch for deferred tools. Build a detection summary:
 
-- **Email**: identify the connected account address (visible in calendar/list results, tool descriptions, or the user's known email). Multiple email MCPs → each is an option.
+- **Email**: identify the connected account address (visible in calendar/list results, tool descriptions, or the user's known email). Multiple email integrations → each is an option.
 - **Calendar**: call the list-calendars tool and collect the user's calendars (id, name, primary flag, access role). Only offer calendars with write access.
 - **Delivery options available**: Slack self-DM (if a Slack send tool exists), local markdown file (always available on local runs), both.
 - **Linear**: note whether it's connected (no choice needed — used if present).
 
-Report anything missing with how to fix it (authorize the connector in claude.ai settings, or `claude mcp add` / `/mcp` in an interactive session).
+Report anything missing with a host-appropriate fix: connect or authorize the
+app/connector, or add and authenticate the MCP server through the current
+host's integration settings.
 
 ### Step 2: Ask the user
 
-Ask these decisions (use the question tool when available; otherwise ask in chat). Present detected values as the defaults:
+Ask these decisions as structured choices. Use the host's question UI when
+available; otherwise show the same numbered options in chat and wait for an
+explicit reply. Present detected values as the defaults:
 
 1. **Which email account** should be summarized and drafted from? (Options: each detected account.)
 2. **Which calendar** should be read for availability and receive `[Briefing]` blocks? (Options: detected writable calendars; default the primary.)

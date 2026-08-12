@@ -1,0 +1,33 @@
+{
+  "name": "social-media-manager",
+  "description": "Social Media Manager: plans a batch of social posts end-to-end — asks how many posts, at what cadence, for which platforms and formats; scans Reddit and news sites for trending content ideas; interviews the user to capture their real opinions and direct quotes (building a persistent voice profile); then authors a production-ready writing prompt and a Higgsfield media prompt per post and files each post as a scheduled Linear issue.",
+  "version": "0.1.0",
+  "license": "PolyForm-Shield-1.0.0",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "keywords": [
+    "social-media",
+    "content",
+    "linear",
+    "scheduling",
+    "prompts",
+    "higgsfield",
+    "voice"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Social Media Manager",
+    "shortDescription": "Research, plan, and schedule authentic social content.",
+    "longDescription": "Plan batches of social posts by researching timely ideas, interviewing the user for genuine opinions and quotes, building reusable voice context, creating production-ready writing and media prompts, and scheduling each post in Linear.",
+    "developerName": "Clickt Digital Marketing Inc.",
+    "category": "Marketing",
+    "capabilities": ["Social content planning", "Trend research", "Linear issue scheduling"],
+    "defaultPrompt": [
+      "Plan my next batch of social posts.",
+      "Research timely ideas and interview me for my take.",
+      "Create writing and media prompts for this content plan."
+    ]
+  }
+}

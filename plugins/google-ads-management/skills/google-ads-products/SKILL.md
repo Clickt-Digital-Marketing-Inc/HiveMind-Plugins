@@ -5,6 +5,10 @@ description: Use when auditing Google Ads Shopping/Performance Max PRODUCT perfo
 
 # Google Ads — Products (Shopping/PMax segments)
 
+## Bundled path resolution
+
+Before running bundled scripts, set `PLUGIN_ROOT` to the absolute path of this plugin directory: the nearest ancestor of this `SKILL.md` that contains either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it from the loaded skill path; do not assume a host-specific environment variable or the current working directory. Then run commands that reference `${PLUGIN_ROOT}` unchanged.
+
 Turn product-level performance into action: stop the bleed on products that spend without converting,
 double down on the ones accelerating, and investigate the ones falling off — all benchmarked against
 each product's **own** recent trend, account-aggregated across Shopping and Performance Max.
@@ -117,7 +121,7 @@ rendered by the shared `_shared/render` toolkit from one model:
 > file. If a chart is wrong, the spec or the model is wrong — change it there and re-run the
 > builder. Same run, same chart, byte for byte.
 
-The in-Claude **tuner** (`--emit-widget`) embeds only the scored products (inactive ones — zero
+The interactive **tuner** (`--emit-widget`) embeds only the scored products (inactive ones — zero
 cost and impressions in every window — can never be segmented) so it stays lean on large catalogs;
 headline counts come from the embedded full-model summary. Live-preview only — the md/html/xlsx
 above always carry the full universe.
@@ -126,10 +130,10 @@ Plus three **action worklists** (`_zombie_worklist.csv`, `_surging_worklist.csv`
 `_declining_worklist.csv`). These are **analytical/worklist** deliverables: product-level exclusions
 are **not** cleanly Google Ads Editor-importable — apply them manually in the Shopping/PMax listing
 groups. (Editor-importable apply files like negatives/keywords come from other skills via
-`${CLAUDE_PLUGIN_ROOT}/skills/google-ads-foundation/scripts/make_editor_csv.py`.)
+`${PLUGIN_ROOT}/skills/google-ads-foundation/scripts/make_editor_csv.py`.)
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/google-ads-products/scripts/build_product_report.py" \
+python3 "${PLUGIN_ROOT}/skills/google-ads-products/scripts/build_product_report.py" \
   --input findings.json --outdir artifacts --brand "{Client Name}" --formats md,html,xlsx
 ```
 

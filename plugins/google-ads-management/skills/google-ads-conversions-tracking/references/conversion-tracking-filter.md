@@ -168,7 +168,7 @@ python3 scripts/build_conv_tracking_report.py \
 # all three (xlsx needs openpyxl; normalizes via LibreOffice)
 python3 scripts/build_conv_tracking_report.py \
   --input findings.json --outdir artifacts --brand "{Client Name}" --formats md,html,xlsx
-# the in-Claude tuner widget
+# the interactive tuner widget
 python3 scripts/build_conv_tracking_report.py \
   --input findings.json --formats "" --emit-widget widget.json
 ```

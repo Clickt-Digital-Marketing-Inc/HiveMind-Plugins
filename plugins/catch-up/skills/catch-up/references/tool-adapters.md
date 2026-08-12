@@ -2,9 +2,11 @@
 
 The plugin is tool-agnostic. The config names one provider per category; this
 guide maps each category to the functions to call. Exact function names vary by
-connector — discover them at runtime with ToolSearch (e.g. search "granola
-transcript", "gmail draft", "linear issue", "clickup task") and use whatever the
-connected server exposes. The notes below are starting points, not a fixed list.
+connected app, connector, or MCP server. Inspect the host's available tools and,
+when it supports tool discovery or search, use that mechanism at runtime
+(Claude Code example: ToolSearch for "granola transcript", "gmail draft",
+"linear issue", or "clickup task"). Use whatever the connected integration
+exposes. The notes below are starting points, not a fixed list.
 
 ## Call transcripts (`~~call transcripts`)
 

@@ -5,6 +5,10 @@ description: Use when Google Ads Quality Score is low or dropping (below 5), CPC
 
 # Google Ads — Quality Score Forensics
 
+## Bundled path resolution
+
+Before running bundled scripts, set `PLUGIN_ROOT` to the absolute path of this plugin directory: the nearest ancestor of this `SKILL.md` that contains either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it from the loaded skill path; do not assume a host-specific environment variable or the current working directory. Then run commands that reference `${PLUGIN_ROOT}` unchanged.
+
 Quality Score drives CPC and Ad Rank — it is not a vanity metric. When it drops below 5, diagnose
 systematically across its three components (Expected CTR, Ad relevance, Landing page experience)
 rather than applying generic tips.
@@ -88,7 +92,7 @@ recovery. No recovery by day 30 → root cause is landing page or ad relevance, 
 authoritative in [references/quality-score-report.md](references/quality-score-report.md)):
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/google-ads-quality-score/scripts/build_qs_report.py" --input findings.json --outdir artifacts \
+python3 "${PLUGIN_ROOT}/skills/google-ads-quality-score/scripts/build_qs_report.py" --input findings.json --outdir artifacts \
   --brand "{Client Name}" --formats md,html,xlsx
 ```
 - `*.md` — headline KPIs (avg QS, in-scope, component split, pause candidates, **dominant QS
@@ -115,7 +119,7 @@ python3 "${CLAUDE_PLUGIN_ROOT}/skills/google-ads-quality-score/scripts/build_qs_
 > builder. Same run, same chart, byte for byte.
 
 **Forensic apply-files** (Google Ads Editor; applied manually — MCP is read-only) via
-`${CLAUDE_PLUGIN_ROOT}/skills/google-ads-foundation/scripts/make_editor_csv.py`:
+`${PLUGIN_ROOT}/skills/google-ads-foundation/scripts/make_editor_csv.py`:
 - `pause_list` CSV — step-5 low-CTR keywords (the bundle's pause candidates).
 - `bid_adjustments` CSV — mobile bid-adjustment changes.
 - `*_rsa_rewrites.md` — the deepened keyword↔headline worklist (`scripts/build_rsa_rewrites.py`,

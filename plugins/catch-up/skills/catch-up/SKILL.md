@@ -32,10 +32,11 @@ Tuesday 9am...").
 
 ## 3. Gather new call transcripts
 
-Use the configured call tool (`~~call transcripts`). Discover its functions with
-ToolSearch if needed. List meetings/transcripts whose date falls in the window,
-then fetch each transcript's text. See `references/tool-adapters.md` for
-per-tool guidance.
+Use the configured call tool (`~~call transcripts`). Inspect the host's
+available tools and, when supported, use its tool discovery or search mechanism
+to locate the needed functions (Claude Code example: ToolSearch). List
+meetings/transcripts whose date falls in the window, then fetch each
+transcript's text. See `references/tool-adapters.md` for per-tool guidance.
 
 If there are no new calls, say so and continue.
 

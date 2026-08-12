@@ -1,6 +1,6 @@
 ---
 name: client-report-monthly
-description: Use for the monthly client report cycle — "run the monthly report", "build <client>'s July report". Pulls the full prior month (plus prior-month and YoY windows), builds the tabbed monthly report draft, requests John's commentary per section, and deploys ONLY after his approval.
+description: Use for the monthly client report cycle — "run the monthly report", "build the client's July report". Pulls the full prior month (plus prior-month and YoY windows), builds the tabbed monthly report draft, requests John's commentary per section, and deploys ONLY after his approval.
 ---
 
 # Monthly Report Cycle

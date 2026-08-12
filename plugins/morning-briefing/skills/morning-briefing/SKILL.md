@@ -33,7 +33,15 @@ Apply these whenever choosing a time for any block:
 
 ## Workflow
 
-Execute the steps in order. Load MCP tools first: use ToolSearch to load Gmail tools (search threads, get thread, list drafts, create draft), Linear tools (list projects, list issues, get user, status updates), and Calendar tools (list calendars, list events, create event). If a required MCP server is not connected, note the gap in the briefing under "Skipped" and continue with the remaining sections. Do not fail the whole briefing because one source is down.
+Execute the steps in order. First inspect the tools available through the host's
+connected apps, connectors, and MCP servers. When the host supports tool
+discovery or search, use it to locate Gmail capabilities (search threads, get
+thread, list drafts, create draft), Linear capabilities (list projects, list
+issues, get user, status updates), and Calendar capabilities (list calendars,
+list events, create event). Claude Code example: use ToolSearch for deferred
+tools. If a required integration is unavailable, note the gap in the briefing
+under "Skipped" and continue with the remaining sections. Do not fail the whole
+briefing because one source is down.
 
 ### Step 1: Establish context
 

@@ -9,7 +9,10 @@
 
 ## Voice profile file spec
 
-Location: `~/.claude/social-media-manager/voice-profile.md` (user-level — NEVER inside the plugin directory, which is replaced on every update). Create the directory if missing.
+Location: `~/.claude/social-media-manager/voice-profile.md` (the plugin's
+existing user-level data path, retained for compatibility across hosts and
+updates — NEVER inside the plugin directory, which is replaced on every
+update). Create the directory if missing.
 
 Exact section skeleton:
 
@@ -48,7 +51,10 @@ Exact section skeleton:
 
 ## Part A — first-run deep interview
 
-Run only when no voice profile exists. Ask conversationally, 1-2 questions at a time, in plain text — NOT AskUserQuestion option lists (multiple choice cannot capture verbatim quotes). Roughly 20-30 minutes of the user's time; say so up front and offer to shorten if they're pressed.
+Run only when no voice profile exists. Ask conversationally, 1-2 questions at
+a time, in plain text — NOT structured option lists (multiple choice cannot
+capture verbatim quotes). Roughly 20-30 minutes of the user's time; say so up
+front and offer to shorten if they're pressed.
 
 1. Who are you and what do you do? Who is the audience you want these posts to reach?
 2. What are three strong opinions you hold in your field that most peers would push back on?

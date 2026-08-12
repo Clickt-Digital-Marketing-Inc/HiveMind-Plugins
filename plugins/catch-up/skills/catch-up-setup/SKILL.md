@@ -25,9 +25,11 @@ Read `~/.catch-up/config.json`.
 
 ## 2. Ask which tools to use
 
-Use AskUserQuestion. Cover the three tool categories and the two behavior
-settings. Present real options for each category (see `CONNECTORS.md`), and rely
-on the free-text box for tools not listed.
+Cover the three tool categories and the two behavior settings with structured
+choices. Use the host's structured-choice UI when one is available; otherwise
+show the same numbered options in chat, invite a typed alternative for tools
+not listed, and wait for the user's explicit reply. Present real options for
+each category (see `CONNECTORS.md`).
 
 1. **Call transcripts** — where meeting recordings/notes live (Granola,
    Microsoft Teams, Google Meet, Zoom, Otter, Fireflies, ...).
@@ -46,15 +48,17 @@ should look, since there is no "last run" yet.
 
 ## 3. Confirm each chosen tool is actually connected
 
-For each chosen tool, verify it is reachable before saving. Discover the tool's
-functions with ToolSearch (e.g. search "granola meetings", "gmail search",
-"linear create issue") and make one lightweight read call (list recent meetings,
-list recent threads, list teams/projects/lists).
+For each chosen tool, verify it is reachable before saving. Inspect the tools
+already available through the host's connected apps, connectors, and MCP
+servers; when the host offers tool discovery or search, use it to find the
+needed functions (Claude Code example: ToolSearch for "granola meetings",
+"gmail search", or "linear create issue"). Make one lightweight read call
+(list recent meetings, list recent threads, list teams/projects/lists).
 
 - If a tool responds, it is connected.
-- If its functions are not available, tell the user in plain language to connect
-  that tool in Cowork's connector settings, then come back. Do not save a broken
-  configuration.
+- If its functions are not available, tell the user in plain language to
+  connect or authorize that app, connector, or MCP integration in the current
+  host, then come back. Do not save a broken configuration.
 
 ## 4. Save the configuration
 

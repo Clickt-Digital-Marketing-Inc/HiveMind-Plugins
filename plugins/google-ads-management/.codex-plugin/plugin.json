@@ -1,0 +1,26 @@
+{
+  "name": "google-ads-management",
+  "version": "2.0.0",
+  "description": "Ongoing, cadence-based Google Ads management as done-with-you advisors — dual input (read-only Google Ads MCP or a user CSV export), fronted by an interactive task menu with a conversational fallback: select a task or ask to 'manage Google Ads' to open the `google-ads` hub, which lists every task and routes to it. A shared foundation (account selection, GAQL cookbook, 2026 benchmarks, dual-input + advisor output contract) plus account health & red flags, budget pacing, bidding strategy, keywords/search terms, Quality Score forensics, audience targeting, conversions & tracking, performance reporting, competitive analysis, PMax campaigns, PMax listing groups, and product performance. Diagnoses account data against thresholds behind a transcription firewall, then leads a prioritized recommendation loop and offers ready-to-apply Google Ads Editor CSVs — emitting the md + interactive-HTML + tunable-xlsx bundle (or a reduced md + xlsx bundle for account health & audience targeting), with Node<->Python kernel parity across every tunable skill.",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "homepage": "https://clickt.ca",
+  "license": "PolyForm-Shield-1.0.0",
+  "keywords": ["google-ads", "ppc", "paid-search", "account-management", "gaql", "mcp", "quality-score", "bidding", "negative-keywords", "pmax", "menu", "hub"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Google Ads Management",
+    "shortDescription": "Manage Google Ads with guided analysis and recommendations.",
+    "longDescription": "Use an interactive task menu or conversational requests to route account health, pacing, bidding, search terms, Quality Score, audiences, conversion tracking, reporting, competitive analysis, PMax, and product-performance work.",
+    "developerName": "Clickt Digital Marketing Inc.",
+    "category": "Marketing",
+    "capabilities": ["Google Ads account management", "Interactive task routing", "Editor-ready recommendations"],
+    "defaultPrompt": [
+      "Manage this Google Ads account and show me the task menu.",
+      "Diagnose account health and prioritize next actions.",
+      "Review budget pacing and bidding from this export."
+    ]
+  }
+}

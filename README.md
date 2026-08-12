@@ -1,6 +1,6 @@
 # HiveMind Plugins
 
-Clickt's HiveMind plugins for **Claude Code**, in one marketplace. **Deliverable**
+Clickt's HiveMind plugins for **Claude Code and Codex**, in one dual-host marketplace. **Deliverable**
 plugins turn live ad/store data (or CSV exports) into self-contained, white-label
 client reports; a **management suite** runs ongoing Google Ads work as done-with-you
 advisors; and **workflow** plugins run your day on Linear, Gmail, and Google Calendar.
@@ -23,8 +23,9 @@ formula-driven xlsx workbook from a single compute pass.
 
 ### Management suite
 
-An ongoing-management layer rather than a one-shot report: an in-Claude menu that
-routes to focus-area **done-with-you advisors**, each of which diagnoses live data
+An ongoing-management layer rather than a one-shot report: an interactive task menu with a
+conversational fallback that routes to focus-area **done-with-you advisors**, each of which
+diagnoses live data
 behind a transcription firewall, leads a prioritized recommendation loop, and hands
 you ready-to-apply Google Ads Editor CSVs.
 
@@ -47,7 +48,7 @@ servers.
 | **orchestrator** | Run a Linear-governed project as rounds of parallel, tiered executors in git worktrees: merge gate, reflect pass, QC, checkpoint/halt discipline, interactive review-queue closeout (`/orchestrator:close-issues`) and lessons review (`/orchestrator:lessons-review`). Execution-side counterpart to project-coordinator. | Linear MCP + git (`python3` optional, for the checkout-guard hook — fails open without it) |
 
 > **Source-available under the [PolyForm Shield License 1.0.0](https://polyformproject.org/licenses/shield/1.0.0).**
-> Free to install and use within Claude Code for the internal business operations
+> Free to install and use with Claude Code or Codex for the internal business operations
 > of you and your company — including work on your own clients' accounts. No
 > redistribution, no re-hosting, no sublicensing, no resale — of the software or
 > anything based on it, in whole or in part. See [`LICENSE`](LICENSE).
@@ -58,44 +59,86 @@ servers.
 
 ## Install
 
-1. **Add the marketplace** in Claude Code:
-   ```
-   /plugin marketplace add Clickt-Digital-Marketing-Inc/HiveMind-Plugins
-   ```
-2. **Install a plugin.** Example:
-   ```
-   /plugin install google-ads-audit@hivemind-plugins
-   ```
-   Installable slugs, each `@hivemind-plugins`:
-   ```
-   /plugin install google-ads-audit@hivemind-plugins
-   /plugin install meta-ads-audit@hivemind-plugins
-   /plugin install shopify-cro-audit@hivemind-plugins
-   /plugin install cm3-profitability@hivemind-plugins
-   /plugin install google-ads-management@hivemind-plugins
-   /plugin install memo@hivemind-plugins
-   /plugin install project-coordinator@hivemind-plugins
-   /plugin install social-media-manager@hivemind-plugins
-   /plugin install morning-briefing@hivemind-plugins
-   /plugin install wppc-report@hivemind-plugins
-   /plugin install catch-up@hivemind-plugins
-   /plugin install orchestrator@hivemind-plugins
-   ```
-   > `orchestrator` is also published in the standalone `clickt-orchestrator` marketplace — install it from **one** marketplace only (two installs of the same plugin name collide).
-3. **Set up what your chosen plugins need:**
-   - *Deliverable plugins & the management suite*: Python 3 with `pip install openpyxl`;
-     `google-ads-management` also needs `vl-convert-python==1.7.0` for its charts, and
-     `cm3-profitability` needs `pip install python-pptx vl-convert-python==1.7.0`.
-   - *Workflow plugins*: no Python required (exception: `orchestrator`'s checkout-guard
-     hook wants `python3` on PATH, and fails open without it). Connect the MCP servers
-     they use: Linear (project-coordinator, social-media-manager, morning-briefing,
-     orchestrator), plus Gmail + Google Calendar (morning-briefing), web access
-     (social-media-manager), and your transcript/email/tracker tools (catch-up).
-     `memo` needs nothing — it writes a markdown file and stops.
+Cloning this repository only downloads its source; it does not register or install the
+marketplace. Choose your host, register the Git marketplace, then install the plugins you need.
+
+### Claude Code
+
+Add the marketplace:
+
+```
+/plugin marketplace add Clickt-Digital-Marketing-Inc/HiveMind-Plugins
+```
+
+Installable slugs, each from `@hivemind-plugins`:
+
+```
+/plugin install google-ads-audit@hivemind-plugins
+/plugin install meta-ads-audit@hivemind-plugins
+/plugin install shopify-cro-audit@hivemind-plugins
+/plugin install cm3-profitability@hivemind-plugins
+/plugin install google-ads-management@hivemind-plugins
+/plugin install memo@hivemind-plugins
+/plugin install project-coordinator@hivemind-plugins
+/plugin install social-media-manager@hivemind-plugins
+/plugin install morning-briefing@hivemind-plugins
+/plugin install wppc-report@hivemind-plugins
+/plugin install catch-up@hivemind-plugins
+/plugin install orchestrator@hivemind-plugins
+/plugin install clickt-reporting@hivemind-plugins
+```
+
+### Codex
+
+Add the Git marketplace from the Codex CLI and verify that Codex resolved it:
+
+```bash
+codex plugin marketplace add Clickt-Digital-Marketing-Inc/HiveMind-Plugins --ref main
+codex plugin marketplace list
+```
+
+Installable slugs, each from `@hivemind-plugins`:
+
+```bash
+codex plugin add google-ads-audit@hivemind-plugins
+codex plugin add meta-ads-audit@hivemind-plugins
+codex plugin add shopify-cro-audit@hivemind-plugins
+codex plugin add cm3-profitability@hivemind-plugins
+codex plugin add google-ads-management@hivemind-plugins
+codex plugin add memo@hivemind-plugins
+codex plugin add project-coordinator@hivemind-plugins
+codex plugin add social-media-manager@hivemind-plugins
+codex plugin add morning-briefing@hivemind-plugins
+codex plugin add wppc-report@hivemind-plugins
+codex plugin add catch-up@hivemind-plugins
+codex plugin add orchestrator@hivemind-plugins
+codex plugin add clickt-reporting@hivemind-plugins
+```
+
+For local development, run `codex plugin marketplace add "$PWD"` from the repository root.
+Alternatively, after registering the marketplace, restart the Codex app and install from the
+Plugins Directory: choose **HiveMind Plugins**, then select the plugins you need. Start a new task
+after installing or updating a plugin so its skills reload.
+
+> `orchestrator` is also published in the standalone `clickt-orchestrator` marketplace — install it from **one** marketplace only (two installs of the same plugin name collide).
+
+### Prerequisites
+
+Set up what your chosen plugins need:
+
+- *Deliverable plugins & the management suite*: Python 3 with `pip install openpyxl`;
+  `google-ads-management` also needs `vl-convert-python==1.7.0` for its charts, and
+  `cm3-profitability` needs `pip install python-pptx vl-convert-python==1.7.0`.
+- *Workflow plugins*: no Python required (exception: `orchestrator`'s checkout-guard
+  hook wants `python3` on PATH, and fails open without it). Connect the MCP servers
+  they use: Linear (project-coordinator, social-media-manager, morning-briefing,
+  orchestrator), plus Gmail + Google Calendar (morning-briefing), web access
+  (social-media-manager), and your transcript/email/tracker tools (catch-up).
+  `memo` needs nothing — it writes a markdown file and stops.
 
 ## Requirements
 
-- **Claude Code** with plugin support.
+- **Claude Code or Codex** with plugin support.
 - **Deliverable plugins & the management suite, Python 3.** The HTML + markdown
   renderers are standard-library only; `openpyxl` (>=3.1) is needed for the xlsx
   workbooks. `google-ads-management` needs `vl-convert-python==1.7.0` for its static

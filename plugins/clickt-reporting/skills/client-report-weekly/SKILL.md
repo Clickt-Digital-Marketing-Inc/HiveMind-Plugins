@@ -1,6 +1,6 @@
 ---
 name: client-report-weekly
-description: Use for the weekly client report cycle — "run the weekly report", "weekly pulse for <client>", or when a scheduled Routine invokes /clickt-reporting:report-weekly. Pulls the just-completed ISO week, builds the pulse draft, requests John's commentary, and deploys ONLY after his approval.
+description: Use for the weekly client report cycle — "run the weekly report", "weekly pulse for the client", or when a scheduled Routine invokes /clickt-reporting:report-weekly. Pulls the just-completed ISO week, builds the pulse draft, requests John's commentary, and deploys ONLY after his approval.
 ---
 
 # Weekly Report Cycle

@@ -1,9 +1,23 @@
 ---
 name: google-ads-pmax-campaigns
-description: Use when reporting on Google Ads Performance Max (PMax) campaigns — a 14-day momentum report that flags campaigns to SCALE (conversions up and ROAS surging) vs campaigns to CUT/INVESTIGATE (conversions down and ROAS collapsing) by comparing the last 14 days to the previous 14 days, plus asset-group concentration and a PMax-vs-Search cannibalization signal. Triggers include "Pmax report", "Performance Max winners and losers", "which Pmax campaigns should I scale or cut", "Pmax 14-day trend", "Pmax momentum", "Pmax asset group concentration", "is my PMax campaign cannibalizing Search". Pulls live campaign metrics via the Google Ads MCP (or a Google Ads UI CSV export) and emits a three-format analytical bundle: a markdown report, a self-contained interactive HTML explorer (tunable ROAS sliders), and a formula-driven .xlsx — plus prioritized advisor recommendations.
+description: >
+  Use when reporting on Google Ads Performance Max (PMax) campaigns — a 14-day momentum report
+  that flags campaigns to SCALE (conversions up and ROAS surging) vs campaigns to CUT/INVESTIGATE
+  (conversions down and ROAS collapsing) by comparing the last 14 days to the previous 14 days,
+  plus asset-group concentration and a PMax-vs-Search cannibalization signal. Triggers include
+  "Pmax report", "Performance Max winners and losers", "which Pmax campaigns should I scale or
+  cut", "Pmax 14-day trend", "Pmax momentum", "Pmax asset group concentration", and "is my PMax
+  campaign cannibalizing Search". Pulls live campaign metrics via the Google Ads MCP (or a Google
+  Ads UI CSV export) and emits a three-format analytical bundle: a markdown report, a self-contained
+  interactive HTML explorer (tunable ROAS sliders), and a formula-driven .xlsx — plus prioritized
+  advisor recommendations.
 ---
 
 # Google Ads — Performance Max campaign momentum
+
+## Bundled path resolution
+
+Before running bundled scripts, set `PLUGIN_ROOT` to the absolute path of this plugin directory: the nearest ancestor of this `SKILL.md` that contains either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it from the loaded skill path; do not assume a host-specific environment variable or the current working directory. Then run commands that reference `${PLUGIN_ROOT}` unchanged.
 
 Separate the Performance Max campaigns gaining momentum from the ones losing it,
 fortnight over fortnight, so budget moves toward what is compounding and away from
@@ -115,7 +129,7 @@ all rendered by the shared `_shared/render` toolkit from one model:
 
 This is a **diagnostic/reporting** skill — PMax has no keyword/ad-group apply files,
 so it emits **no Google Ads Editor CSVs**. (That apply path,
-`${CLAUDE_PLUGIN_ROOT}/skills/google-ads-foundation/scripts/make_editor_csv.py`, is separate and unrelated.)
+`${PLUGIN_ROOT}/skills/google-ads-foundation/scripts/make_editor_csv.py`, is separate and unrelated.)
 
 ## Resources
 - [references/pmax-momentum-filter.md](references/pmax-momentum-filter.md) —

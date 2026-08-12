@@ -18,6 +18,10 @@ metadata:
 
 # Meta Ads Account Audit
 
+## Bundled path resolution
+
+Before running bundled scripts, set `PLUGIN_ROOT` to the absolute path of this plugin directory: the nearest ancestor of this `SKILL.md` that contains either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it from the loaded skill path; do not assume a host-specific environment variable or the current working directory. Then run commands that reference `${PLUGIN_ROOT}` unchanged.
+
 ## Overview
 
 Conduct a full Meta Ads account audit by pulling live data through the **Meta Ads MCP**,
@@ -127,7 +131,7 @@ To use the skill, work through these steps in order.
 5. **Run the pre-scorer FIRST, then evaluate the judgment checks.** The mechanical checks
    are machine-scored — get their results before judging anything:
    ```bash
-   python3 "${CLAUDE_PLUGIN_ROOT}/skills/meta-ads-audit/scripts/build_audit.py" \
+   python3 "${PLUGIN_ROOT}/skills/meta-ads-audit/scripts/build_audit.py" \
      --prescore-only --raw-dir "<workdir>" --business-model "{Lead Gen|Ecommerce}"
    ```
    (`--csv-dir` on the manual path; works without `--input`.) The JSON lists machine-scored
@@ -147,7 +151,7 @@ To use the skill, work through these steps in order.
 7. **Build the deliverable bundle.** Ask the user **where to save** the report (suggest
    `~/Downloads` as a sensible default), then build all three formats to that directory:
    ```bash
-   python3 "${CLAUDE_PLUGIN_ROOT}/skills/meta-ads-audit/scripts/build_audit.py" \
+   python3 "${PLUGIN_ROOT}/skills/meta-ads-audit/scripts/build_audit.py" \
      --input audit-payload.json --outdir "<user-chosen-dir>" --brand "{Client Name}" \
      --raw-dir "<workdir-with-the-saved-pulls>" --business-model "{Lead Gen|Ecommerce}"
    ```

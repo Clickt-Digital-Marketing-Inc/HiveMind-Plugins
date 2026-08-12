@@ -82,7 +82,7 @@ Protect the usage window; these are mandates, not suggestions:
 - The issue is the lock: In Progress = owned. Verify Todo/unlocked before claiming (stale In Progress from dead sessions is a flag for the user, not a lock).
 - Exactly **two comments per issue**: the plan when work starts, the wrap-up (what changed + verification evidence + deviations, everything disclosed) when it finishes.
 - Executors stop at **In Review**; only the human reviewer moves Done.
-- Reviewer verdicts run through `/close-issues` when the user wants to work the queue interactively — popup verdicts, immediate execution, decision-queue coverage.
+- Reviewer verdicts run through `/close-issues` when the user wants to work the queue interactively — structured verdict choices with a conversational fallback, immediate execution after an explicit answer, and decision-queue coverage.
 - New work discovered mid-issue → new issue, never silent scope expansion.
 - Decision asks are written as **options + recommendation + blast radius**, filed on the issue (or as a new decision issue), and **never improvised around** — the lane halts or routes around the decision surface.
 

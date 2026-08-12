@@ -1,20 +1,25 @@
 ---
 name: client-report-setup
-description: Use when onboarding a new ecomm client into Clickt's hosted reporting system — "set up client reporting", "onboard <client> reports", "new report package". Interviews for accounts and value semantics, scaffolds the report-package engine into the client repo, configures data-source adapters, sets up hosting at reports.clickt.ca with per-client basic auth, and schedules the weekly report Routine.
+description: Use when onboarding a new ecomm client into Clickt's hosted reporting system — "set up client reporting", "onboard client reports", "new report package". Interviews for accounts and value semantics, scaffolds the report-package engine into the client repo, configures data-source adapters, sets up hosting at reports.clickt.ca with per-client basic auth, and schedules the weekly report Routine.
 ---
 
 # Client Report Setup
 
+## Bundled path resolution
+
+Before using bundled templates, set `PLUGIN_ROOT` to the absolute path of this plugin directory: the nearest ancestor of this `SKILL.md` that contains either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it from the loaded skill path; do not assume a host-specific environment variable or the current working directory. Then use paths that reference `${PLUGIN_ROOT}` unchanged.
+
 Onboard one ecomm client into the Clickt reporting system: scaffold → configure →
 verify sources → host → schedule. The engine ships with this plugin at
-`${CLAUDE_PLUGIN_ROOT}/templates/report-package/`.
+`${PLUGIN_ROOT}/templates/report-package/`.
 
 **Read first:** the bundled `templates/report-package/RUNBOOK.md` (the cycle and its
 gates) and `template/schema/CONTRACT.md` (the data contract). They govern everything.
 
 ## 1. Interview
 
-Ask (AskUserQuestion where options exist; keep it to what config needs):
+Ask for the following inputs. Use the host's structured prompt surface when available; otherwise
+ask conversationally. Keep it to what the configuration needs:
 
 - Client name, slug (kebab), website, currency, locale.
 - Client repo path (report-package lands at `<client-repo>/<project>/report-package/`).
@@ -33,7 +38,7 @@ Ask (AskUserQuestion where options exist; keep it to what config needs):
 ## 2. Scaffold
 
 ```bash
-cp -R "${CLAUDE_PLUGIN_ROOT}/templates/report-package" <client-repo>/<project>/report-package
+cp -R "${PLUGIN_ROOT}/templates/report-package" <client-repo>/<project>/report-package
 cd <client-repo>/<project>/report-package
 mv config/client.example.json config/client.json   # then edit per interview
 mv config/goals.example.json config/goals.json

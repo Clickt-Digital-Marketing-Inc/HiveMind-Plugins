@@ -1,9 +1,9 @@
 ---
-description: Walk the In Review queue (and decision queue) with popup verdicts - evidence-honest summaries in the question text, rulings executed immediately
+description: Walk the In Review queue (and decision queue) with structured verdict choices - evidence-honest summaries with each question, explicit rulings executed immediately
 argument-hint: [optional scope, e.g. "decision queue only" or an issue id]
 ---
 
-Work the review queue interactively with the user. Load the `close-issues` skill from this plugin first if you haven't — it carries the full protocol: per-issue procedure, popup format, batching rules, verdict execution, and the safety rails.
+Work the review queue interactively with the user. Load the `close-issues` skill from this plugin first if you haven't — it carries the full protocol: per-issue procedure, structured-choice format with conversational fallback, batching rules, verdict execution, and the safety rails.
 
 ## Before starting
 
@@ -12,4 +12,4 @@ Work the review queue interactively with the user. Load the `close-issues` skill
 
 ## Run
 
-Follow the skill: pull each issue's full record, synthesize the evidence-honest summary, surface embedded decisions as their own questions, present AskUserQuestion popups (≤4 questions, decision-carrying issues solo, dismissed popup = stop and wait), and execute every verdict immediately with the skill's safety rails. Batch Linear writes >~5 through a subagent.
+Follow the skill: pull each issue's full record, synthesize the evidence-honest summary, surface embedded decisions as their own questions, present structured choices (≤4 questions, decision-carrying issues solo) through the host UI or as numbered chat options, stop and wait on dismissal or silence, and execute every explicit verdict immediately with the skill's safety rails. Batch Linear writes >~5 through a subagent.

@@ -1,0 +1,25 @@
+{
+  "name": "catch-up",
+  "version": "0.1.0",
+  "license": "PolyForm-Shield-1.0.0",
+  "description": "Turn new call transcripts and emails into tracked issues and draft replies. Reads everything since the last run, pulls out tasks, decisions, and open questions, files them in your project tracker, and drafts the emails you owe.",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "keywords": ["productivity", "meetings", "transcripts", "email", "issues", "follow-up", "automation"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Catch Up",
+    "shortDescription": "Turn new conversations into tracked work and draft replies.",
+    "longDescription": "Process new call transcripts and emails since the last run, extract tasks, decisions, and open questions, de-duplicate them against the connected tracker, prepare issues for review, and draft owed replies and follow-ups without sending them.",
+    "developerName": "Clickt Digital Marketing Inc.",
+    "category": "Productivity",
+    "capabilities": ["Transcript and email review", "Task extraction", "Draft reply preparation"],
+    "defaultPrompt": [
+      "Catch me up on new calls and email.",
+      "Extract tasks and decisions since the last run.",
+      "Draft the replies and follow-ups I owe."
+    ]
+  }
+}

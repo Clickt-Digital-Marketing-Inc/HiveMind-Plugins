@@ -1,0 +1,32 @@
+{
+  "name": "morning-briefing",
+  "description": "Daily Morning Briefing: summarizes Gmail conversations and drafts replies, reports Linear project progress and blocked issues, prioritizes your assigned issues, and blocks focused work time on your calendar.",
+  "version": "0.4.0",
+  "license": "PolyForm-Shield-1.0.0",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "keywords": [
+    "briefing",
+    "email",
+    "linear",
+    "calendar",
+    "productivity",
+    "daily"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Morning Briefing",
+    "shortDescription": "Start the day with email, project, and calendar priorities.",
+    "longDescription": "Summarize important email conversations, draft replies, report Linear progress and blockers, prioritize assigned work, reserve focus time, and identify upcoming calendar bottlenecks in one daily briefing.",
+    "developerName": "Clickt Digital Marketing Inc.",
+    "category": "Productivity",
+    "capabilities": ["Daily briefing", "Email drafting", "Linear and calendar planning"],
+    "defaultPrompt": [
+      "Prepare my morning briefing.",
+      "Summarize my inbox and draft the replies I owe.",
+      "Prioritize my Linear work and block focus time."
+    ]
+  }
+}

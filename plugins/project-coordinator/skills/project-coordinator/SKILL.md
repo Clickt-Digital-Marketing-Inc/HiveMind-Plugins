@@ -1,6 +1,6 @@
 ---
 name: project-coordinator
-description: Coordinates a project end-to-end as a project coordinator — assesses project state, routes between idea refinement and Linear planning, structures the project root folder, generates the guidance markdown that keeps Claude on-rails, and enforces Linear as the source of truth with every issue executable as a standalone prompt. Covers software and marketing projects alike — content planning, social media calendars, events, launches. Use when the user says "act as my project coordinator", "coordinate this project", "set up this project", "kick off this project", "plan this campaign", "set up the content calendar", "coordinate this event", "what should I work on next", "audit my Linear issues", "groom the backlog", "is this project set up right", or "get this repo/project folder ready for Claude".
+description: Coordinates a project end-to-end as a project coordinator — assesses project state, routes between idea refinement and Linear planning, structures the project root folder, generates the guidance markdown that keeps coding agents on-rails, and enforces Linear as the source of truth with every issue executable as a standalone prompt. Covers software and marketing projects alike — content planning, social media calendars, events, launches. Use when the user says "act as my project coordinator", "coordinate this project", "set up this project", "kick off this project", "plan this campaign", "set up the content calendar", "coordinate this event", "what should I work on next", "audit my Linear issues", "groom the backlog", "is this project set up right", or "get this repo/project folder ready for an agent".
 ---
 
 # Project Coordinator
@@ -10,7 +10,11 @@ Orchestrate a project's lifecycle — software builds and marketing projects ali
 - **`idea-refinement`** — turns a raw idea into a decision-complete project brief.
 - **`plan-to-linear-build`** — turns a brief into a Linear project (milestones + issues as standalone prompts) plus a root `CLAUDE.md`.
 
-Invoke them via the Skill tool as `project-coordinator:idea-refinement` and `project-coordinator:plan-to-linear-build`; if the plugin-namespaced name is not found, fall back to whichever registered skill carries the same base name (plain or another namespace) — they are the same skill.
+Invoke the registered skills `project-coordinator:idea-refinement` and
+`project-coordinator:plan-to-linear-build` through the current host's skill
+selection mechanism. If a plugin-namespaced name is not found, fall back to the
+registered skill with the same base name (plain or another namespace) — they
+are the same skill.
 
 ## Operating principles
 
@@ -66,6 +70,21 @@ For an existing Linear project. Detailed procedures live in [references/issue-au
 
 ## Linear MCP access
 
-Before any operation that reads or writes Linear, confirm the Linear MCP server's tools are reachable — `list_teams`, `list_projects`, `get_project`, `list_issues`, `get_issue`, `save_issue`, plus what `plan-to-linear-build` needs (tool names carry a server prefix such as `mcp__linear__` or a plugin namespace; if deferred, load them with ToolSearch before calling — "deferred" is not "unavailable").
+Before any operation that reads or writes Linear, confirm that the Linear tools
+are reachable through a connected app, connector, or MCP server —
+`list_teams`, `list_projects`, `get_project`, `list_issues`, `get_issue`,
+`save_issue`, plus what `plan-to-linear-build` needs. Tool names may carry a
+server prefix such as `mcp__linear__` or a plugin namespace. If the host defers
+tools, use its discovery or search mechanism before calling; deferred is not
+unavailable (Claude Code example: ToolSearch).
 
-If the Linear MCP is not connected or not authenticated: say so plainly and do not silently degrade. Refinement and folder structuring still work; for the rest, save the outputs (plan, audits, rewritten issue bodies) to `docs/linear-handoff-pending.md` so the user can apply them once Linear is connected — nothing from the session should be lost. In the fallback path, defer the root `CLAUDE.md` and the Linear-dependent `PROJECT.md` fields rather than writing unfilled placeholders, and report the handoff as **pending**, never complete. When a later session finds `docs/linear-handoff-pending.md` and Linear is available, resume by importing that plan (approval gate still applies) instead of re-planning.
+If the Linear integration is not connected or authenticated: say so plainly
+and do not silently degrade. Refinement and folder structuring still work; for
+the rest, save the outputs (plan, audits, rewritten issue bodies) to
+`docs/linear-handoff-pending.md` so the user can apply them once Linear is
+connected — nothing from the session should be lost. In the fallback path,
+defer the root `CLAUDE.md` and the Linear-dependent `PROJECT.md` fields rather
+than writing unfilled placeholders, and report the handoff as **pending**,
+never complete. When a later session finds `docs/linear-handoff-pending.md` and
+Linear is available, resume by importing that plan (approval gate still
+applies) instead of re-planning.

@@ -12,12 +12,12 @@ Plans a batch of social posts end-to-end: intake → trend scan → voice interv
 ## Critical guardrails
 
 1. **Never invent quotes.** Quotes come only from this session's interview or the voice profile, verbatim.
-2. **Voice profile lives at `~/.claude/social-media-manager/voice-profile.md`** — user-level state that survives plugin updates. NEVER write files inside the plugin directory (it is replaced on update).
+2. **Voice profile lives at `~/.claude/social-media-manager/voice-profile.md`** — this is the plugin's existing user-level data path, retained for compatibility across hosts and plugin updates. NEVER write files inside the plugin directory (it is replaced on update).
 3. **Linear writes are creates only** (`Linear:save_issue` for new issues). Never modify or delete existing issues. Never create labels.
 4. **This skill never calls Higgsfield tools.** It authors media prompts *for a future agent* to execute.
 5. **Every prompt passes the Quality Checklist** (in [references/prompt-templates.md](references/prompt-templates.md)) before saving. Fail → fix → recheck, maximum 2 loops, then surface remaining gaps to the user.
-6. **If the Linear MCP is unavailable**, write the same issue bodies to `~/Documents/Social Posts/<today>-batch.md` and tell the user clearly. Never silently drop posts; never claim issues were created when they were not.
-7. **Interviews are plain conversation**, not AskUserQuestion option lists — multiple choice cannot capture verbatim quotes.
+6. **If the Linear integration is unavailable**, write the same issue bodies to `~/Documents/Social Posts/<today>-batch.md` and tell the user clearly. Never silently drop posts; never claim issues were created when they were not.
+7. **Interviews are plain conversation**, not structured option lists — multiple choice cannot capture verbatim quotes.
 
 ## Run checklist
 
@@ -52,11 +52,19 @@ Load each reference only when its phase begins:
 
 1. Get the date: `date +%Y-%m-%d` and `date +%A` via Bash.
 2. Check whether `~/.claude/social-media-manager/voice-profile.md` exists. This decides Phase 3's mode.
-3. If Linear MCP tools are deferred in this session, load `Linear:list_teams`, `Linear:list_projects`, `Linear:save_issue`, and `Linear:list_issue_labels` via ToolSearch now. If the Linear server is absent entirely, note it — guardrail 6 applies at Phase 5.
+3. Inspect the tools available through connected apps, connectors, and MCP
+   servers for Linear capabilities equivalent to `list_teams`, `list_projects`,
+   `save_issue`, and `list_issue_labels`. If the host defers tools, use its
+   discovery or search mechanism now (Claude Code example: ToolSearch). If the
+   Linear integration is absent entirely, note it — guardrail 6 applies at
+   Phase 5.
 
 ## Phase 1 — Intake
 
-Read [references/platform-playbook.md](references/platform-playbook.md) first. Then ask via AskUserQuestion. NEVER re-ask anything the user already stated in their request.
+Read [references/platform-playbook.md](references/platform-playbook.md) first.
+Use the host's structured-choice UI when one is available; otherwise present
+the same labeled options as numbered chat choices and wait for an explicit
+reply. NEVER re-ask anything the user already stated in their request.
 
 - **Platforms** (multi-select): LinkedIn / X / Instagram / TikTok / Facebook.
 - **Post count**: offer 3 / 5 / 10; recommend whichever fills a 1-2 week queue at the likely cadence.
@@ -68,15 +76,24 @@ Read [references/platform-playbook.md](references/platform-playbook.md) first. T
 
 Procedure (inline; no reference file):
 
-1. Build 4-6 WebSearch queries from the niche. Patterns:
+1. Use the current host's connected web-search capability to run 4-6 queries
+   built from the niche. Patterns:
    - `site:reddit.com <niche> <current month and year>` — trending discussions
    - `site:reddit.com r/<relevant subreddit> "hot take" OR "unpopular opinion" <niche>`
    - `<niche> news this week`
    - `<niche> debate OR controversy`
    - `"why does nobody talk about" <niche>`
-2. WebFetch the 3-5 most promising results to confirm the discussion is substantive; capture the URL and the top arguments.
+2. Use an available page-fetch or browser capability to inspect the 3-5 most
+   promising results, confirm the discussion is substantive, and capture the
+   URL and top arguments. If web access is unavailable, say so and ask the user
+   either to provide source links or to skip the trend scan; never fabricate
+   current trends.
 3. Present a shortlist of **2x the post count, capped at 10 ideas**. Each idea: one-line headline, why it is trending, source link, and a suggested angle *for this user* (informed by voice-profile Positions when available).
-4. The user picks via AskUserQuestion (multi-select; batch 4 options at a time if needed) until exactly `post count` ideas are chosen. One idea may cover multiple posts/platforms if the user says so — extract separate content atoms per post (see the playbook's strategy rules).
+4. The user picks through a structured multi-select when the host supports one;
+   otherwise show numbered options in batches of 4 and accept a comma-separated
+   chat reply. Continue until exactly `post count` ideas are chosen. One idea
+   may cover multiple posts/platforms if the user says so — extract separate
+   content atoms per post (see the playbook's strategy rules).
 
 ## Phase 3 — Interview
 
@@ -99,10 +116,16 @@ Read [references/prompt-templates.md](references/prompt-templates.md). For each 
 
 Read [references/linear-issue-template.md](references/linear-issue-template.md).
 
-1. Call `Linear:list_teams`; let the user pick via AskUserQuestion. Then `Linear:list_projects` for that team; let the user pick (offer "no project").
+1. Call the connected Linear integration's `list_teams` capability and let the
+   user pick through the host's structured-choice UI or numbered chat options.
+   Then call `list_projects` for that team and let the user pick the same way
+   (offer "no project").
 2. **Compute publish dates** from the playbook's cadence-to-weekday pattern table. Start from tomorrow — never today, never the past. Interleave platforms. Date arithmetic via Bash: `date -v+3d +%Y-%m-%d` (macOS) or `date -d "+3 days" +%Y-%m-%d` (GNU/Linux).
 3. One `Linear:save_issue` per post: title, description, team, project, and dueDate exactly per the template's field mapping. Record each returned issue identifier/URL.
-4. **Fallback:** if Linear is unavailable or errors persist, write all issue bodies (template-conformant) to `~/Documents/Social Posts/<today>-batch.md`, tell the user, and explain how to connect the Linear MCP.
+4. **Fallback:** if Linear is unavailable or errors persist, write all issue
+   bodies (template-conformant) to `~/Documents/Social Posts/<today>-batch.md`,
+   tell the user, and explain how to connect or authorize the Linear app,
+   connector, or MCP server in the current host.
 
 ## Phase 6 — Summary
 

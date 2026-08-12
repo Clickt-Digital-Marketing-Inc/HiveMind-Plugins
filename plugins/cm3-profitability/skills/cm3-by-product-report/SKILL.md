@@ -5,6 +5,10 @@ description: Generate a per-product CM3 contribution-margin report from a Google
 
 # CM3 by Product — Report Generator (md + HTML explorer + xlsx; pptx opt-in)
 
+## Bundled path resolution
+
+Before running bundled scripts, set `PLUGIN_ROOT` to the absolute path of this plugin directory: the nearest ancestor of this `SKILL.md` that contains either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it from the loaded skill path; do not assume a host-specific environment variable or the current working directory. Then run commands that reference `${PLUGIN_ROOT}` unchanged.
+
 You are running the `cm3-by-product-report` skill. Your job: locate (or
 collect) two CSVs plus four variable-cost assumptions, then call the bundled
 `cm3_by_product.py` script — which produces the locked 3-format bundle from a
@@ -87,7 +91,7 @@ script is location-independent):
 
 ```bash
 TS=$(date +%Y%m%d-%H%M%S)
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/cm3-by-product-report/cm3_by_product.py" \
+python3 "${PLUGIN_ROOT}/skills/cm3-by-product-report/cm3_by_product.py" \
   --csv "<google-ads-shopping.csv>" \
   --cogs-csv "<shopify-gross-profit.csv-or-omit>" \
   --inputs ./cm3-by-product-inputs.json \
@@ -108,7 +112,7 @@ python3 "${CLAUDE_PLUGIN_ROOT}/skills/cm3-by-product-report/cm3_by_product.py" \
   the tuner widget chart).
 - The xlsx is LibreOffice-normalized by default; if LibreOffice (`soffice`) is
   missing the build fails with exit code 2 — pass `--no-normalize` to skip.
-- Integrity-check a built workbook with `python3 "${CLAUDE_PLUGIN_ROOT}/skills/cm3-by-product-report/cm3_by_product.py" --check <file.xlsx>`.
+- Integrity-check a built workbook with `python3 "${PLUGIN_ROOT}/skills/cm3-by-product-report/cm3_by_product.py" --check <file.xlsx>`.
 
 ### Step 6 — Read the script's stdout JSON and report back
 
@@ -136,7 +140,7 @@ Then print the three output paths. Done.
 
 CM3% per product determines the band. The four lower cutoffs below are the
 **defaults** — they are tunable via `--inputs`, the `--band-*` CLI flags, or the
-in-Claude tuner, and the tuned values flow through every output and its provenance.
+interactive tuner when the host supports one, and the tuned values flow through every output and its provenance.
 
 | Band      | CM3% range (default)                | Style    |
 | --------- | ----------------------------------- | -------- |
@@ -184,14 +188,14 @@ lives in the Vega-Lite `transform` array. `--no-charts` opts out.
 > wrong, the spec or the model is wrong — change it there and re-run the
 > builder. Same run, same chart, byte for byte.
 
-## In-Claude tuner (`--emit-widget`)
+## Interactive tuner (`--emit-widget`)
 
 When this skill is launched through the **Google Ads hub** it is treated as a
-*tunable* task: instead of building files up front, the hub renders an in-Claude
+*tunable* task: instead of building files up front, the hub renders an interactive
 tuner. The same `cm3_by_product.py` builder emits it:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/cm3-by-product-report/cm3_by_product.py" --csv "<shopping.csv>" [--cogs-csv "<shopify.csv>"] \
+python3 "${PLUGIN_ROOT}/skills/cm3-by-product-report/cm3_by_product.py" --csv "<shopping.csv>" [--cogs-csv "<shopify.csv>"] \
   --brand "<label>" --emit-widget /tmp/cm3_widget.html
 ```
 
@@ -259,7 +263,7 @@ tables, rollups by Campaign / Category L1 / Product Type L1 / Vendor,
 After installing the plugin, run once:
 
 ```bash
-pip install -r "${CLAUDE_PLUGIN_ROOT}/requirements.txt"
+pip install -r "${PLUGIN_ROOT}/requirements.txt"
 ```
 
 ## On error
@@ -267,4 +271,4 @@ pip install -r "${CLAUDE_PLUGIN_ROOT}/requirements.txt"
 - If the script exits non-zero, surface its stderr verbatim. Do not retry
   silently. Do not guess at the failure.
 - If `openpyxl` or `python-pptx` is missing, the script's traceback names the
-  module; relay the `pip install -r "${CLAUDE_PLUGIN_ROOT}/requirements.txt"` hint.
+  module; relay the `pip install -r "${PLUGIN_ROOT}/requirements.txt"` hint.

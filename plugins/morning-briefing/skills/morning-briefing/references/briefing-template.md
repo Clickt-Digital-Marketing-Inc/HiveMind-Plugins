@@ -81,7 +81,7 @@ Prioritized:
 *(If none: "No blocks created today.")*
 
 ## Skipped
-- {Source}: {reason, e.g. "Linear MCP not connected — authorize it in claude.ai connector settings"}
+- {Source}: {reason, e.g. "Linear integration unavailable — connect or authorize the Linear app, connector, or MCP server in this host"}
 
 *(If none: "All sources available.")*
 ```

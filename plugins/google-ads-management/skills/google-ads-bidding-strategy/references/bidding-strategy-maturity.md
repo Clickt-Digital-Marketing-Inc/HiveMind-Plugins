@@ -3,7 +3,7 @@
 Scores every campaign's readiness for automated bidding and flags where the strategy actually
 running doesn't match what the account's data supports. Ships the standard three-format
 analytical bundle: a **markdown report**, a **self-contained interactive HTML explorer**, and a
-**formula-driven xlsx** — plus a `--emit-widget` tuner for the in-Claude hub. Reuses every
+**formula-driven xlsx** — plus a `--emit-widget` tuner for the interactive hub. Reuses every
 `google-ads-foundation` convention (micros, dates, dedup, the advisor + dual-input contract in
 [`../../google-ads-foundation/references/artifact-formats.md`](../../google-ads-foundation/references/artifact-formats.md)) — load that first.
 
@@ -154,7 +154,7 @@ type these numbers directly into `findings.json` (that would bypass the transcri
 # md + html — dependency-free, needs only Python
 python3 scripts/build_bidding_report.py \
   --input findings.json --outdir artifacts --brand "{Client Name}" --formats md,html
-# all three (xlsx needs openpyxl; normalizes via LibreOffice) + the in-Claude tuner
+# all three (xlsx needs openpyxl; normalizes via LibreOffice) + the interactive tuner
 python3 scripts/build_bidding_report.py \
   --input findings.json --outdir artifacts --brand "{Client Name}" \
   --formats md,html,xlsx --emit-widget widget.json

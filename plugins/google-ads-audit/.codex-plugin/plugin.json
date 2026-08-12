@@ -1,0 +1,26 @@
+{
+  "name": "google-ads-audit",
+  "version": "1.1.0",
+  "description": "Full Google Ads account audit driven by the Google Ads MCP (GAQL). Scores live data against a comprehensive 9-step audit framework plus modern Google checks (PMax, Consent Mode v2, Enhanced Conversions, Demand Gen) and emits a 3-format deliverable bundle from one findings JSON: an interactive, self-contained, white-label HTML report (the primary deliverable, with a live Health-Score gauge and ICE re-ranking), an Obsidian-ready markdown record, and a formula-driven multi-tab xlsx backup. HTML + markdown are standard-library only; the xlsx backup needs openpyxl.",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "homepage": "https://clickt.ca",
+  "license": "PolyForm-Shield-1.0.0",
+  "keywords": ["google-ads", "audit", "ppc", "gaql", "mcp", "html", "interactive", "report", "xlsx", "wasted-spend"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Google Ads Audit",
+    "shortDescription": "Audit Google Ads accounts and build client-ready reports.",
+    "longDescription": "Analyze live GAQL data against a nine-step audit framework, score account health, and generate synchronized HTML, Markdown, and XLSX deliverables with prioritized findings.",
+    "developerName": "Clickt Digital Marketing Inc.",
+    "category": "Marketing",
+    "capabilities": ["Google Ads account auditing", "GAQL analysis", "Multi-format reporting"],
+    "defaultPrompt": [
+      "Audit this Google Ads account and prioritize the findings.",
+      "Build the HTML, Markdown, and XLSX audit bundle.",
+      "Review this Google Ads export for wasted spend."
+    ]
+  }
+}

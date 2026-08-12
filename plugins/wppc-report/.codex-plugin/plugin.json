@@ -1,0 +1,26 @@
+{
+  "name": "wppc-report",
+  "version": "1.0.0",
+  "description": "wPPC — Weighted Profit-Per-Click. Sabermetric linear-weights report for Google & Meta Ads segment exports: funnel events credited at expected CM3 value, indexed to the account baseline, shrunk for sample size, and scored above replacement (Margin Above Replacement). Emits a 3-format bundle from one model — an interactive, self-contained, white-label HTML report (primary, with a Scale/Cut/Watch decision lens and four charts), an Obsidian-ready markdown record, and a formula-driven multi-tab xlsx backup (Report/Weights/Charts/Run). HTML + markdown are standard-library only; the xlsx backup needs openpyxl and static chart SVGs need vl-convert-python.",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "homepage": "https://clickt.ca",
+  "license": "PolyForm-Shield-1.0.0",
+  "keywords": ["wppc", "ppc", "google-ads", "meta-ads", "sabermetrics", "profit-per-click", "mar", "cm3", "html", "interactive", "report", "xlsx"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "wPPC Report",
+    "shortDescription": "Score paid-media segments by weighted profit per click.",
+    "longDescription": "Apply sabermetric linear weights to Google and Meta Ads exports, value funnel events at expected CM3, adjust for sample size, score margin above replacement, and generate a decision-ready HTML, Markdown, and XLSX bundle.",
+    "developerName": "Clickt Digital Marketing Inc.",
+    "category": "Marketing",
+    "capabilities": ["Weighted profit analysis", "Paid-media segment scoring", "Multi-format reporting"],
+    "defaultPrompt": [
+      "Build a wPPC report from these paid-media exports.",
+      "Score these segments above replacement.",
+      "Identify which segments to scale, cut, or watch."
+    ]
+  }
+}

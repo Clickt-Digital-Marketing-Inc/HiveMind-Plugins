@@ -1,0 +1,26 @@
+{
+  "name": "orchestrator",
+  "description": "Multi-agent project orchestration for repos governed by a Linear team: round-based execution with tiered executors in git worktrees, a mixed-tier merge-gate workflow, reflect passes against acceptance criteria, checkpoint/halt-state discipline, interactive review-queue closeout (/close-issues), and an interactive learnings loop (/lessons-review). Execution-side counterpart to project-coordinator.",
+  "version": "0.3.0",
+  "license": "PolyForm-Shield-1.0.0",
+  "author": {
+    "name": "John Greenhow"
+  },
+  "homepage": "https://github.com/performance-clickt/orchestrator",
+  "repository": "https://github.com/performance-clickt/orchestrator",
+  "keywords": ["orchestration", "linear", "worktrees", "merge-gate", "multi-agent", "review-queue"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Orchestrator",
+    "shortDescription": "Run governed multi-agent delivery rounds from Linear.",
+    "longDescription": "Coordinate tiered executors in isolated worktrees, enforce merge gates and checkpoints, reflect against acceptance criteria, work the review queue interactively, and capture approved process lessons for Linear-governed repositories.",
+    "developerName": "John Greenhow",
+    "category": "Productivity",
+    "capabilities": ["Multi-agent orchestration", "Linear workflow management", "Merge and review coordination"],
+    "defaultPrompt": [
+      "Run the next governed execution round.",
+      "Work through the Linear review queue with me.",
+      "Review the lessons from this delivery round."
+    ]
+  }
+}

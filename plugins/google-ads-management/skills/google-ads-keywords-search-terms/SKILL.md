@@ -5,6 +5,10 @@ description: Use when running a Google Ads search-query report (SQR) audit, mana
 
 # Google Ads — Keywords & Search Terms
 
+## Bundled path resolution
+
+Before running bundled scripts, set `PLUGIN_ROOT` to the absolute path of this plugin directory: the nearest ancestor of this `SKILL.md` that contains either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it from the loaded skill path; do not assume a host-specific environment variable or the current working directory. Then run commands that reference `${PLUGIN_ROOT}` unchanged.
+
 Turn the search terms report into action: capture converting queries, block budget bleed, keep ad
 groups tightly themed. Negatives are the single most underused lever for cutting waste — and the
 primary control under broad match / AI Max.
@@ -124,13 +128,13 @@ recommendations to act on. Full contract: `google-ads-foundation/references/arti
 > file. If a chart is wrong, the spec or the model is wrong — change it there and re-run the
 > builder. Same run, same chart, byte for byte.
 
-The in-Claude **tuner** (`--emit-widget`) embeds only the in-play envelope (scored terms with
+The interactive **tuner** (`--emit-widget`) embeds only the in-play envelope (scored terms with
 CTR below their campaign CTR — the only rows the sliders can ever surface) so it stays lean on large
 accounts; headline counts come from the embedded full-model summary. This trimming is **live-preview
 only** — the md/html/xlsx above always carry the full universe.
 
 These are **analytical** deliverables. The Google Ads Editor **apply** files (negative/add-keyword
-CSVs) are separate — generate them with `${CLAUDE_PLUGIN_ROOT}/skills/google-ads-foundation/scripts/make_editor_csv.py`.
+CSVs) are separate — generate them with `${PLUGIN_ROOT}/skills/google-ads-foundation/scripts/make_editor_csv.py`.
 
 ## Resources
 - [references/search-term-waste-filter.md](references/search-term-waste-filter.md) — **authoritative**

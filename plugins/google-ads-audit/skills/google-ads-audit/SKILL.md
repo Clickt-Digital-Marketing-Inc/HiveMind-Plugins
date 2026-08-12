@@ -5,6 +5,10 @@ description: Use when a user asks to audit a Google Ads account, run a PPC or Go
 
 # Google Ads Audit
 
+## Bundled path resolution
+
+Before running bundled scripts, set `PLUGIN_ROOT` to the absolute path of this plugin directory: the nearest ancestor of this `SKILL.md` that contains either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it from the loaded skill path; do not assume a host-specific environment variable or the current working directory. Then run commands that reference `${PLUGIN_ROOT}` unchanged.
+
 ## Overview
 
 Conduct a full Google Ads account audit by pulling live data through the
@@ -76,7 +80,7 @@ To use the skill, work through these steps in order.
 4. **Run the pre-scorer FIRST, then evaluate the judgment checks.** The mechanical
    checks are machine-scored — get their results before judging anything:
    ```bash
-   python3 "${CLAUDE_PLUGIN_ROOT}/skills/google-ads-audit/scripts/build_audit.py" \
+   python3 "${PLUGIN_ROOT}/skills/google-ads-audit/scripts/build_audit.py" \
      --prescore-only --raw-dir "<workdir>/raw" --business-model "{Lead Gen|Ecommerce}"
    ```
    (`--csv-dir` on the manual path.) The JSON lists machine-scored `checks`
@@ -98,7 +102,7 @@ To use the skill, work through these steps in order.
    is installed, run its `resolve_vault.py` and propose the vault; otherwise propose
    `~/Downloads`. Let the user confirm or override, then:
    ```bash
-   python3 "${CLAUDE_PLUGIN_ROOT}/skills/google-ads-audit/scripts/build_audit.py" \
+   python3 "${PLUGIN_ROOT}/skills/google-ads-audit/scripts/build_audit.py" \
      --input findings.json --outdir "<user-chosen-dir>" --brand "{Client Name}" \
      --raw-dir "<working-dir-with-the-three-saved-pulls>"
    ```

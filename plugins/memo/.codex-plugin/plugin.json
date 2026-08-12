@@ -1,0 +1,24 @@
+{
+  "name": "memo",
+  "description": "Turn a raw idea into a decision memo a director can act on in one read. Interrogates the idea before writing a word, scales depth to stakes, marks every claim as measured/estimated/assumed/derived, pressure-tests it against the objections a director would actually raise, and writes a markdown memo with an explicit ask, real options, and a reasoned recommendation.",
+  "version": "0.2.0",
+  "license": "PolyForm-Shield-1.0.0",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Decision Memo",
+    "shortDescription": "Turn an idea into an evidence-honest decision memo.",
+    "longDescription": "Interrogate a proposal before drafting, scale the questions to its stakes, label the strength of every claim, pressure-test the reasoning, and produce a concise Markdown memo with an explicit ask, real options, and a defensible recommendation.",
+    "developerName": "Clickt Digital Marketing Inc.",
+    "category": "Productivity",
+    "capabilities": ["Decision analysis", "Structured interviewing", "Markdown memo drafting"],
+    "defaultPrompt": [
+      "Turn this idea into a decision memo.",
+      "Interview me before writing this proposal.",
+      "Pressure-test this recommendation for the directors."
+    ]
+  }
+}

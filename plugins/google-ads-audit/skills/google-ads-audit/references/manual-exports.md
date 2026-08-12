@@ -48,7 +48,7 @@ with Match type "Performance Max" — they are kept.
 ## Build
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/google-ads-audit/scripts/build_audit.py" \
+python3 "${PLUGIN_ROOT}/skills/google-ads-audit/scripts/build_audit.py" \
   --input findings.json --outdir "<user-chosen-dir>" --brand "{Client Name}" \
   --csv-dir "<dir-with-the-three-csv-files>"
 ```

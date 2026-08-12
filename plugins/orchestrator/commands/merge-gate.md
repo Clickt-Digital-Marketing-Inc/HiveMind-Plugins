@@ -5,6 +5,15 @@ argument-hint: [worktree] [branch] [base]
 
 Run the merge-gate workflow on an integration worktree. Load the `merge-gate` skill from this plugin first if you haven't — it documents the protocol, the context-argument convention, and the launch/resume rules.
 
+## Bundled path resolution
+
+Before running the bundled workflow, set `PLUGIN_ROOT` to the absolute path of
+this plugin directory: the nearest ancestor of this command file that contains
+either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it
+from the loaded command path; do not assume a host-specific environment
+variable or the current working directory. Then use paths beneath
+`${PLUGIN_ROOT}` unchanged.
+
 ## Gather the arguments
 
 From `$ARGUMENTS` if provided (order: worktree, branch, base), otherwise determine or ask:
@@ -17,7 +26,7 @@ From `$ARGUMENTS` if provided (order: worktree, branch, base), otherwise determi
 
 ## Launch
 
-- **Script resolution:** if the project has its own copy at `.claude/workflows/merge-gate.js`, that copy is canonical — use its path. Otherwise use this plugin's copy at `workflows/merge-gate.js` under the plugin root (resolve the installed plugin directory, e.g. `~/.claude/plugins/cache/<marketplace>/orchestrator/<version>/workflows/merge-gate.js`).
+- **Script resolution:** if the project has its own copy at `.claude/workflows/merge-gate.js`, that copy is canonical — use its path. Otherwise use `${PLUGIN_ROOT}/workflows/merge-gate.js`.
 - **Launch by `scriptPath`, never by `name`**, if the script has been edited this session (the name registry can serve a stale snapshot). Launching by scriptPath always is the safe habit.
 - Invoke the Workflow with `args: { worktree, branch, base, context, applyFixes }`.
 - **Record the run id immediately** in the project's checkpoint state file (default `tasks/todo.md`) with resume instructions: `resume via Workflow { scriptPath, resumeFromRunId: "<wf_id>" }`. Runs are resumable after limit kills.

@@ -1,0 +1,26 @@
+{
+  "name": "clickt-reporting",
+  "version": "1.0.0",
+  "description": "Clickt's hosted ecomm client reporting system. Scaffolds a client-agnostic report engine (tabbed monthly reports + weekly pulses: Google Ads, Meta, store/CRO, goal attainment with flexible v2 goals incl. SKU and seasonal targets) into a client repo, hosts it behind per-client basic auth at reports.clickt.ca, and runs the report cycles: pull → validate → spot-check → draft → John's commentary → deploy only after approval. Includes a weekly-Routine workflow that requests and integrates commentary. Honors profit-vs-revenue value semantics per channel (POAS vs ROAS, never blended; MER/nCAC suppressed on incomplete spend). Node ≥18; data via Windsor.ai / platform MCPs.",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "homepage": "https://clickt.ca",
+  "license": "PolyForm-Shield-1.0.0",
+  "keywords": ["reporting", "ecommerce", "google-ads", "meta-ads", "shopify", "cro", "poas", "mer", "ncac", "client-dashboard", "performance-marketing"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Clickt Reporting",
+    "shortDescription": "Build and run approval-gated ecommerce client reports.",
+    "longDescription": "Set up and operate client-agnostic monthly reports and weekly pulses for paid media, store performance, CRO, and goals, with explicit data validation, commentary review, profit-aware channel semantics, and approval-gated deployment.",
+    "developerName": "Clickt Digital Marketing Inc.",
+    "category": "Marketing",
+    "capabilities": ["Ecommerce client reporting", "Monthly and weekly report cycles", "Approval-gated deployment"],
+    "defaultPrompt": [
+      "Set up reporting for this ecommerce client.",
+      "Run this client's monthly reporting cycle.",
+      "Prepare this week's performance pulse for review."
+    ]
+  }
+}

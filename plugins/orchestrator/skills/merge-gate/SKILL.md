@@ -5,6 +5,15 @@ description: Use when running or explaining the pre-merge review gate on an inte
 
 # Merge Gate
 
+## Bundled path resolution
+
+Before running the bundled workflow, set `PLUGIN_ROOT` to the absolute path of
+this plugin directory: the nearest ancestor of this `SKILL.md` that contains
+either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it
+from the loaded skill path; do not assume a host-specific environment variable
+or the current working directory. Then use paths beneath `${PLUGIN_ROOT}`
+unchanged.
+
 The merge gate is the mandatory pre-merge review on an integration worktree. It runs as the **workflow script** at `workflows/merge-gate.js` in this plugin (projects may carry their own canonical copy at `.claude/workflows/merge-gate.js` — if the project has one, that copy wins). The `/merge-gate` command gathers the arguments and launches it.
 
 ## Protocol

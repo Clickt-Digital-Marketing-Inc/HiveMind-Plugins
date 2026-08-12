@@ -5,6 +5,10 @@ description: Use when reviewing Google Ads audience targeting and remarketing, c
 
 # Google Ads — Audience & Targeting
 
+## Bundled path resolution
+
+Before running bundled scripts, set `PLUGIN_ROOT` to the absolute path of this plugin directory: the nearest ancestor of this `SKILL.md` that contains either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it from the loaded skill path; do not assume a host-specific environment variable or the current working directory. Then run commands that reference `${PLUGIN_ROOT}` unchanged.
+
 Reach high-value segments and stop over-serving the wrong users. In 2026 targeting precision
 depends on first-party data (third-party cookies are gone), so this skill is part Google Ads,
 part measurement-readiness.
@@ -112,13 +116,13 @@ don't "complete" this into a thin explorer). Emitted formats: **`md` + `xlsx`**.
   row, formula-scored — mirrors the Python model exactly) + **First-Party Readiness** (static
   snapshot). Needs `openpyxl`; LibreOffice-normalized so it opens in Excel.
 - `*_bid_adjustments.csv` — Google Ads Editor import, via
-  `${CLAUDE_PLUGIN_ROOT}/skills/google-ads-foundation/scripts/make_editor_csv.py`, **only** for
+  `${PLUGIN_ROOT}/skills/google-ads-foundation/scripts/make_editor_csv.py`, **only** for
   audiences flagged `wasted_spend`/`high_cpa` (a directionally-justified `-20%`). Everything else
   flagged is a **manual** recommendation — no defensible number can be assigned without knowing
   which remarketing tier a list represents.
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/google-ads-audience-targeting/scripts/build_audience_report.py" \
+python3 "${PLUGIN_ROOT}/skills/google-ads-audience-targeting/scripts/build_audience_report.py" \
   --input findings.json --first-party-csv first_party.csv \
   --outdir artifacts --brand "{Client Name}" --formats md,xlsx
 ```

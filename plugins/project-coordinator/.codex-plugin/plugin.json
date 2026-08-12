@@ -1,0 +1,24 @@
+{
+  "name": "project-coordinator",
+  "description": "Project coordination pipeline for software and marketing projects (content, social calendars, events, launches): refine ideas into briefs, plan work into Linear, structure project folders, and keep Linear as the source of truth with issues executable as standalone Claude prompts.",
+  "version": "0.5.1",
+  "license": "PolyForm-Shield-1.0.0",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Project Coordinator",
+    "shortDescription": "Turn project ideas into briefs and executable Linear plans.",
+    "longDescription": "Coordinate software and marketing projects by refining ideas into briefs, planning standalone work in Linear, structuring project folders, and keeping the issue tracker as the source of truth.",
+    "developerName": "Clickt Digital Marketing Inc.",
+    "category": "Productivity",
+    "capabilities": ["Brief development", "Linear project planning", "Project coordination"],
+    "defaultPrompt": [
+      "Refine this project idea into an actionable brief.",
+      "Plan this brief as executable Linear issues.",
+      "Set up a coordinated project workflow for this launch."
+    ]
+  }
+}

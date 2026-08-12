@@ -1,0 +1,26 @@
+{
+  "name": "meta-ads-audit",
+  "version": "2.0.0",
+  "description": "Full Meta (Facebook/Instagram) ad-account audit via the Meta Ads MCP or manual Ads Manager CSV exports, scored against a comprehensive 7-lever account-audit framework with a deterministic pre-scorer that machine-scores the mechanical checks. Emits a 3-format deliverable bundle from one findings payload — an Obsidian-ready markdown record, an interactive self-contained HTML report (the primary client-shareable deliverable), and a formula-driven xlsx backup — plus Concentration (HHI/Gini/Pareto-ABC) and Creative Signals (fatigue, reach saturation, effective frequency, ranking decomposition) analytics computed straight from the raw data files. Python stdlib only; openpyxl (>=3.1) needed only for the xlsx backup.",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "homepage": "https://clickt.ca",
+  "license": "PolyForm-Shield-1.0.0",
+  "keywords": ["meta-ads", "facebook-ads", "instagram-ads", "audit", "mcp", "html-report", "xlsx", "concentration", "creative-fatigue"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Meta Ads Audit",
+    "shortDescription": "Audit Meta Ads accounts with deterministic scoring.",
+    "longDescription": "Audit Meta Ads data from a connected account or CSV exports, machine-score mechanical checks, analyze concentration and creative signals, and produce synchronized Markdown, HTML, and XLSX reports.",
+    "developerName": "Clickt Digital Marketing Inc.",
+    "category": "Marketing",
+    "capabilities": ["Meta Ads account auditing", "CSV and MCP analysis", "Multi-format reporting"],
+    "defaultPrompt": [
+      "Audit this Meta Ads account and rank the findings.",
+      "Analyze these Ads Manager exports for creative fatigue.",
+      "Build the Markdown, HTML, and XLSX audit bundle."
+    ]
+  }
+}

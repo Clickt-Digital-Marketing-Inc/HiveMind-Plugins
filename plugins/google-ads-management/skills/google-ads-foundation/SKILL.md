@@ -1,6 +1,6 @@
 ---
 name: google-ads-foundation
-description: Use when running any google-ads-* management skill or querying a Google Ads account through the Google Ads MCP. Provides the shared account-selection workflow, the mandatory metadata-first GAQL query method, money/date/dedup conventions, and the standard Diagnose -> Recommend -> Artifacts output contract that every focus-area skill depends on.
+description: Use when running any google-ads-* management skill or querying a Google Ads account through the Google Ads MCP. Provides the shared account-selection workflow, the mandatory metadata-first GAQL query method, money/date/dedup conventions, and the standard Diagnose to Recommend to Artifacts output contract that every focus-area skill depends on.
 ---
 
 # Google Ads Foundation

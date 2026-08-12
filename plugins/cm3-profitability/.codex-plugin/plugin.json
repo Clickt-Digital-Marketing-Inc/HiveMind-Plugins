@@ -1,0 +1,26 @@
+{
+  "name": "cm3-profitability",
+  "version": "1.0.0",
+  "description": "Per-product CM3 contribution-margin report from a Google Ads 'Shopping products' CSV (optionally enriched with a Shopify 'Gross profit by product' CSV). Outputs a detailed Clickt-branded multi-tab .xlsx, a 7-slide executive .pptx, and an Obsidian-ready .md. Segments products into CM3 bands and rolls up by campaign, category (L1-L5), product type (L1-L5), and vendor. Requires openpyxl and python-pptx.",
+  "author": {
+    "name": "Clickt Digital Marketing Inc.",
+    "url": "https://clickt.ca"
+  },
+  "homepage": "https://clickt.ca",
+  "license": "PolyForm-Shield-1.0.0",
+  "keywords": ["cm3", "contribution-margin", "ecommerce", "google-ads", "shopify", "profitability", "performance-marketing"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "CM3 Profitability",
+    "shortDescription": "Measure product-level contribution margin from ad data.",
+    "longDescription": "Calculate per-product CM3 from Google Ads and optional Shopify exports, segment products into profitability bands, and roll results up by campaign, category, product type, and vendor.",
+    "developerName": "Clickt Digital Marketing Inc.",
+    "category": "Marketing",
+    "capabilities": ["Contribution-margin analysis", "Product segmentation", "Spreadsheet and presentation reporting"],
+    "defaultPrompt": [
+      "Build a CM3 profitability report from this export.",
+      "Segment these products into CM3 performance bands.",
+      "Compare product profitability by campaign and vendor."
+    ]
+  }
+}

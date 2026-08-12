@@ -1,0 +1,164 @@
+{
+  "name": "hivemind-plugins",
+  "interface": {
+    "displayName": "HiveMind Plugins"
+  },
+  "plugins": [
+    {
+      "name": "google-ads-audit",
+      "source": {
+        "source": "local",
+        "path": "./plugins/google-ads-audit"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Marketing"
+    },
+    {
+      "name": "meta-ads-audit",
+      "source": {
+        "source": "local",
+        "path": "./plugins/meta-ads-audit"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Marketing"
+    },
+    {
+      "name": "shopify-cro-audit",
+      "source": {
+        "source": "local",
+        "path": "./plugins/shopify-cro-audit"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Marketing"
+    },
+    {
+      "name": "cm3-profitability",
+      "source": {
+        "source": "local",
+        "path": "./plugins/cm3-profitability"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Marketing"
+    },
+    {
+      "name": "google-ads-management",
+      "source": {
+        "source": "local",
+        "path": "./plugins/google-ads-management"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Marketing"
+    },
+    {
+      "name": "memo",
+      "source": {
+        "source": "local",
+        "path": "./plugins/memo"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "project-coordinator",
+      "source": {
+        "source": "local",
+        "path": "./plugins/project-coordinator"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "social-media-manager",
+      "source": {
+        "source": "local",
+        "path": "./plugins/social-media-manager"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Marketing"
+    },
+    {
+      "name": "morning-briefing",
+      "source": {
+        "source": "local",
+        "path": "./plugins/morning-briefing"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "wppc-report",
+      "source": {
+        "source": "local",
+        "path": "./plugins/wppc-report"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Marketing"
+    },
+    {
+      "name": "catch-up",
+      "source": {
+        "source": "local",
+        "path": "./plugins/catch-up"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "orchestrator",
+      "source": {
+        "source": "local",
+        "path": "./plugins/orchestrator"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "clickt-reporting",
+      "source": {
+        "source": "local",
+        "path": "./plugins/clickt-reporting"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Marketing"
+    }
+  ]
+}

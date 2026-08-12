@@ -5,6 +5,10 @@ description: Use when checking Google Ads budget pacing (daily spend distributio
 
 # Google Ads — Budget & Pacing
 
+## Bundled path resolution
+
+Before running bundled scripts, set `PLUGIN_ROOT` to the absolute path of this plugin directory: the nearest ancestor of this `SKILL.md` that contains either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it from the loaded skill path; do not assume a host-specific environment variable or the current working directory. Then run commands that reference `${PLUGIN_ROOT}` unchanged.
+
 Keep spend pacing to goal, find budget-constrained winners, and cut budget bleed — without
 destabilizing learning.
 
@@ -63,7 +67,7 @@ Campaigns table → columns → Download → CSV):
 2. **MTD export** — the same report, date range = **this month**. Columns: Campaign, Cost.
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/google-ads-budget-pacing/scripts/assemble_from_csv.py" \
+python3 "${PLUGIN_ROOT}/skills/google-ads-budget-pacing/scripts/assemble_from_csv.py" \
   --window campaigns_last30.csv --mtd campaigns_mtd.csv \
   --client-name "{Client Name}" --account-id {account} --currency {CUR} \
   --period "last 30 days" --monthly-goal {goal} --days-elapsed {N} --days-in-month {M} \
@@ -129,7 +133,7 @@ model (spend concentration, pace verdict/confidence, the bucket), then offer to 
 [references/budget-pacing-report.md](references/budget-pacing-report.md)):
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/google-ads-budget-pacing/scripts/build_budget_report.py" --input findings.json --outdir artifacts \
+python3 "${PLUGIN_ROOT}/skills/google-ads-budget-pacing/scripts/build_budget_report.py" --input findings.json --outdir artifacts \
   --brand "{Client Name}" --formats md,html,xlsx
 ```
 - `*.md` — pacing read (MTD vs expected), headline KPIs + bucket split + spend concentration +
@@ -155,7 +159,7 @@ python3 "${CLAUDE_PLUGIN_ROOT}/skills/google-ads-budget-pacing/scripts/build_bud
 > builder. Same run, same chart, byte for byte.
 
 **Apply files** (Google Ads Editor; applied manually — MCP is read-only) via
-`${CLAUDE_PLUGIN_ROOT}/skills/google-ads-foundation/scripts/make_editor_csv.py`:
+`${PLUGIN_ROOT}/skills/google-ads-foundation/scripts/make_editor_csv.py`:
 - `budget_changes` CSV — current vs proposed daily budget, change % (**≤ +20%**), reason.
 - `pause_list` CSV — 3× kill candidates.
 

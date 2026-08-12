@@ -21,6 +21,10 @@ metadata:
 
 # Shopify CRO Audit (11-Step Framework)
 
+## Bundled path resolution
+
+Before running bundled scripts, set `PLUGIN_ROOT` to the absolute path of this plugin directory: the nearest ancestor of this `SKILL.md` that contains either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it from the loaded skill path; do not assume a host-specific environment variable or the current working directory. Then run commands that reference `${PLUGIN_ROOT}` unchanged.
+
 ## Overview
 
 Run a structured conversion-rate-optimization audit of a Shopify store following an **11-step CRO
@@ -106,7 +110,7 @@ are **triangulated**: the same problem appearing in analytics + behavior + custo
 - **WebFetch** — storefront + top landing page (Step 2 heuristic) and competitor URLs (Step 10).
   Degrade to auditor notes if a URL isn't provided or a fetch fails.
 - **Python 3** (stdlib) for md/html; **openpyxl ≥ 3.1** only for the xlsx backup
-  (`python3 -m pip install -r "${CLAUDE_PLUGIN_ROOT}/requirements.txt"`).
+  (`python3 -m pip install -r "${PLUGIN_ROOT}/requirements.txt"`).
 
 ## Workflow
 
@@ -132,7 +136,7 @@ To use the skill, work through these steps in order.
 
 4. **Run the machine layer FIRST.** Before writing a single analytics number:
    ```bash
-   python3 "${CLAUDE_PLUGIN_ROOT}/skills/shopify-cro-audit/scripts/build_cro_audit.py" \
+   python3 "${PLUGIN_ROOT}/skills/shopify-cro-audit/scripts/build_cro_audit.py" \
      --machine-only --raw-dir "<workdir>" --csv-dir "<exports-folder>"
    ```
    (either input flag alone is fine; works without `--input`.) It prints a JSON object with
@@ -166,7 +170,7 @@ To use the skill, work through these steps in order.
 9. **Build the deliverable bundle.** Ask the user **where to save** the report (suggest
    `~/Downloads` as a sensible default), then build all three formats to that directory:
    ```bash
-   python3 "${CLAUDE_PLUGIN_ROOT}/skills/shopify-cro-audit/scripts/build_cro_audit.py" \
+   python3 "${PLUGIN_ROOT}/skills/shopify-cro-audit/scripts/build_cro_audit.py" \
      --input cro-payload.json --outdir "<user-chosen-dir>" --brand "{Client Name}" \
      --raw-dir "<workdir>" --csv-dir "<exports-folder>"
    ```

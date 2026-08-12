@@ -79,7 +79,7 @@ scorable — the raw path's all-click CTR is evidence-only.
 ## Build
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/meta-ads-audit/scripts/build_audit.py" \
+python3 "${PLUGIN_ROOT}/skills/meta-ads-audit/scripts/build_audit.py" \
   --input audit-payload.json --outdir "<user-chosen-dir>" --brand "{Client Name}" \
   --csv-dir "<dir-with-the-three-csv-files>" --business-model "{Lead Gen|Ecommerce}"
 ```

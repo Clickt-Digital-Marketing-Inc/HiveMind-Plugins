@@ -5,6 +5,10 @@ description: Use when reporting Google Ads performance — daily visibility/enga
 
 # Google Ads — Performance Reporting (Visibility, Revenue & ROAS)
 
+## Bundled path resolution
+
+Before running bundled scripts, set `PLUGIN_ROOT` to the absolute path of this plugin directory: the nearest ancestor of this `SKILL.md` that contains either `.claude-plugin/plugin.json` or `.codex-plugin/plugin.json`. Resolve it from the loaded skill path; do not assume a host-specific environment variable or the current working directory. Then run commands that reference `${PLUGIN_ROOT}` unchanged.
+
 Translate live account data into a clear, honest picture: are the ads visible, are they converting,
 and what is the return. Reporting proves value and drives the budget conversation.
 
@@ -96,7 +100,7 @@ Build it from a findings JSON (schema + the two GAQL pulls are authoritative in
 [references/performance-report.md](references/performance-report.md)):
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/google-ads-performance-reporting/scripts/build_perf_report.py" --input findings.json --outdir artifacts \
+python3 "${PLUGIN_ROOT}/skills/google-ads-performance-reporting/scripts/build_perf_report.py" --input findings.json --outdir artifacts \
   --brand "{Client Name}" --formats md,html,xlsx
 ```
 - `*.md` — client-ready report: header (account, period, currency), headline KPIs with the bucket +

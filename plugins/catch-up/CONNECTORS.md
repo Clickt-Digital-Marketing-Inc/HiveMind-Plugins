@@ -20,6 +20,7 @@ run it (see the `catch-up-setup` skill), and your choices are saved to
 
 ## Connecting a tool
 
-Connect each tool you want to use in Cowork's connector settings before running
-setup. If a chosen tool is not connected, the plugin will tell you which one to
-add and stop, rather than guessing.
+Connect or authorize each tool through the current host's available apps,
+connectors, or MCP integrations before running setup. If a chosen tool is not
+available, the plugin will tell you which integration to add and stop, rather
+than guessing.

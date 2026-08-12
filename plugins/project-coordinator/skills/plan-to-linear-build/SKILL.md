@@ -25,9 +25,17 @@ Handoff Progress:
 
 ### 0. Verify Linear MCP access
 
-Before planning, confirm the Linear MCP server's tools are reachable — you will need its `list_teams`, `save_project`, `save_milestone`, and `save_issue` tools (tool names carry a server prefix such as `mcp__linear__` or a plugin namespace; in Claude Code, if they are deferred, load them with ToolSearch before calling).
+Before planning, confirm that the Linear tools are reachable through a
+connected app, connector, or MCP server — you will need `list_teams`,
+`save_project`, `save_milestone`, and `save_issue`. Tool names may carry a
+server prefix such as `mcp__linear__` or a plugin namespace. If the host defers
+tools, use its discovery or search mechanism before calling (Claude Code
+example: ToolSearch).
 
-If the Linear MCP is not connected or not authenticated: tell the user, and do not silently degrade. Offer to run the planning session anyway and save the full plan (overview, milestones, issue bodies) to a local markdown file they can import once Linear is connected — nothing from the session should be lost.
+If the Linear integration is not connected or authenticated: tell the user,
+and do not silently degrade. Offer to run the planning session anyway and save
+the full plan (overview, milestones, issue bodies) to a local markdown file they
+can import once Linear is connected — nothing from the session should be lost.
 
 ### 1. Plan Mode
 
