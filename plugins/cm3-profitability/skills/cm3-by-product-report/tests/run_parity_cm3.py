@@ -58,7 +58,7 @@ def main() -> int:
         widget = Path(td) / "widget.html"
         r = subprocess.run(
             [PY, str(SKILL / "cm3_by_product.py"), "--csv", str(SAMPLE),
-             "--brand", "Abes College", "--emit-widget", str(widget)],
+             "--brand", "Acme Corp", "--emit-widget", str(widget)],
             capture_output=True, text=True)
         if r.returncode != 0:
             sys.stderr.write(r.stderr)

@@ -95,7 +95,7 @@ SKILLS = [
     {"id": "keywords-search-terms-large", "skill": "google-ads-keywords-search-terms",
      "builder": "build_waste_filter.py", "core": "waste_filter_core",
      "fixture": "tests/sample-findings-large.json",
-     "tune_key": "cost_multiple", "tune_value": "1.5", "brand": "Abes College",
+     "tune_key": "cost_multiple", "tune_value": "1.5", "brand": "Acme Corp",
      "kpi_map": {"b1": "block1", "b2": "block2"}, "trim": True},
     # Bounded-embed fast-follow: products envelope = status=="scored" (drops the
     # inactive long tail; this skill has no near-miss panel so scored is complete).

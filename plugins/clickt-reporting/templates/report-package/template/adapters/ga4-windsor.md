@@ -1,7 +1,8 @@
 # Adapter: `traffic` block ← GA4 via Windsor.ai MCP (`googleanalytics4`)
 
-**Client instance:** property `507568174` — "PantryLot | Revenue | ProfitMetrics".
-(A parallel property `507576481` tracks profit-based values; the traffic/funnel block uses
+**Configure before use:** set `<GA4_REVENUE_PROPERTY_ID>` and, if applicable,
+`<GA4_PROFIT_PROPERTY_ID>` from the approved client configuration. A parallel property may
+track profit-based values; the traffic/funnel block uses
 the **Revenue** property so funnel counts and channel revenue read in familiar terms.)
 
 ## Pull
@@ -26,10 +27,9 @@ Use `get_fields(connector: "googleanalytics4")` to confirm exact ids before the 
 
 ## Store profit + new customers (added 2026-08-04)
 
-- `store.profit` ← `purchase_revenue` pulled from the **Profit property** (`507576481`,
-  "PantryLot | Profit | ProfitMetrics") — same metric id, different property; its purchase
-  values are profit. Sanity: store margin runs ~56-57%.
-- `store.new_customers` ← `first_time_purchasers` (Revenue property `507568174`).
+- `store.profit` ← `purchase_revenue` pulled from `<GA4_PROFIT_PROPERTY_ID>` only when the
+  client has verified that property's value semantics are profit.
+- `store.new_customers` ← `first_time_purchasers` from `<GA4_REVENUE_PROPERTY_ID>`.
 - Weekly `mtd.new_customers` ← same field for the month-to-date range.
 
 ## Gotchas

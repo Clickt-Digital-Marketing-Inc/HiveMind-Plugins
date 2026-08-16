@@ -75,11 +75,11 @@ def test_dominant_factor():
     check("summary.dominant_component == Expected CTR",
           m["summary"]["dominant_component"] == "Expected CTR")
     # location: dominant (Expected CTR) below-target cost sits in ad groups
-    # "MLA Calgary" (550: #3 300 + #6 250) and "Generic" (800: #4) -> top-3
+    # "Program Gamma" (550: #3 300 + #6 250) and "Generic" (800: #4) -> top-3
     # share is 100% of the (only two) ad groups' cost.
     loc_by_ag = {r["ad_group"]: r for r in dom["location_rows"]}
     check("location has 2 ad groups", len(dom["location_rows"]) == 2, f"got {len(dom['location_rows'])}")
-    check("MLA Calgary location cost == 550", abs(loc_by_ag["MLA Calgary"]["cost"] - 550.0) < 1e-6)
+    check("Program Gamma location cost == 550", abs(loc_by_ag["Program Gamma"]["cost"] - 550.0) < 1e-6)
     check("Generic location cost == 800", abs(loc_by_ag["Generic"]["cost"] - 800.0) < 1e-6)
     check("summary.dominant_location_share_pct == 100.0",
           abs(m["summary"]["dominant_location_share_pct"] - 100.0) < 1e-6,

@@ -1,6 +1,6 @@
 ---
 name: client-report-monthly
-description: Use for the monthly client report cycle — "run the monthly report", "build <client>'s July report". Pulls the full prior month (plus prior-month and YoY windows), builds the tabbed monthly report draft, requests John's commentary per section, and deploys ONLY after his approval.
+description: Use for the monthly client report cycle — "run the monthly report", "build <client>'s July report". Pulls the full prior month (plus prior-month and YoY windows), builds the tabbed monthly report draft, requests the designated approver's commentary per section, and deploys ONLY after their approval.
 ---
 
 # Monthly Report Cycle
@@ -33,12 +33,13 @@ Store / Weekly Pulses); the Weekly Pulses tab auto-discovers sibling pulse perio
 ## Commentary
 
 Section ids in `periods/<YYYY-MM>/commentary.md`: `## exec`, `## attainment`,
-`## google_ads`, `## meta`, `## store`. Offer John a per-section draft grounded in the
+`## google_ads`, `## meta`, `## store`. Offer the designated approver a per-section draft grounded in the
 spot-check notes; he edits or replaces. Empty sections render "Commentary to follow" —
-fine for a first deploy only if John explicitly approves shipping without commentary.
+fine for a first deploy only if the designated approver explicitly approves shipping without commentary.
 
 ## After approval
 
-Deploy via `./deploy/deploy.sh`, verify live (auth + titles + tabs), commit. If goals
+Deploy via `./deploy/deploy.sh --destination <target-ending-in-slug> --confirm deploy:<slug>`,
+verify live (auth + titles + tabs), commit. If goals
 changed this cycle (dashboard export handed back), replace `config/goals.json`
 verbatim first so attainment judges against the new set.

@@ -19,9 +19,8 @@ produce it; `validate.mjs` enforces it. Source-specific knowledge stops at the a
   store new customers; like MER it is suppressed unless every enabled channel's spend is
   present. `store.profit` and `store.new_customers` are optional source facts (nullable);
   tiles depending on them render only when present. Channel profit is never estimated: it renders
-  only when the platform reports a profit stream (PantryLot Meta: the ProfitMetrics
-  profit value carried on the complete-registration event; PantryLot Google: the PM
-  conversion actions). A channel without one shows an explicit "not tracked" state.
+  only when the platform reports a client-configured, independently verified profit
+  stream. A channel without one shows an explicit "not tracked" state.
 
 ## Envelope
 
@@ -61,9 +60,9 @@ produce it; `validate.mjs` enforces it. Source-specific knowledge stops at the a
 ```
 
 `conversion_value` basis comes from `config.sections.google_ads.conversion_value_is`
-(`"profit"` → engine renders **POAS**, `"revenue"` → ROAS). PantryLot: profit.
+(`"profit"` → engine renders **POAS**, `"revenue"` → ROAS).
 `revenue` is optional/nullable: a second, revenue-based value stream when the account tracks
-one (PantryLot: sum of the "PM Revenue" conversion actions). When present the engine also
+one (for example, a configured set of revenue conversion actions). When present the engine also
 renders a Revenue tile and revenue-based ROAS alongside POAS. When both streams are present,
 `conversion_value` (profit) must not exceed `revenue`.
 

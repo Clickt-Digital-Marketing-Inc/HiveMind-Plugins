@@ -1,8 +1,8 @@
 {
   "client": {
-    "name": "PantryLot",
-    "slug": "pantrylot",
-    "website": "www.pantrylot.com",
+    "name": "Example Client",
+    "slug": "example-client",
+    "website": "www.example.com",
     "currency": "CAD",
     "locale": "en-CA"
   },
@@ -40,26 +40,25 @@
   },
   "accounts": {
     "google_ads": {
-      "customer_id": "544-317-0313",
+      "customer_id": "REPLACE_WITH_GOOGLE_ADS_CUSTOMER_ID",
       "adapter": "google-ads-windsor",
       "revenue_conversion_actions": [
-        "PM Revenue - Browser",
-        "PM Revenue - Conversion Booster"
+        "REPLACE_WITH_REVENUE_CONVERSION_ACTION"
       ]
     },
     "meta": {
-      "ad_account_id": "1182016997374640",
+      "ad_account_id": "REPLACE_WITH_META_AD_ACCOUNT_ID",
       "adapter": "meta-windsor",
       "profit_tracking": "complete_registration_value"
     },
     "store": {
       "platform": "shopify",
-      "store": "pantrylot",
+      "store": "example-client",
       "adapter": "shopify-mcp"
     },
     "traffic": {
-      "ga4_property_id": "507568174",
-      "ga4_property_name": "PantryLot | Revenue | ProfitMetrics",
+      "ga4_property_id": "REPLACE_WITH_GA4_PROPERTY_ID",
+      "ga4_property_name": "REPLACE_WITH_GA4_PROPERTY_NAME",
       "adapter": "ga4-windsor"
     }
   },
