@@ -30,8 +30,9 @@ SCANNED_SUFFIXES = {
 SKIPPED_DIR_PARTS = {".git", "node_modules", "__pycache__", ".venv", "dist"}
 
 # Real client / infrastructure identifiers. These must not appear ANYWHERE in
-# the tree. Source: pyrito-performance-audit-client-data.md S4 (PantryLot
-# cluster A, ABES cluster B) plus the agency's own MCC and deploy host.
+# the tree. Source: pyrito-performance-audit-client-data.md S4 (the ecomm
+# client of cluster A, the college of cluster B) plus the agency's own MCC and
+# the report deploy host.
 #
 # The scanner itself must not contain a live token, or it would trip its own
 # guard, so every entry is assembled from fragments at import time. The
@@ -121,9 +122,10 @@ def test_scanner_fires_on_a_known_positive() -> None:
 def test_no_client_or_infrastructure_identifiers_anywhere_in_tree() -> None:
     failures: list[str] = []
     scanned = 0
+    # This file is scanned too: every token here is split across a `+` so no
+    # literal appears on disk, and the sweep proves that claim rather than
+    # exempting the scanner from its own rule.
     for path in _scannable_files(ROOT):
-        if path == Path(__file__):
-            continue  # this file carries the fragments by construction
         scanned += 1
         text = path.read_text(encoding="utf-8", errors="replace")
         for token in scan_for_tokens(text, CLIENT_AND_INFRA_TOKENS):
