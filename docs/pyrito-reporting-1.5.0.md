@@ -51,6 +51,9 @@ the canonical package while preserving non-destructive rollback evidence.
 
 The primary user-facing source for both hosts is the canonical private repository.
 Repository access is required.
+The downstream Claude entries use the repository's explicit HTTPS Git URL so Claude
+Code can use the credential-helper flow documented for private repositories; both
+entries remain pinned to the approved commit above.
 
 Claude Code:
 

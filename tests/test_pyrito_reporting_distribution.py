@@ -61,15 +61,15 @@ def validate(root: Path) -> list[str]:
 
     canonical = by_name.get("pyrito-reporting")
     expected_canonical_source = {
-        "source": "github",
-        "repo": "Pyrito-ai/Pyrito-Reporting",
+        "source": "url",
+        "url": "https://github.com/Pyrito-ai/Pyrito-Reporting.git",
         "sha": PIN,
     }
     if not isinstance(canonical, dict):
         errors.append("canonical pyrito-reporting marketplace entry is required")
     else:
         if canonical.get("source") != expected_canonical_source:
-            errors.append("canonical source must be the exact pinned private GitHub commit")
+            errors.append("canonical source must be the exact pinned private HTTPS Git commit")
         if canonical.get("version") != "1.5.0":
             errors.append("canonical catalog version must be 1.5.0")
         if HOSTNAME not in str(canonical.get("description", "")):
@@ -78,7 +78,7 @@ def validate(root: Path) -> list[str]:
     legacy = by_name.get("clickt-reporting")
     expected_legacy_source = {
         "source": "git-subdir",
-        "url": "Pyrito-ai/Pyrito-Reporting",
+        "url": "https://github.com/Pyrito-ai/Pyrito-Reporting.git",
         "path": ".claude-plugin/legacy/clickt-reporting",
         "sha": PIN,
     }
@@ -210,7 +210,7 @@ def test_mutation_sweep_proves_every_distribution_gate(tmp_path: Path) -> None:
                 _write_json(marketplace_path, payload),
             )
         )(marketplace()),
-        "canonical source must be the exact pinned private GitHub commit",
+        "canonical source must be the exact pinned private HTTPS Git commit",
         (marketplace_path,),
     )
     exercise(

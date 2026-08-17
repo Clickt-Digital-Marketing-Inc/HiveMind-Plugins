@@ -43,6 +43,8 @@ A standing reporting system rather than a single document: the canonical private
 package scaffolds an engine into a client repo and then runs the recurring cycle
 against it. This public marketplace stores only commit-pinned source metadata; it does
 not carry a second engine copy.
+Its Claude source records use the canonical repository's HTTPS URL so private access
+can use the operator's existing Git credential helper.
 
 | Plugin | What it does | Data in |
 | --- | --- | --- |
