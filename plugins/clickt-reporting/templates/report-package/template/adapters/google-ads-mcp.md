@@ -1,15 +1,14 @@
 # Adapter: `google_ads` block ← google-ads-mcp (direct GAQL)
 
-**Client instance:** PantryLot customer `544-317-0313` (`5443170313`).
+**Configure before use:** replace `<GOOGLE_ADS_CUSTOMER_ID>` and
+`<GOOGLE_ADS_LOGIN_CUSTOMER_ID>` with approved client values.
 
-## ⚠ MCC login gotcha (this blocked the 2026-06-24 pull)
+## MCC login boundary
 
 The google-ads-mcp authenticates through a manager account set by
-`GOOGLE_ADS_LOGIN_CUSTOMER_ID`. PantryLot sits under manager **318-624-6648** — if the MCP
-is configured with a different manager (e.g. Clickt's 581-043-2788), queries fail with
-*"User doesn't have permission to access customer"*. Fix: set the env var to PantryLot's
-manager MCC and restart the server. Verify access first with
-`customers_list_accessible_customers`.
+`GOOGLE_ADS_LOGIN_CUSTOMER_ID`. If the client account is not under that manager, queries
+fail with an access error. Fix the approved manager configuration and restart the server.
+Verify access first with `customers_list_accessible_customers`.
 
 ## Pull (GAQL via `search_search`)
 

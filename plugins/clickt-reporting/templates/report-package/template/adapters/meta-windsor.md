@@ -1,6 +1,7 @@
 # Adapter: `meta` block ← Windsor.ai MCP (`facebook` connector)
 
-**Client instance:** PantryLot ad account `1182016997374640` (connected in Windsor ✓). CAD.
+**Configure before use:** replace `<WINDSOR_META_AD_ACCOUNT_ID>` with the approved client
+account and verify its currency and connector access.
 
 ## Pull
 
@@ -24,14 +25,13 @@ field naming varies (e.g. `actions_offsite_conversion_fb_pixel_purchase`).
 | `reach` / `frequency` | same |
 | `purchases` | purchase actions count |
 | `revenue` | purchase action value |
-| `profit` | `action_values_complete_registration` — ProfitMetrics carries profit on the complete-registration event (per John, 2026-08-04) |
+| `profit` | a client-configured field only when its values are verified as profit; otherwise null |
 
 ## Profit stream
 
-- `profit` ← `action_values_complete_registration`. This is a repurposed standard event:
-  ProfitMetrics fires complete-registration with value = order gross profit. Sanity checks:
-  event count ≤ purchases; implied margin ~28-34% (matches Google PM margin, NOT the
-  ~57% store blended margin). Meta POAS = profit ÷ spend.
+- Map `profit` only from the field named in the approved client configuration and only
+  after independently verifying its semantics. Never infer profit from a standard event
+  name. Meta POAS = verified profit ÷ spend.
 
 ## Gotchas
 

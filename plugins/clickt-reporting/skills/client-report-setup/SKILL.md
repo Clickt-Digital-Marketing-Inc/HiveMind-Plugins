@@ -50,7 +50,7 @@ mv config/goals.example.json config/goals.json
 - Golden-build check: run `report:fixtures` — both fixtures must build; the broken
   fixture (`--fixture broken`) must abort.
 - Write/adjust adapter recipes in `template/adapters/` for this client's sources
-  (bundled recipes are working references from prior clients — verify field ids with
+  (bundled recipes use placeholders — replace every placeholder and verify field ids with
   `get_fields` before the first pull; Windsor `ctr` fields may be fractions → ×100).
 
 ## 3. Verify sources
@@ -59,44 +59,37 @@ Before promising anything: `get_connectors` (Windsor) / platform MCP probes for 
 block. A block with no working source is configured `available: false` from day one —
 the report renders an honest "unavailable" state, never approximations.
 
-## 4. Hosting (reports.clickt.ca)
+## 4. Hosting
 
-Shared Hetzner box — see the bundled RUNBOOK's Hosting section for server details.
-New client = folder + auth block + graceful reload (no container recreation):
+Obtain the exact destination and authentication procedure from the approved
+infrastructure runbook; this generic plugin contains no server, username, IP address, or
+remote path. Provision one authenticated destination whose final path component is the
+validated client slug. Keep plaintext credentials out of the repository. First deploy:
 
-1. `ssh` to the server: `mkdir /root/reports/<slug>`.
-2. Generate a password locally (`openssl rand -base64 15`), hash it with
-   `docker exec caddy caddy hash-password`, and append to the Caddyfile
-   (`/root/vaultwarden/Caddyfile`, timestamped backup first):
-   ```
-   @<slug> path /<slug> /<slug>/*
-   basic_auth @<slug> {
-       <slug> <bcrypt-hash>
-   }
-   ```
-   inside the `reports.clickt.ca` site block, then
-   `docker exec caddy caddy reload --config /etc/caddy/Caddyfile` (zero-downtime).
-3. Give John the plaintext credential once, for Vaultwarden — never write it to a repo.
-4. First deploy: `./deploy/deploy.sh`, then verify: `/` 200, `/<slug>/` 401 without
-   credentials, 200 with; page titles correct.
+```bash
+./deploy/deploy.sh --destination <approved-target-ending-in-slug> --confirm deploy:<slug>
+```
+
+Inspect the mandatory dry-run output, then verify the deployed authentication boundary
+and page titles through the approved route.
 
 ## 5. Schedule the weekly Routine
 
-Create a scheduled task (default **Monday 08:00**, John's timezone) whose prompt is
+Create a scheduled task at a day, time, and timezone explicitly chosen by the operator. Its prompt is
 self-contained, e.g.:
 
 > Run /clickt-reporting:report-weekly for `<absolute path to report-package>` — pull the
-> just-completed ISO week, build the pulse draft, request commentary from John, and hold
-> all deployment until he approves.
+> just-completed ISO week, build the pulse draft, request commentary from the designated approver, and hold
+> all deployment until they approve.
 
-Confirm day/time with John before creating. Monthly runs can be a second Routine (1st of
+Confirm day/time with the operator before creating. Monthly runs can be a second Routine (1st of
 month) or on-demand via `/clickt-reporting:report-monthly`.
 
 ## Hard rules
 
-- Client deliverables are drafts until John approves. Hosting is auth-gated, but once a
+- Client deliverables are drafts until the designated approver approves. Hosting is auth-gated, but once a
   client holds credentials, **deploys are client-visible — the weekly/monthly skills
-  hold deployment until John approves.**
+  hold deployment until the designated approver approves.**
 - Numbers are never fabricated or approximated; blocked sources render unavailable.
 - Validator failures abort builds — fix data, not the validator.
 - Every cycle records raw pulls verbatim plus a spot-check note.

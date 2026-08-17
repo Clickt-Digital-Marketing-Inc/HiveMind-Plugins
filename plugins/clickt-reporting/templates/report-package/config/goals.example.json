@@ -5,7 +5,7 @@
     {
       "effective_from": "2026-07-01",
       "status": "proposed",
-      "_basis": "Proposed 2026-08-04 from July/June actuals. John to review and edit.",
+      "_basis": "Example targets only. The client and designated approver must review and replace them.",
       "goals": [
         { "id": "store_revenue", "metric": "store_revenue", "target": 85000 },
         { "id": "store_profit", "metric": "store_profit", "target": 48000 },

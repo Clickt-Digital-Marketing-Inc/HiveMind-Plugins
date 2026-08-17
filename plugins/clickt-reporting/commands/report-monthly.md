@@ -4,5 +4,5 @@ argument-hint: [path to client report-package]
 ---
 
 Use the clickt-reporting:client-report-monthly skill for the client report-package at:
-$ARGUMENTS (ask if empty). Same deploy gate as weekly: nothing ships before John
+$ARGUMENTS (ask if empty). Same deploy gate as weekly: nothing ships before the designated approver
 approves.

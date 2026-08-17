@@ -1,12 +1,12 @@
 # Adapter: `google_ads` block ← Windsor.ai MCP (`google_ads` connector)
 
-**Client instance:** PantryLot account `544-317-0313` ("adscale_ecom_PantryLot" in Windsor;
-connected 2026-08-04). This is the ACTIVE Google adapter for PantryLot — the direct
-google-ads-mcp recipe (`google-ads-mcp.md`) is the alternative once its OAuth is fixed.
+**Configure before use:** replace `<WINDSOR_GOOGLE_ADS_ACCOUNT_ID>` with the approved
+client account and verify connector access. Use the direct google-ads-mcp recipe only when
+that approved connection is available.
 
 ## Pull
 
-Windsor `get_data`, connector `google_ads`, `accounts: ["544-317-0313"]`:
+Windsor `get_data`, connector `google_ads`, `accounts: ["<WINDSOR_GOOGLE_ADS_ACCOUNT_ID>"]`:
 
 - **Totals (per window — current / prior / YoY):** fields
   `spend, impressions, clicks, ctr, cpc, conversions, conversions_value`.
@@ -28,19 +28,17 @@ Windsor `get_data`, connector `google_ads`, `accounts: ["544-317-0313"]`:
 
 - `google_ads.*.revenue` ← sum of the **PM Revenue** conversion actions, pulled with
   fields `conversion_action_name, all_conversions, all_conversions_value` and summing the
-  actions listed in `config.accounts.google_ads.revenue_conversion_actions`
-  ("PM Revenue - Browser" + "PM Revenue - Conversion Booster").
+  actions listed in `config.accounts.google_ads.revenue_conversion_actions`.
 - Same Google attribution as the profit stream, so POAS and ROAS are comparable ratios.
-- Windows that predate ProfitMetrics have **no PM actions** (July 2025 used TagFly
-  revenue tracking) — leave `revenue` null and drop value-based YoY comparisons there.
+- Windows without the configured revenue actions leave `revenue` null and omit
+  value-based YoY comparisons.
 
 ## Gotchas
 
-- **Value semantics: PROFIT** (ProfitMetrics; the campaign is literally named
-  "Pmax | Profitable tPOAS 75"). Template renders POAS. Never call it ROAS.
-- **YoY:** resolved 2026-08-04 — July 2025 has no PM conversion actions (pre-ProfitMetrics,
-  TagFly revenue tracking), so 2025 conversion value = revenue. Value-based YoY comparisons
-  are omitted until a profit-tracked YoY window exists.
+- **Value semantics:** derive from `config.sections.google_ads.conversion_value_is`; never
+  infer profit or revenue from campaign names. Render POAS for verified profit and ROAS
+  for revenue.
+- **YoY:** compare value only when both windows use the same verified semantics.
 - Windsor `ctr` is a fraction here (unlike some connectors) — always cross-check
   clicks/impressions before mapping.
 - Save raw responses verbatim to `periods/<id>/raw/google_windsor.json`.
