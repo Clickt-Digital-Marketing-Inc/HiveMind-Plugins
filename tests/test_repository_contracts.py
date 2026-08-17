@@ -322,6 +322,28 @@ def test_deploy_script_has_no_default_destination_and_is_fail_closed() -> None:
 # --------------------------------------------------------------------------
 
 
+def test_readme_documents_every_installable_plugin() -> None:
+    """Restored (in part) from `8ecd705` under PYR-81.
+
+    The README documented 11 of 13: `wppc-report` appeared only as a bare
+    install line with no description, and `clickt-reporting` appeared nowhere at
+    all. Derived from the marketplace rather than hand-listed, so a plugin added
+    later is covered by construction.
+
+    The original also asserted this repo was private and access-gated. That half
+    is deliberately NOT restored: `main` has been public since HM-708 (`2d82f67`),
+    so those assertions now pin the opposite of the truth.
+    """
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    undescribed = [name for name in PLUGIN_NAMES if f"**{name}**" not in readme]
+    uninstallable = [
+        name for name in PLUGIN_NAMES
+        if f"/plugin install {name}@hivemind-plugins" not in readme
+    ]
+    assert not undescribed, f"README has no bold entry for: {undescribed}"
+    assert not uninstallable, f"README has no install line for: {uninstallable}"
+
+
 def test_google_ads_hub_advertises_only_marketplace_plugins() -> None:
     """Restored from `8ecd705` under PYR-81.
 

@@ -3,7 +3,8 @@
 Clickt's HiveMind plugins for **Claude Code**, in one marketplace. **Deliverable**
 plugins turn live ad/store data (or CSV exports) into self-contained, white-label
 client reports; a **management suite** runs ongoing Google Ads work as done-with-you
-advisors; and **workflow** plugins run your day on Linear, Gmail, and Google Calendar.
+advisors; a **hosted reporting** system runs recurring client report cycles; and
+**workflow** plugins run your day on Linear, Gmail, and Google Calendar.
 
 Authored by **Clickt Digital Marketing Inc.** ([clickt.ca](https://clickt.ca)).
 This repo is public and every plugin in it is free to install and run. No
@@ -20,6 +21,7 @@ formula-driven xlsx workbook from a single compute pass.
 | **meta-ads-audit** | Full Meta (Facebook/Instagram) audit against a 7-lever framework with a deterministic pre-scorer, Concentration, and Creative Signals (fatigue, reach saturation, effective frequency, ranking decomposition). | Meta Ads MCP **or** Ads Manager CSV exports |
 | **shopify-cro-audit** | 11-step Shopify conversion-rate-optimization audit; machine-computed funnel analytics, a 0–150 Funnel Health gauge, Concentration, and CVR Signals (Wilson CIs, z-tests, empirical-Bayes page CVRs). | Shopify MCP (ShopifyQL) and/or GA4 + Shopify CSV exports |
 | **cm3-profitability** | Per-product CM3 contribution-margin report; CM3 bands + rollups by campaign, category (L1–L5), product type (L1–L5), and vendor, with a live HTML explorer that re-bands every table as you tune assumptions. | Google Ads Shopping-products CSV (+ optional Shopify Gross-profit CSV) |
+| **wppc-report** | wPPC (Weighted Profit-Per-Click) — a sabermetric linear-weights model: funnel events credited at expected CM3 value, indexed to the account baseline, shrunk for sample size, and scored above replacement (Margin Above Replacement), behind a Scale/Cut/Watch decision lens with four charts. | Google & Meta Ads segment CSV exports |
 
 ### Management suite
 
@@ -31,6 +33,15 @@ you ready-to-apply Google Ads Editor CSVs.
 | Plugin | What it does | Data in |
 | --- | --- | --- |
 | **google-ads-management** | Menu hub + 12 Google Ads advisors — budget pacing, bidding strategy, keywords/search terms, Quality Score, audiences, conversions & tracking, performance reporting, competitive analysis, PMax campaigns, PMax listing groups, products, and account health. Each tunable skill emits the same 3-format bundle (interactive HTML + markdown + tunable xlsx) with Node↔Python kernel parity (account health & audience targeting ship a reduced md + xlsx bundle). | Google Ads MCP (GAQL) **or** Ads UI / Editor / Auction Insights CSV exports |
+
+### Hosted client reporting
+
+A standing reporting system rather than a single document: it scaffolds an engine
+into a client repo and then runs the recurring cycle against it.
+
+| Plugin | What it does | Data in |
+| --- | --- | --- |
+| **clickt-reporting** | Scaffolds a client-agnostic report engine — tabbed monthly reports and weekly pulses across Google Ads, Meta, store/CRO, and goal attainment (flexible v2 goals, incl. SKU and seasonal targets) — then runs each cycle: pull → validate → spot-check → draft → designated approval → explicit fail-closed deploy. Channel value semantics stay honest: POAS vs ROAS, never blended; MER/nCAC suppressed on incomplete spend. Ships a weekly routine that requests and integrates commentary. | Windsor.ai / platform MCPs (needs Node ≥18) |
 
 ### Workflow plugins
 
@@ -80,12 +91,15 @@ servers.
    /plugin install wppc-report@hivemind-plugins
    /plugin install catch-up@hivemind-plugins
    /plugin install orchestrator@hivemind-plugins
+   /plugin install clickt-reporting@hivemind-plugins
    ```
    > `orchestrator` is also published in the standalone `clickt-orchestrator` marketplace — install it from **one** marketplace only (two installs of the same plugin name collide).
 3. **Set up what your chosen plugins need:**
    - *Deliverable plugins & the management suite*: Python 3 with `pip install openpyxl`;
      `google-ads-management` also needs `vl-convert-python==1.7.0` for its charts, and
      `cm3-profitability` needs `pip install python-pptx vl-convert-python==1.7.0`.
+   - *Hosted client reporting*: `clickt-reporting` needs **Node ≥18** and its data
+     source (Windsor.ai or the platform MCPs); no Python.
    - *Workflow plugins*: no Python required (exception: `orchestrator`'s checkout-guard
      hook wants `python3` on PATH, and fails open without it). Connect the MCP servers
      they use: Linear (project-coordinator, social-media-manager, morning-briefing,
