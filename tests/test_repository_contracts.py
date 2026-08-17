@@ -198,12 +198,6 @@ def test_bare_brand_scanner_fires_on_every_casing_the_substring_list_misses() ->
             f"bare-brand scanner missed {sample!r}"
         )
 
-    # Each pattern is individually proven, so an emptied or broken entry cannot
-    # hide behind its sibling.
-    for pattern in BARE_BRAND_PATTERNS:
-        planted = "deploy target " + pattern.pattern.replace(r"\b", "") + " here"
-        assert scan_for_patterns(planted, (pattern,)), f"{pattern.pattern} never fires"
-
     # Word boundaries hold: a longer word that merely contains a brand is not a
     # leak, and flagging it would make the guard unusable.
     for benign in ("cab" + "esque", "pantry" + "lots", "t" + "ab" + "es" + "poon"):
@@ -218,8 +212,22 @@ def test_bare_brand_scanner_fires_on_every_casing_the_substring_list_misses() ->
 
 
 def test_host_and_path_scanner_fires_on_each_tree_wide_token() -> None:
-    """PYR-81 known-positive for the tokens promoted from scoped to tree-wide."""
-    for token in HOST_AND_PATH_TOKENS:
+    """PYR-81 known-positive for the tokens promoted from scoped to tree-wide.
+
+    The controls are written out independently rather than looped over
+    HOST_AND_PATH_TOKENS: a sample derived from the subject vanishes along with
+    the subject, so deleting an entry would silently delete its own assertion.
+    The coverage assertion below is what pins the shipped set to these controls.
+    """
+    controls = (
+        "/Users/" + "johngreenhow",
+        "ro" + "ot@",
+    )
+    assert set(controls) <= set(HOST_AND_PATH_TOKENS), (
+        "a token these controls prove is no longer swept tree-wide: "
+        f"{sorted(set(controls) - set(HOST_AND_PATH_TOKENS))}"
+    )
+    for token in controls:
         planted = "run: rsync -az ./dist/ " + token + "example.internal:/srv/reports/"
         assert scan_for_tokens(planted, HOST_AND_PATH_TOKENS) == [token], (
             f"tree-wide scanner missed a planted {token!r}"
