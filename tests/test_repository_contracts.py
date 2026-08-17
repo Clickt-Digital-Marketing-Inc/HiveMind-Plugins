@@ -8,6 +8,12 @@ version restores the guard, extends the banned list to every identifier named in
 the client-data audit (both clients, the agency MCC, and the deploy host), and
 scans the whole tree instead of one plugin directory.
 
+Hardened under PYR-81, which closed the two coverage gaps PYR-50 left behind: the
+substring list banned the brands only in the exact casings it happened to list,
+and only inside an allowlisted set of file suffixes; and the host/path defaults
+were swept under `plugins/clickt-reporting/` alone. Both are now word-boundary,
+case-insensitive, and tree-wide over every file.
+
 Run: `python3 -m pytest -q tests/test_repository_contracts.py`
 """
 
@@ -50,42 +56,92 @@ CLIENT_AND_INFRA_TOKENS: tuple[str, ...] = (
     "11820" + "16997374640",
     "5075" + "68174",
     "5075" + "76481",
-    "Abes" + " College",
-    "abes" + " college",
+    "Ab" + "es College",
+    "ab" + "es college",
     "176-" + "892-9875",
     "1768" + "929875",
 )
 
-# Personal defaults that must not be baked into the client-onboarding scaffold.
-# Scoped to plugins/clickt-reporting, exactly as the original guard scoped them:
-# the leak these prevent is a personal default shipped into a client's package,
-# not the principal's name appearing in governance or authorship metadata.
-PERSONAL_DEFAULT_TOKENS: tuple[str, ...] = (
-    "John's", "John ", "/Users/" + "johngreenhow", "root@",
+# PYR-81 gap 1: the substring list above bans each brand only in the casings it
+# happens to spell. The bare brand word is the leak that actually matters — a
+# client name survives casing changes: a title-cased ecomm brand and an
+# all-caps college short name would both have walked straight through. These
+# patterns are word-boundary and case-insensitive, so they subsume every casing
+# and every surrounding context (inside a hostname, inside quotes, before a
+# comma) without matching a longer word that merely contains them.
+#
+# Same no-literal rule as above: each word is assembled from fragments, so the
+# scanner carries no bare brand token on disk and does not trip itself. It is
+# also why the college entries above are split mid-word rather than at the
+# space — a word-boundary match would otherwise fire on the quoted first word.
+# Nothing below this line may spell either brand out in prose, for the same
+# reason; the sweep enforces that rather than trusting it.
+BARE_BRAND_WORDS: tuple[str, ...] = (
+    "ab" + "es",
+    "pantry" + "lot",
 )
+BARE_BRAND_PATTERNS: tuple[re.Pattern[str], ...] = tuple(
+    re.compile(r"\b" + re.escape(word) + r"\b", re.IGNORECASE)
+    for word in BARE_BRAND_WORDS
+)
+
+# PYR-81 gap 2: these were swept under plugins/clickt-reporting only. A personal
+# home path or an `ssh`/`rsync` root target is a leak wherever it appears — a
+# doc, a workflow, a helper script — so they are swept tree-wide.
+HOST_AND_PATH_TOKENS: tuple[str, ...] = (
+    "/Users/" + "johngreenhow",
+    "ro" + "ot@",
+)
+
+# The principal's name stays scoped to the onboarding scaffold, exactly as the
+# original guard scoped it. Tree-wide it would fire on authorship, licence, and
+# governance metadata, which is legitimate; the leak it prevents is a personal
+# default shipped inside a client's package.
+ONBOARDING_ONLY_TOKENS: tuple[str, ...] = ("John's", "John ")
 ONBOARDING_ROOT = ROOT / "plugins/clickt-reporting"
 
 
+def _all_files(root: Path) -> list[Path]:
+    """Every file under `root`, with no suffix allowlist.
+
+    PYR-81: the brand sweep must cover "any file type", so it walks this rather
+    than `_scannable_files`. Safe to read everything here because the tree
+    carries no binaries — the only files outside SCANNED_SUFFIXES are
+    `.gitignore`, `LICENSE`, and the vendored `SHA256SUMS` manifests — and the
+    reads below are `errors="replace"` regardless.
+    """
+    return [
+        path
+        for path in sorted(root.rglob("*"))
+        if path.is_file() and not (SKIPPED_DIR_PARTS & set(path.parts))
+    ]
+
+
 def _scannable_files(root: Path) -> list[Path]:
-    files = []
-    for path in sorted(root.rglob("*")):
-        if not path.is_file():
-            continue
-        if SKIPPED_DIR_PARTS & set(path.parts):
-            continue
-        if path.suffix.lower() not in SCANNED_SUFFIXES:
-            continue
-        files.append(path)
-    return files
+    return [
+        path
+        for path in _all_files(root)
+        if path.suffix.lower() in SCANNED_SUFFIXES
+    ]
 
 
 def scan_for_tokens(text: str, tokens: tuple[str, ...]) -> list[str]:
     """Return every token from `tokens` present in `text`.
 
-    The single matching primitive used by both the tree sweep and the
+    The single substring primitive used by both the tree sweep and the
     known-positive self-test, so the self-test exercises the real scanner.
     """
     return [token for token in tokens if token in text]
+
+
+def scan_for_patterns(text: str, patterns: tuple[re.Pattern[str], ...]) -> list[str]:
+    """Return the matched text of every pattern in `patterns` found in `text`.
+
+    The regex sibling of `scan_for_tokens`, and likewise the single primitive
+    shared by the tree sweep and the self-tests. Returns the matches rather
+    than the patterns so a failure report names what was actually found.
+    """
+    return [match.group(0) for pattern in patterns for match in pattern.finditer(text)]
 
 
 # --------------------------------------------------------------------------
@@ -104,18 +160,74 @@ def test_scanner_fires_on_a_known_positive() -> None:
     planted = (
         '{"client": {"name": "Pantry' + 'Lot"}, '
         '"google_ads": {"customer_id": "544-' + '317-0313"}, '
-        '"deploy": "root@5.161.' + '204.210", '
-        '"other_client": "Abes' + ' College"}'
+        '"deploy": "ro' + 'ot@5.161.' + '204.210", '
+        '"other_client": "Ab' + 'es College"}'
     )
     hits = scan_for_tokens(planted, CLIENT_AND_INFRA_TOKENS)
     assert "Pantry" + "Lot" in hits, "scanner missed the planted client name"
     assert "544-" + "317-0313" in hits, "scanner missed the planted Google Ads CID"
     assert "5.161." + "204.210" in hits, "scanner missed the planted deploy host"
-    assert "Abes" + " College" in hits, "scanner missed the planted second client"
+    assert "Ab" + "es College" in hits, "scanner missed the planted second client"
 
     clean = '{"client": {"name": "Example Client"}, "customer_id": "000-000-0000"}'
     assert scan_for_tokens(clean, CLIENT_AND_INFRA_TOKENS) == [], (
         "scanner flagged a synthetic fixture — the guard would be unusable"
+    )
+
+
+def test_bare_brand_scanner_fires_on_every_casing_the_substring_list_misses() -> None:
+    """PYR-81 known-positive: each bare-brand pattern fires, and only on words.
+
+    Every sample here is a casing the PYR-50 substring list would have let
+    through, so this test is red against that list by construction. Samples are
+    assembled from fragments, so no bare brand word exists on disk.
+    """
+    missed_by_the_substring_list = (
+        "Pantry" + "lot",                 # third casing; list had two
+        "PANTRY" + "LOT",
+        "Ab" + "es",                      # bare, without the "College" suffix
+        "AB" + "ES",
+        "ab" + "es",
+    )
+    for sample in missed_by_the_substring_list:
+        assert scan_for_tokens(sample, CLIENT_AND_INFRA_TOKENS) == [], (
+            f"{sample!r} is no longer a gap in the substring list — this test's "
+            "premise is stale and its samples need replacing"
+        )
+        assert scan_for_patterns(sample, BARE_BRAND_PATTERNS), (
+            f"bare-brand scanner missed {sample!r}"
+        )
+
+    # Each pattern is individually proven, so an emptied or broken entry cannot
+    # hide behind its sibling.
+    for pattern in BARE_BRAND_PATTERNS:
+        planted = "deploy target " + pattern.pattern.replace(r"\b", "") + " here"
+        assert scan_for_patterns(planted, (pattern,)), f"{pattern.pattern} never fires"
+
+    # Word boundaries hold: a longer word that merely contains a brand is not a
+    # leak, and flagging it would make the guard unusable.
+    for benign in ("cab" + "esque", "pantry" + "lots", "t" + "ab" + "es" + "poon"):
+        assert scan_for_patterns(benign, BARE_BRAND_PATTERNS) == [], (
+            f"bare-brand scanner flagged {benign!r} — \\b is not holding"
+        )
+
+    clean = '{"client": {"name": "Example Client"}, "store": "example.com"}'
+    assert scan_for_patterns(clean, BARE_BRAND_PATTERNS) == [], (
+        "bare-brand scanner flagged a synthetic fixture"
+    )
+
+
+def test_host_and_path_scanner_fires_on_each_tree_wide_token() -> None:
+    """PYR-81 known-positive for the tokens promoted from scoped to tree-wide."""
+    for token in HOST_AND_PATH_TOKENS:
+        planted = "run: rsync -az ./dist/ " + token + "example.internal:/srv/reports/"
+        assert scan_for_tokens(planted, HOST_AND_PATH_TOKENS) == [token], (
+            f"tree-wide scanner missed a planted {token!r}"
+        )
+
+    clean = "run: rsync -az ./dist/ ${DESTINATION}/"
+    assert scan_for_tokens(clean, HOST_AND_PATH_TOKENS) == [], (
+        "tree-wide scanner flagged a parameterized destination"
     )
 
 
@@ -134,14 +246,49 @@ def test_no_client_or_infrastructure_identifiers_anywhere_in_tree() -> None:
     assert not failures, "client/infrastructure identifiers at tip:\n" + "\n".join(failures)
 
 
+def test_no_bare_brand_word_in_any_file_type() -> None:
+    """PYR-81: the brand words, in any casing, in any file — not just the
+    suffix allowlist the substring sweep uses."""
+    failures: list[str] = []
+    scanned = 0
+    for path in _all_files(ROOT):
+        scanned += 1
+        text = path.read_text(encoding="utf-8", errors="replace")
+        for hit in scan_for_patterns(text, BARE_BRAND_PATTERNS):
+            failures.append(f"{path.relative_to(ROOT)} contains {hit!r}")
+    assert scanned > 0, "brand sweep scanned nothing — the walker is broken"
+    # The sweep must reach beyond the substring sweep, or the gap it exists to
+    # close is still open.
+    assert scanned > len(_scannable_files(ROOT)), (
+        "brand sweep covered no more files than the suffix allowlist"
+    )
+    assert not failures, "bare brand identifiers at tip:\n" + "\n".join(failures)
+
+
+def test_no_personal_path_or_root_host_anywhere_in_tree() -> None:
+    """PYR-81: promoted from the clickt-reporting scope to the whole tree."""
+    failures: list[str] = []
+    scanned = 0
+    for path in _all_files(ROOT):
+        scanned += 1
+        text = path.read_text(encoding="utf-8", errors="replace")
+        for token in scan_for_tokens(text, HOST_AND_PATH_TOKENS):
+            failures.append(f"{path.relative_to(ROOT)} contains {token!r}")
+    assert scanned > 0, "host/path sweep scanned nothing — the walker is broken"
+    assert not failures, "personal path / root host at tip:\n" + "\n".join(failures)
+
+
 def test_clickt_reporting_onboarding_has_no_personal_or_client_defaults() -> None:
     failures: list[str] = []
     scanned = 0
     for path in _scannable_files(ONBOARDING_ROOT):
         scanned += 1
         text = path.read_text(encoding="utf-8", errors="replace")
-        for token in scan_for_tokens(text, PERSONAL_DEFAULT_TOKENS + CLIENT_AND_INFRA_TOKENS):
+        banned = ONBOARDING_ONLY_TOKENS + HOST_AND_PATH_TOKENS + CLIENT_AND_INFRA_TOKENS
+        for token in scan_for_tokens(text, banned):
             failures.append(f"{path.relative_to(ROOT)} contains {token!r}")
+        for hit in scan_for_patterns(text, BARE_BRAND_PATTERNS):
+            failures.append(f"{path.relative_to(ROOT)} contains {hit!r}")
     assert scanned > 0, "onboarding sweep scanned nothing — the walker is broken"
     assert not failures, "\n".join(failures)
 
