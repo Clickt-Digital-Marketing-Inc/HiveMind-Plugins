@@ -47,7 +47,7 @@ path" in [references/search-term-waste-filter.md](references/search-term-waste-f
 
 ## Diagnose — 4-bucket SQR segmentation
 For each search term (dedupe, ≥ 30d), bucket per
-[benchmarks](google-ads-foundation/references/benchmarks-2026.md):
+[benchmarks](../google-ads-foundation/references/benchmarks-2026.md):
 
 | Bucket | Trigger | Action |
 |---|---|---|

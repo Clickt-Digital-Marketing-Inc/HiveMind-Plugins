@@ -322,6 +322,28 @@ def test_deploy_script_has_no_default_destination_and_is_fail_closed() -> None:
 # --------------------------------------------------------------------------
 
 
+def test_local_markdown_links_resolve() -> None:
+    """Restored from `8ecd705` under PYR-81.
+
+    PYR-50 left this out because it was red against `main`: four sibling skills
+    linked to the foundation skill's benchmarks reference by a path relative to
+    the foundation skill rather than to themselves. Those four links are fixed,
+    so the guard is back to keep them fixed.
+    """
+    broken: list[str] = []
+    pattern = re.compile(r"(?<!!)\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
+    for markdown in sorted(ROOT.rglob("*.md")):
+        if SKIPPED_DIR_PARTS & set(markdown.parts) or markdown.name.endswith(".template.md"):
+            continue
+        for raw in pattern.findall(markdown.read_text(encoding="utf-8", errors="replace")):
+            if raw.startswith(("http://", "https://", "mailto:", "#")):
+                continue
+            target = raw.split("#", 1)[0]
+            if target and "{{" not in target and not (markdown.parent / target).exists():
+                broken.append(f"{markdown.relative_to(ROOT)} -> {raw}")
+    assert not broken, "broken local Markdown links:\n" + "\n".join(broken)
+
+
 def test_marketplace_population_matches_plugin_directories() -> None:
     directories = sorted(
         path.name
