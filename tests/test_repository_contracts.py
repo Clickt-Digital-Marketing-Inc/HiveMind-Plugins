@@ -322,6 +322,42 @@ def test_deploy_script_has_no_default_destination_and_is_fail_closed() -> None:
 # --------------------------------------------------------------------------
 
 
+def test_google_ads_hub_advertises_only_marketplace_plugins() -> None:
+    """Restored from `8ecd705` under PYR-81.
+
+    The hub catalog advertised a `mediametrics-google` task whose plugin is not
+    in this marketplace, which also made the hub's own
+    `skills/google-ads/tests/test_catalog.py` fail live. Task removed; guard
+    back. The surface check is case-insensitive here (the original was not) so
+    the lowercase route references that the original would have missed cannot
+    creep back.
+
+    Scoped to the hub's three advertising surfaces on purpose: the name also
+    appears across the audit plugins as provenance for mirrored analytics
+    ("mirror of the MediaMetrics analytics module"), which is attribution, not
+    an advertised install.
+    """
+    catalog_path = ROOT / "plugins/google-ads-management/skills/google-ads/references/catalog.json"
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    advertised = {task["plugin"] for task in catalog["tasks"]}
+    assert advertised <= set(PLUGIN_NAMES), (
+        "hub catalog advertises plugins absent from this marketplace: "
+        f"{sorted(advertised - set(PLUGIN_NAMES))}"
+    )
+    # Every group the catalog offers must still be populated by a task.
+    assert set(catalog["groups"]) == {task["group"] for task in catalog["tasks"]}, (
+        "hub catalog offers a group no task belongs to"
+    )
+    for surface in (
+        ROOT / "plugins/google-ads-management/README.md",
+        ROOT / "plugins/google-ads-management/skills/google-ads/SKILL.md",
+        catalog_path,
+    ):
+        assert "mediametrics" not in surface.read_text(encoding="utf-8").lower(), (
+            f"{surface.relative_to(ROOT)} advertises a plugin this marketplace does not ship"
+        )
+
+
 def test_local_markdown_links_resolve() -> None:
     """Restored from `8ecd705` under PYR-81.
 
