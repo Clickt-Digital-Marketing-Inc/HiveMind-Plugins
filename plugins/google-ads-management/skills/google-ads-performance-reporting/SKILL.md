@@ -60,7 +60,7 @@ and build the findings JSON with
   gaps. Period-over-period deltas for every headline metric.
 
 ## Diagnose / interpret
-Use [benchmarks](google-ads-foundation/references/benchmarks-2026.md) as context, but compare to the
+Use [benchmarks](../google-ads-foundation/references/benchmarks-2026.md) as context, but compare to the
 account's own trend first:
 - **Visibility:** low/declining impression share or impressions → reach problem (budget vs rank).
 - **Engagement:** high impressions + low CTR → ad copy/relevance review (route to QS skill).

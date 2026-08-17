@@ -1,6 +1,6 @@
 ---
 name: google-ads
-description: Use when the user wants to start, browse, or choose among Google Ads tasks without naming a specific one — e.g. "manage Google Ads", "Google Ads menu", "open the Google Ads menu", "what Google Ads tools do I have", "help with my Google Ads account", or "where do I start with Google Ads". Presents an interactive in-Claude menu of every Google Ads skill (management, audit, CM3 profitability, MediaMetrics), captures the task's inputs, and routes to the chosen skill. When the user already names a specific task (budget pacing, quality score, audit, PMax, CM3, MediaMetrics, etc.), use that task's own skill directly instead of this hub.
+description: Use when the user wants to start, browse, or choose among Google Ads tasks without naming a specific one — e.g. "manage Google Ads", "Google Ads menu", "open the Google Ads menu", "what Google Ads tools do I have", "help with my Google Ads account", or "where do I start with Google Ads". Presents an interactive in-Claude menu of every Google Ads skill (management, audit, CM3 profitability), captures the task's inputs, and routes to the chosen skill. When the user already names a specific task (budget pacing, quality score, audit, PMax, CM3, etc.), use that task's own skill directly instead of this hub.
 ---
 
 # Google Ads — task hub
@@ -20,12 +20,11 @@ then let the routed prompt trigger the task skill.
   winners and losers", "CM3 report"). Defer to that task's skill — its description will match.
 - **Don't shadow** `google-ads-foundation` (the shared prerequisite that task skills load).
 
-## The 15 tasks (source of truth: [references/catalog.json](references/catalog.json))
+## The 14 tasks (source of truth: [references/catalog.json](references/catalog.json))
 The catalog is authoritative — read it, don't hardcode the list here. Groups: **Management** (12
-skills), **Audit** (full account audit), **Profitability** (CM3 by product), **MediaMetrics**
-(35-metric deep-dive). Each entry carries its `skill` name, `plugin`, input shape (`mcp` = account +
+skills), **Audit** (full account audit), **Profitability** (CM3 by product). Each entry carries its `skill` name, `plugin`, input shape (`mcp` = account +
 date window; `csv` = file paths), available `formats`, and a route template. Cross-plugin tasks
-(audit, cm3-by-product, mediametrics-google) only run if that plugin is installed; if a routed task
+(audit, cm3-by-product) only run if that plugin is installed; if a routed task
 has no matching skill, say so rather than improvising.
 
 ## Flow
@@ -94,7 +93,7 @@ formats, so **build them now** via the skill's own builder (the audit →
 `{"title","scope","summary","taskLabel","artifacts":[{"label","fmt","path"}]}` listing the built
 files (omit `exports`).
 
-**C. Export-from-results skill** (every other non-tunable — the advisory skills + mediametrics):
+**C. Export-from-results skill** (every other non-tunable — the advisory skills):
 build **no files yet**; render the card with `__CARD__` =
 `{"title","scope","summary","taskLabel","skill","filename_stem","exports":[<the task's formats>]}`
 (omit `artifacts`). Each format becomes a button that routes to Step 5.
@@ -120,12 +119,10 @@ the **right builder for the skill** — the CLIs differ by family, so don't assu
   exactly one `--output-md|--output-html|--output-xlsx|--output-pptx <path>`. A tuner **Save** uses
   `--output-md` into the vault `raw/reports/`; the tuned cutoffs + cost assumptions are recorded in the
   md frontmatter (and the xlsx methodology), so the saved report matches the tuner. Exports → `artifacts/`.
-- **mediametrics / audit**: invoke that skill's **own** builder per its SKILL.md — bespoke single-output
-  flags, **not** `--input/--formats`: mediametrics
-  `${CLAUDE_PLUGIN_ROOT}/../mediametrics-google/skills/mediametrics-google/mediametrics_google_report.py --raw-dir …
-  --output-md|--output-html <path>`; audit
+- **audit**: invoke that skill's **own** builder per its SKILL.md — bespoke single-output
+  flags, **not** `--input/--formats`:
   `${CLAUDE_PLUGIN_ROOT}/../google-ads-audit/skills/google-ads-audit/scripts/generate_workbook.py --input <findings> --output <path>.xlsx`.
-  They rebuild from their original inputs (CSV exports / findings).
+  It rebuilds from its original inputs (findings).
 - **Reduced-bundle advisory skills** (account-health, audience-targeting — md+xlsx, no html/tuner):
   rebuild via `${CLAUDE_PLUGIN_ROOT}/skills/<skill>/scripts/build_<prefix>_report.py --input <findings>.json
   --outdir artifacts --brand "{brand}" --formats <md|xlsx>` (same interface as the tunable bundle skills,
@@ -146,7 +143,7 @@ requested format per the above and reply with the clickable path.
 
 ## Fallback — no widget tool available
 If `mcp__visualize__read_me` / `show_widget` aren't available, don't fail — degrade gracefully:
-1. Use `AskUserQuestion` to ask which area (Management / Audit / Profitability / MediaMetrics).
+1. Use `AskUserQuestion` to ask which area (Management / Audit / Profitability).
 2. List that area's tasks (from the catalog) and let the user name one.
 3. Capture the inputs conversationally (account + window, or file paths; then formats + context).
 4. Run the task skill, then present results as a short text summary plus the markdown artifact links

@@ -42,7 +42,7 @@ because their signal is structural/checklist-shaped rather than a tunable per-ro
 
 **Hub**
 - **`google-ads`** — the "manage Google Ads" menu; lists and routes to every task (including the
-  Audit, CM3 Profitability, and MediaMetrics skills in sibling plugins).
+  Audit and CM3 Profitability skills in sibling plugins).
 
 **Data skills** (12 — full 3-format bundle unless noted)
 
