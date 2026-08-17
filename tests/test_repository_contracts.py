@@ -33,7 +33,14 @@ SCANNED_SUFFIXES = {
     ".md", ".json", ".sh", ".mjs", ".js", ".py", ".yml", ".yaml",
     ".txt", ".csv", ".html", ".css", ".toml", ".cfg", ".ini",
 }
-SKIPPED_DIR_PARTS = {".git", "node_modules", "__pycache__", ".venv", "dist"}
+SKIPPED_DIR_PARTS = {
+    ".git", "node_modules", "__pycache__", ".venv", "dist",
+    # PYR-81: the brand sweep walks every file, not just SCANNED_SUFFIXES, so
+    # tool caches now fall inside it. They are generated, untracked, and their
+    # contents (failed-test node ids, hashes) would make the sweep's file count
+    # depend on whether pytest had run before — skip them explicitly.
+    ".pytest_cache", ".mypy_cache", ".ruff_cache", ".tox",
+}
 
 # Real client / infrastructure identifiers. These must not appear ANYWHERE in
 # the tree. Source: pyrito-performance-audit-client-data.md S4 (the ecomm
