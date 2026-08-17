@@ -125,11 +125,28 @@
       ]
     },
     {
-      "name": "clickt-reporting",
-      "source": "./plugins/clickt-reporting",
-      "version": "1.0.1",
+      "name": "pyrito-reporting",
+      "source": {
+        "source": "github",
+        "repo": "Pyrito-ai/Pyrito-Reporting",
+        "sha": "dcb19312a1285bcbf0f2db2d1309919f39789997"
+      },
+      "version": "1.5.0",
       "category": "marketing",
-      "description": "Clickt's hosted ecomm client reporting system. Scaffolds a client-agnostic report engine (tabbed monthly reports + weekly pulses: Google Ads, Meta, store/CRO, goal attainment with flexible v2 goals incl. SKU and seasonal targets) into a client repo and runs the report cycles: pull, validate, spot-check, draft, designated approval, explicit fail-closed deploy. Includes the weekly-Routine workflow that requests and integrates commentary. Honors profit-vs-revenue value semantics per channel (POAS vs ROAS, never blended; MER/nCAC suppressed on incomplete spend). Node >=18; data via Windsor.ai / platform MCPs."
+      "description": "Pyrito's private agency-reporting workflow for hosted HTML monthly reports and weekly pulses. It scaffolds the canonical report engine, validates source data, holds drafts for operator commentary and approval, and publishes to an authenticated VPS or a private artifact. Production remains at reports.gethivemind.co."
+    },
+    {
+      "name": "clickt-reporting",
+      "source": {
+        "source": "git-subdir",
+        "url": "Pyrito-ai/Pyrito-Reporting",
+        "path": ".claude-plugin/legacy/clickt-reporting",
+        "sha": "dcb19312a1285bcbf0f2db2d1309919f39789997"
+      },
+      "version": "1.5.0",
+      "category": "marketing",
+      "description": "Deprecated command shim for existing /clickt-reporting:report-* invocations. Install the pinned pyrito-reporting package to run workflows.",
+      "strict": true
     }
   ]
 }

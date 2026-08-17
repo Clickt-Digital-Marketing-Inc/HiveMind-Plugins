@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "release": "1.5.0",
+  "canonical": {
+    "repository": "Pyrito-ai/Pyrito-Reporting",
+    "commit": "dcb19312a1285bcbf0f2db2d1309919f39789997",
+    "treeOid": "ec1b9ff3575f99a5439592ec0625ddf4b5f15248",
+    "fileCount": 66,
+    "engineSha256": "84613b8c65767f654776e44a316c524920abc3bb5803dd786e213e89b5affdec"
+  },
+  "legacyShim": {
+    "sourcePath": ".claude-plugin/legacy/clickt-reporting",
+    "treeOid": "fbc99cf2673d8e90dd69a5c83de3ce0e8a52f80f",
+    "fileCount": 4,
+    "files": {
+      ".claude-plugin/plugin.json": "c4f3d1787504e4f23cd7c296cc6f22497aae6be3e6676019f0c38b04c80c9b8f",
+      "commands/report-monthly.md": "9bea0a61b0ec86ccd059e5d9fdad1a82221ddb45c61f7992f8cd536972e3d201",
+      "commands/report-setup.md": "e2d87379b6756027bbf8f807d9c203830dd18d5848298de4486176732cdec0c7",
+      "commands/report-weekly.md": "ef8232cbf2e899cb308018d4d6ac941778d8d751e2b549fe215b00971b0df5de"
+    }
+  },
+  "productionHostname": "reports.gethivemind.co",
+  "deferredDomainMigration": true,
+  "compatibilityRetirementIssue": "PYR-73",
+  "compatibilityRetirementRequiresHumanApproval": true
+}

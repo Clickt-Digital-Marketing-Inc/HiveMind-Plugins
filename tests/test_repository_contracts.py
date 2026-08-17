@@ -415,11 +415,22 @@ def test_marketplace_population_matches_plugin_directories() -> None:
         for path in (ROOT / "plugins").iterdir()
         if path.is_dir() and (path / ".claude-plugin/plugin.json").is_file()
     )
-    assert PLUGIN_NAMES == directories
+    local_entries = sorted(
+        Path(entry["source"]).name
+        for entry in MARKETPLACE["plugins"]
+        if isinstance(entry.get("source"), str)
+        and entry["source"].startswith("./plugins/")
+    )
+    assert local_entries == sorted(set(directories) - {"clickt-reporting"})
+    assert sorted(set(directories) - set(local_entries)) == ["clickt-reporting"], (
+        "only the frozen clickt-reporting recovery snapshot may be unreferenced"
+    )
 
 
 def test_plugin_manifest_versions_match_marketplace() -> None:
     for entry in MARKETPLACE["plugins"]:
+        if not isinstance(entry.get("source"), str):
+            continue
         manifest = json.loads(
             (ROOT / entry["source"] / ".claude-plugin/plugin.json").read_text(encoding="utf-8")
         )

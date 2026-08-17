@@ -1,14 +1,17 @@
 # HiveMind Plugins
 
-Clickt's HiveMind plugins for **Claude Code**, in one marketplace. **Deliverable**
+Clickt's HiveMind plugins for **Claude Code**, in one marketplace. The separately
+owned Pyrito Reporting package is also available here as a pinned private source and
+installs directly from its canonical repository in both Claude Code and Codex. **Deliverable**
 plugins turn live ad/store data (or CSV exports) into self-contained, white-label
 client reports; a **management suite** runs ongoing Google Ads work as done-with-you
 advisors; a **hosted reporting** system runs recurring client report cycles; and
 **workflow** plugins run your day on Linear, Gmail, and Google Calendar.
 
 Authored by **Clickt Digital Marketing Inc.** ([clickt.ca](https://clickt.ca)).
-This repo is public and every plugin in it is free to install and run. No
-signup of any kind is required.
+This repo is public and its locally bundled plugins are free to install and run. No
+signup is required for those plugins. `pyrito-reporting` is different: its source
+repository is private, and installation requires access to that repository.
 
 ### Deliverable plugins
 
@@ -36,12 +39,15 @@ you ready-to-apply Google Ads Editor CSVs.
 
 ### Hosted client reporting
 
-A standing reporting system rather than a single document: it scaffolds an engine
-into a client repo and then runs the recurring cycle against it.
+A standing reporting system rather than a single document: the canonical private
+package scaffolds an engine into a client repo and then runs the recurring cycle
+against it. This public marketplace stores only commit-pinned source metadata; it does
+not carry a second engine copy.
 
 | Plugin | What it does | Data in |
 | --- | --- | --- |
-| **clickt-reporting** | Scaffolds a client-agnostic report engine — tabbed monthly reports and weekly pulses across Google Ads, Meta, store/CRO, and goal attainment (flexible v2 goals, incl. SKU and seasonal targets) — then runs each cycle: pull → validate → spot-check → draft → designated approval → explicit fail-closed deploy. Channel value semantics stay honest: POAS vs ROAS, never blended; MER/nCAC suppressed on incomplete spend. Ships a weekly routine that requests and integrates commentary. | Windsor.ai / platform MCPs (needs Node ≥18) |
+| **pyrito-reporting** | Canonical Pyrito package for approval-gated monthly reports and weekly pulses. The marketplace source is pinned to the verified private release commit; production remains at `reports.gethivemind.co`. | Windsor.ai / platform MCPs (needs Node ≥18) |
+| **clickt-reporting** | Transitional command shim for saved `/clickt-reporting:report-*` invocations. It points at the shim inside the same pinned canonical commit and never carries or runs an independent engine. | Install `pyrito-reporting` to run workflows. |
 
 ### Workflow plugins
 
@@ -91,15 +97,63 @@ servers.
    /plugin install wppc-report@hivemind-plugins
    /plugin install catch-up@hivemind-plugins
    /plugin install orchestrator@hivemind-plugins
+   /plugin install pyrito-reporting@hivemind-plugins
    /plugin install clickt-reporting@hivemind-plugins
    ```
    > `orchestrator` is also published in the standalone `clickt-orchestrator` marketplace — install it from **one** marketplace only (two installs of the same plugin name collide).
-3. **Set up what your chosen plugins need:**
+
+   `pyrito-reporting@hivemind-plugins` resolves to the private canonical repository at
+   the approved commit recorded in [the 1.5.0 release notes](docs/pyrito-reporting-1.5.0.md).
+   It requires Git access to `Pyrito-ai/Pyrito-Reporting`; the private engine is not
+   copied into this public repository.
+
+### Install Pyrito Reporting directly
+
+Direct installation from the canonical private repository is the primary path. It
+requires repository access.
+
+Claude Code:
+
+```text
+/plugin marketplace add Pyrito-ai/Pyrito-Reporting
+/plugin install pyrito-reporting@pyrito-reporting
+```
+
+Codex:
+
+```bash
+codex plugin marketplace add Pyrito-ai/Pyrito-Reporting --ref main
+codex plugin add pyrito-reporting@pyrito-reporting
+```
+
+Start a fresh conversation after installation so the setup, weekly, and monthly
+workflows are discovered.
+
+### Migrate existing `clickt-reporting` installs
+
+The `clickt-reporting` marketplace identity remains available as a fail-closed command
+shim. It does not include a reporting engine and cannot publish a report by itself.
+
+1. Install `pyrito-reporting` from the canonical marketplace above.
+2. Replace `/clickt-reporting:report-setup`, `/clickt-reporting:report-weekly`, and
+   `/clickt-reporting:report-monthly` with the equivalent `/pyrito-reporting:...`
+   commands in saved prompts and scheduled routines.
+3. Confirm setup, weekly, and monthly discovery in a fresh conversation.
+4. Keep the shim enabled until every saved invocation has been checked.
+
+The shim is retained through the final no-stranding audit in PYR-73 and may retire only
+after separate human approval and the objective compatibility window in the release
+notes. Domain migration is explicitly deferred to a separate project; the current
+production hostname remains `reports.gethivemind.co`.
+
+### Set up what your chosen plugins need
+
    - *Deliverable plugins & the management suite*: Python 3 with `pip install openpyxl`;
      `google-ads-management` also needs `vl-convert-python==1.7.0` for its charts, and
      `cm3-profitability` needs `pip install python-pptx vl-convert-python==1.7.0`.
-   - *Hosted client reporting*: `clickt-reporting` needs **Node ≥18** and its data
-     source (Windsor.ai or the platform MCPs); no Python.
+   - *Hosted client reporting*: `pyrito-reporting` needs **Node ≥18**, access to
+     `Pyrito-ai/Pyrito-Reporting`, and its data source (Windsor.ai or the platform
+     MCPs); no Python. `clickt-reporting` is only a migration shim.
    - *Workflow plugins*: no Python required (exception: `orchestrator`'s checkout-guard
      hook wants `python3` on PATH, and fails open without it). Connect the MCP servers
      they use: Linear (project-coordinator, social-media-manager, morning-briefing,
@@ -109,7 +163,8 @@ servers.
 
 ## Requirements
 
-- **Claude Code** with plugin support.
+- **Claude Code** with plugin support for this marketplace. The canonical reporting
+  package also supports **Codex** through its own private Git marketplace.
 - **Deliverable plugins & the management suite, Python 3.** The HTML + markdown
   renderers are standard-library only; `openpyxl` (>=3.1) is needed for the xlsx
   workbooks. `google-ads-management` needs `vl-convert-python==1.7.0` for its static
