@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "issue": "PYR-112",
+  "subtreePath": "plugins/clickt-reporting",
+  "status": "frozen-unreferenced-recovery-snapshot",
+  "gitTreeOid": "5345123e4a5703822e1f9dce39d81f360b7724ba",
+  "fileCount": 34,
+  "files": {
+    ".claude-plugin/plugin.json": {
+      "mode": "100644",
+      "sha256": "3079a1629dba9c7815da3d6e589185a35cab2130f9659fcb8f35b27164908ad9"
+    },
+    "README.md": {
+      "mode": "100644",
+      "sha256": "3d7b901c393c08d299c194876c3b7c51ad1d45a538a91c5ebaf0ef85ac506e03"
+    },
+    "commands/report-monthly.md": {
+      "mode": "100644",
+      "sha256": "40a921beffec70acdf94b0f43ea40676ed6af8c51264dd65efba10d6397fa643"
+    },
+    "commands/report-setup.md": {
+      "mode": "100644",
+      "sha256": "ab74ecaa22b321099af5bda2689b90529fe76037cfacc9f68d2f3e6ab260a7cb"
+    },
+    "commands/report-weekly.md": {
+      "mode": "100644",
+      "sha256": "d017a50c33acd4d0a334504d02d871bc96c2f5c1768850992cfcfec3c73e61b3"
+    },
+    "skills/client-report-monthly/SKILL.md": {
+      "mode": "100644",
+      "sha256": "1776ff3efb0b8b47210dd684d0aa91081b1234a018f5df3e1c344a87824a6e42"
+    },
+    "skills/client-report-setup/SKILL.md": {
+      "mode": "100644",
+      "sha256": "22faf56e6b036f557a5f6a82ef18dc91fd651945c66d9de4a925f9d77c00f2af"
+    },
+    "skills/client-report-weekly/SKILL.md": {
+      "mode": "100644",
+      "sha256": "de8fde14b70bb1482526441ba6888c98a19c3a48a9920fb89f5bd36574a1e91e"
+    },
+    "templates/report-package/.gitignore": {
+      "mode": "100644",
+      "sha256": "998ddf17f55a2de6ef2cece208babf906bd1959a70f83f95ae5172080281817f"
+    },
+    "templates/report-package/RUNBOOK.md": {
+      "mode": "100644",
+      "sha256": "0a30ad278f65a09e887e422bc7d80e8ac7e2232810dcf80ea74256be72bd41c9"
+    },
+    "templates/report-package/config/client.example.json": {
+      "mode": "100644",
+      "sha256": "73b935df2a6114f78e4f161c3b201d144805611cf636fe2f7b1b455bccab38e8"
+    },
+    "templates/report-package/config/goals.example.json": {
+      "mode": "100644",
+      "sha256": "1bf6a7ccbd89cc54584ac9bfe593ffccff6c7246d4b9dafa203a3e748f7d06f2"
+    },
+    "templates/report-package/deploy/deploy.sh": {
+      "mode": "100755",
+      "sha256": "5da646aedbf7d078a78368b487e69221a92f89d89327e50fe504b998f91ff930"
+    },
+    "templates/report-package/template/adapters/ga4-windsor.md": {
+      "mode": "100644",
+      "sha256": "943934e9ac84d55b54d33eb3234a365c23b020ddeddee168c82d479ad7cedf74"
+    },
+    "templates/report-package/template/adapters/google-ads-mcp.md": {
+      "mode": "100644",
+      "sha256": "00acb8a3f0d92d6de75722e12e2a44d8e78adb9a33b97ed6c81279c4a7e3c1d7"
+    },
+    "templates/report-package/template/adapters/google-ads-windsor.md": {
+      "mode": "100644",
+      "sha256": "36be955285077cc2723c9ae44f847f74d6cb3888dd8f6fc66dc854e8382a894b"
+    },
+    "templates/report-package/template/adapters/meta-windsor.md": {
+      "mode": "100644",
+      "sha256": "a7f918bfedbedb7bd5b01db8adf1803e40b50c9be2a270d1f30645fc15101b53"
+    },
+    "templates/report-package/template/adapters/shopify-mcp.md": {
+      "mode": "100644",
+      "sha256": "34e304b98d3a55c367682ee2530352091ed25d33e7fe21214a1a253be3271398"
+    },
+    "templates/report-package/template/build-dist.mjs": {
+      "mode": "100644",
+      "sha256": "cf0f3b725475a5dbc1f75cdbc0711dd0e49a1541a2959877dcd2fc07b6ba5e22"
+    },
+    "templates/report-package/template/build.mjs": {
+      "mode": "100644",
+      "sha256": "c5b85f5c87d6ace07e99052fcd9bf295760c892a92e58fbb5ee6a74ab8d0fc03"
+    },
+    "templates/report-package/template/fixtures/make-fixtures.mjs": {
+      "mode": "100644",
+      "sha256": "ac05f73a8d1ce514843e2b359b7d6be782930bf2bfda687cd04c49e3c1b90877"
+    },
+    "templates/report-package/template/partials/charts.mjs": {
+      "mode": "100644",
+      "sha256": "7a4a608b28580b65379bbe6ab19ac19b7d43ee90ed1c274d333097b6cba906f7"
+    },
+    "templates/report-package/template/partials/components.mjs": {
+      "mode": "100644",
+      "sha256": "6de4d3299b1108ffbc3b2ad0f49a076af80ce1ce5606390acf29fd16d542759e"
+    },
+    "templates/report-package/template/partials/derive.mjs": {
+      "mode": "100644",
+      "sha256": "99e99f8e31b16e2a8d0f81ab7a94308836234ec4eff38552c60f7f1079cc5308"
+    },
+    "templates/report-package/template/partials/fmt.mjs": {
+      "mode": "100644",
+      "sha256": "a253340d337bb6de8d60b041607bfb6a814d9b3fae0920d48479d98ecbf96357"
+    },
+    "templates/report-package/template/partials/goals-editor.js": {
+      "mode": "100644",
+      "sha256": "22880f2f3ec4ddabe25d3a6b54cf1cd8af04c043469f9d8c8ac4fdb1392771ad"
+    },
+    "templates/report-package/template/partials/goals-tab.mjs": {
+      "mode": "100644",
+      "sha256": "c211d6f7da77e474f3d904688d55b55b2e1b5fc8eade9b14b0f6e7050b263e77"
+    },
+    "templates/report-package/template/partials/monthly.mjs": {
+      "mode": "100644",
+      "sha256": "53622c7b1220b765260b22f7d5138b751b5262a2b1749665b97407af7fed8fff"
+    },
+    "templates/report-package/template/partials/runtime.js": {
+      "mode": "100644",
+      "sha256": "f7aeae918d800a28837de3879539eecd73daaf393645f756add1604602ef1892"
+    },
+    "templates/report-package/template/partials/styles.css": {
+      "mode": "100644",
+      "sha256": "d08d969cd3cb2eb1fe73c5306239d6c5255f04dfdb707eba0e9e829c474399e5"
+    },
+    "templates/report-package/template/partials/weekly.mjs": {
+      "mode": "100644",
+      "sha256": "40b1a9718324177ac1d13dde51272d0f8c5a2e1d56cdcc15d9216acc8e1cb426"
+    },
+    "templates/report-package/template/schema/CONTRACT.md": {
+      "mode": "100644",
+      "sha256": "261132833ed0e5dae47c21c66e949dd64c2d0eb661d3a24c1f4f88816eec49e7"
+    },
+    "templates/report-package/template/schema/GOALS.md": {
+      "mode": "100644",
+      "sha256": "5defbe31d90c1054ea4676f58edaec8ac5569cacd6f63daaacdf4a4734483f7b"
+    },
+    "templates/report-package/template/validate.mjs": {
+      "mode": "100644",
+      "sha256": "d4fcdf78bf77544ae3e8c2e8d68dd6fe9e6798aa58d86b4aa6315b0065cdae00"
+    }
+  },
+  "retirementGate": {
+    "issue": "PYR-73",
+    "requiresSeparateHumanApproval": true
+  },
+  "notes": "Preserved byte-for-byte from the pre-PYR-66 downstream engine. Unreferenced by any active marketplace entry; both pyrito-reporting and clickt-reporting resolve to the pinned canonical release dcb19312a1285bcbf0f2db2d1309919f39789997. Do not edit, delete, activate, publish, or install this subtree."
+}
